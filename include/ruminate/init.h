@@ -3,10 +3,13 @@
 
 #include <glib.h>
 
+struct _RDebugger;
+typedef struct _RDebugger RDebugger;
+
 G_BEGIN_DECLS
 
-void ruminate_initialize();
-void ruminate_terminate();
+RDebugger *r_debugger_new( GError **err );
+void r_debugger_delete( RDebugger *rum );
 
 G_END_DECLS
 

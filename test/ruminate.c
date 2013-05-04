@@ -15,17 +15,34 @@ void die_if_error( GError *err ) {
 }
 
 int main( int argc, char *argv[] ) {
+#if 0
+	if( argc != 2 ) {
+		fprintf(stderr, "Usage: %s type\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 	GError *err = NULL;
+	RDebugger *ruminate = r_debugger_new(&err);
 
-	ruminate_initialize();
-
+#if 0
+	GError *err = NULL;
 	Rumination *rum = rumination_new(argv[0], &err);
 	die_if_error(err);
-
-	rumination_gettype(rum, argv[1], &err);
+	Type *type = rumination_find_type(rum, argv[1], &err);
 	die_if_error(err);
 
-	rumination_delete(&rum);
+	if( type != NULL ) {
+		printf("%s\n", type_name(type));
 
-	ruminate_terminate();
+		type_delete(&type);
+	} else {
+		printf("Type '%s' not found\n", argv[1]);
+	}
+
+	rumination_get_type(rum, argv, &err);
+
+	rumination_delete(&rum);
+#endif
+	r_debugger_delete(ruminate);
 }
