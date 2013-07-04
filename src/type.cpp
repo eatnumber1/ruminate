@@ -28,9 +28,7 @@ const char *type_name( Type *type ) {
 	return type->proxy->getName().c_str();
 }
 
-G_END_DECLS
-
-Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
+Type *type_new( Ruminate::TypePrx &proxy, GError **err ) {
 	Type *ret = g_slice_new(Type);
 	new (ret) Type();
 
@@ -38,3 +36,5 @@ Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 
 	return ret;
 }
+
+G_END_DECLS

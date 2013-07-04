@@ -3,4 +3,10 @@
 #include <Ice/Ice.h>
 #include "ice/type.h"
 
-Type *type_new( Ruminate::TypePrx &type, GError **err );
+#include <glib.h>
+
+G_BEGIN_DECLS
+
+Type *type_new( Ruminate::TypePrx &, GError **err );
+
+G_END_DECLS
