@@ -2,7 +2,6 @@
 #define _RUMINATE_RUMINATION_H_
 
 #include "ruminate/type.h"
-#include "ruminate/rdebugger.h"
 
 #include <glib.h>
 
@@ -12,7 +11,7 @@ typedef struct Rumination Rumination;
 G_BEGIN_DECLS
 
 void rumination_delete( Rumination **rum );
-Rumination *rumination_new( RDebugger *debugger, const char *exename, GError **err );
+Rumination *rumination_new( int *argc, char *argv[], GError **err );
 
 void rumination_begin_get_type_by_variable_name( Rumination *rum, const char *varname, GError **err );
 Type *rumination_end_get_type_by_variable_name( Rumination *rum, GError **err );

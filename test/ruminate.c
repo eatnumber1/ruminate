@@ -23,9 +23,7 @@ int main( int argc, char *argv[] ) {
 #endif
 
 	GError *err = NULL;
-	RDebugger *ruminate = r_debugger_new(&argc, argv, &err);
-
-	Rumination *rum = rumination_new(ruminate, argv[0], &err);
+	Rumination *rum = rumination_new(&argc, argv, &err);
 	die_if_error(err);
 
 	Type *type = rumination_get_type(rum, &die_if_error, &err);
@@ -41,6 +39,4 @@ int main( int argc, char *argv[] ) {
 	}
 
 	rumination_delete(&rum);
-
-	r_debugger_delete(ruminate);
 }

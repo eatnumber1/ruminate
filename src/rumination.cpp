@@ -1,11 +1,11 @@
 #include "private/gettid.h"
-#include "private/rdebugger.h"
 #include "private/type.h"
 
 #include "ruminate/rumination.h"
 #include "ruminate/errors.h"
 
 #include <Ice/Ice.h>
+#include "ice/debugger_factory.h"
 #include "ice/debugger.h"
 #include "ice/type.h"
 
@@ -16,6 +16,8 @@
 #define die_unless(...)
 
 struct Rumination {
+	Ice::CommunicatorPtr communicator;
+	Ruminate::DebuggerFactoryPrx factory;
 	Ruminate::DebuggerPrx debugger;
 	Ice::AsyncResultPtr arp;
 	// TODO: Deal with bad states
@@ -29,17 +31,22 @@ void rumination_hit_breakpoint() {
 	asm("");
 }
 
-Rumination *rumination_new( RDebugger *debugger, const char *exename, GError **err ) {
+Rumination *rumination_new( int *argc, char *argv[], GError **err ) {
 	Rumination *ret = new Rumination();
+	ret->communicator = Ice::initialize(*argc, argv);
+	auto factory_proxy = ret->communicator->stringToProxy("DebuggerFactory:default -p 1024");
+	ret->factory = Ruminate::DebuggerFactoryPrx::checkedCast(factory_proxy);
+	die_unless(ret->factory);
+
 	Ruminate::DebuggerFactoryOptions opts;
 
-	opts.exename = exename;
+	opts.exename = argv[0];
 	static_assert(sizeof(::Ice::Long) >= sizeof(pid_t), "A pid cannot fit in a long!");
 	opts.pid = getpid();
 	static_assert(sizeof(::Ice::Long) >= sizeof(size_t), "A pointer cannot fit in a long!");
 	opts.breakpointAddress = (::Ice::Long) &rumination_hit_breakpoint;
 
-	ret->debugger = rdebugger_get_factory(debugger)->create(opts);
+	ret->debugger = ret->factory->create(opts);
 	die_unless(ret->debugger);
 
 	return ret;
@@ -47,7 +54,10 @@ Rumination *rumination_new( RDebugger *debugger, const char *exename, GError **e
 
 void rumination_delete( Rumination **rum ) {
 	if( rum == NULL ) return;
-	delete *rum;
+	Rumination *r = *rum;
+	r->factory->shutdown();
+	r->communicator->destroy();
+	delete r;
 	*rum = NULL;
 }
 
