@@ -8,7 +8,7 @@ typedef struct _RDebugger RDebugger;
 
 G_BEGIN_DECLS
 
-RDebugger *r_debugger_new( int argc, char *argv[], GError **err );
+RDebugger *r_debugger_new( int *argc, char *argv[], GError **err );
 void r_debugger_delete( RDebugger *rum );
 
 void r_debugger_get_type_by_variable_name( const char *name );

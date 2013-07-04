@@ -2,6 +2,7 @@
 #define _RUMINATE_RUMINATION_H_
 
 #include "ruminate/type.h"
+#include "ruminate/rdebugger.h"
 
 #include <glib.h>
 

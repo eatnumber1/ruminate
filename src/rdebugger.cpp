@@ -31,12 +31,12 @@ static void die( const char *fn, int line ) {
 
 G_BEGIN_DECLS
 
-RDebugger *r_debugger_new( int argc, char *argv[], GError **err ) {
+RDebugger *r_debugger_new( int *argc, char *argv[], GError **err ) {
 	// TODO: Handle errors properly
 	try {
 		RDebugger *ret = new RDebugger();
 
-		ret->communicator = Ice::initialize(argc, argv);
+		ret->communicator = Ice::initialize(*argc, argv);
 		ret->factory = DebuggerFactoryPrx::checkedCast(ret->communicator->stringToProxy("DebuggerFactory:default -p 1024"));
 		die_unless(ret->factory);
 
