@@ -11,7 +11,7 @@ typedef struct Rumination Rumination;
 G_BEGIN_DECLS
 
 void rumination_delete( Rumination **rum );
-Rumination *rumination_new( const char *exename, GError **err );
+Rumination *rumination_new( RDebugger *debugger, const char *exename, GError **err );
 
 Type *rumination_get_type_by_local_variable( Rumination *rum, const char *varname, GError **err );
 

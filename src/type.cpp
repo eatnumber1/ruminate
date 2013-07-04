@@ -13,14 +13,7 @@ struct Type {
 	Ruminate::TypePrx proxy;
 };
 
-Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
-	Type *ret = g_slice_new(Type);
-	new (ret) Type();
-
-	ret->proxy = proxy;
-
-	return ret;
-}
+G_BEGIN_DECLS
 
 void type_delete( Type **type ) {
 	g_return_if_fail(type != NULL && *type != NULL);
@@ -33,4 +26,15 @@ void type_delete( Type **type ) {
 
 const char *type_name( Type *type ) {
 	return type->proxy->getName().c_str();
+}
+
+G_END_DECLS
+
+Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
+	Type *ret = g_slice_new(Type);
+	new (ret) Type();
+
+	ret->proxy = proxy;
+
+	return ret;
 }

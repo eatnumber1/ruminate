@@ -19,6 +19,8 @@ struct Rumination {
 	Ruminate::DebuggerPrx debugger;
 };
 
+G_BEGIN_DECLS
+
 __attribute__((noinline))
 static void gettype_breakpoint_fn() {
 	// We try really hard to not be optimized away.
@@ -53,3 +55,5 @@ Type *rumination_get_type_by_local_variable( Rumination *rum, const char *varnam
 	Ruminate::TypePrx t = rum->debugger->end_getTypeByVariableName(arp);
 	return type_new(t, err);
 }
+
+G_END_DECLS

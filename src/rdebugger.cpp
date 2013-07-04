@@ -29,7 +29,7 @@ static void die( const char *fn, int line ) {
 #define die() die(__FILE__, __LINE__)
 #define die_unless(cond) if( !cond ) { die(); } else {}
 
-// TODO: Reference count an internal ref to the DebuggerFactoryPrx
+G_BEGIN_DECLS
 
 RDebugger *r_debugger_new( int argc, char *argv[], GError **err ) {
 	// TODO: Handle errors properly
@@ -59,6 +59,8 @@ void r_debugger_delete( RDebugger *debugger ) {
 	debugger->communicator->destroy();
 	delete debugger;
 }
+
+G_END_DECLS
 
 Ruminate::DebuggerFactoryPrx &rdebugger_get_factory( RDebugger *debugger ) {
 	return debugger->factory;
