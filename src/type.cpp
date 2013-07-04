@@ -28,7 +28,7 @@ const char *type_name( Type *type ) {
 	return type->proxy->getName().c_str();
 }
 
-Type *type_new( Ruminate::TypePrx &proxy, GError **err ) {
+Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 	Type *ret = g_slice_new(Type);
 	new (ret) Type();
 

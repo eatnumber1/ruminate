@@ -17,12 +17,14 @@
 
 struct Rumination {
 	Ruminate::DebuggerPrx debugger;
+	Ice::AsyncResultPtr arp;
+	// TODO: Deal with bad states
 };
 
 G_BEGIN_DECLS
 
 __attribute__((noinline))
-static void gettype_breakpoint_fn() {
+void rumination_hit_breakpoint() {
 	// We try really hard to not be optimized away.
 	asm("");
 }
@@ -35,7 +37,7 @@ Rumination *rumination_new( RDebugger *debugger, const char *exename, GError **e
 	static_assert(sizeof(::Ice::Long) >= sizeof(pid_t), "A pid cannot fit in a long!");
 	opts.pid = getpid();
 	static_assert(sizeof(::Ice::Long) >= sizeof(size_t), "A pointer cannot fit in a long!");
-	opts.breakpointAddress = (::Ice::Long) &gettype_breakpoint_fn;
+	opts.breakpointAddress = (::Ice::Long) &rumination_hit_breakpoint;
 
 	ret->debugger = rdebugger_get_factory(debugger)->create(opts);
 	die_unless(ret->debugger);
@@ -49,10 +51,14 @@ void rumination_delete( Rumination **rum ) {
 	*rum = NULL;
 }
 
-Type *rumination_get_type_by_local_variable( Rumination *rum, const char *varname, GError **err ) {
-	Ice::AsyncResultPtr arp = rum->debugger->begin_getTypeByVariableName(varname, gettid());
-	gettype_breakpoint_fn();
-	Ruminate::TypePrx t = rum->debugger->end_getTypeByVariableName(arp);
+
+void rumination_begin_get_type_by_variable_name( Rumination *rum, const char *varname, GError **err ) {
+	rum->arp = rum->debugger->begin_getTypeByVariableName(varname, gettid());
+}
+
+Type *rumination_end_get_type_by_variable_name( Rumination *rum, GError **err ) {
+	Ruminate::TypePrx t(rum->debugger->end_getTypeByVariableName(rum->arp));
+	rum->arp = NULL;
 	return type_new(t, err);
 }
 
