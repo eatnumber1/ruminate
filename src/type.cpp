@@ -1,36 +1,23 @@
-#include "ruminate/type.h"
 #include "private/type.h"
 
 #include "ruminate/errors.h"
 
-#include <lldb/API/LLDB.h>
+#include <Ice/Ice.h>
+#include "ice/type.h"
+
 #include <glib.h>
 
 #include <exception>
 
-using namespace lldb;
-
 struct Type {
-	SBType sb;
+	Ruminate::TypePrx proxy;
 };
 
-Type *type_new( SBType &type, GError **err ) {
+Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 	Type *ret = g_slice_new(Type);
 	new (ret) Type();
 
-	ret->sb = type;
-
-	if( !ret->sb.IsValid() ) {
-		g_set_error(
-			err,
-			RUMINATE_ERROR,
-			RUMINATE_ERROR_SB_INVALID,
-			"SBType instance invalid"
-		);
-		ret->~Type();
-		g_slice_free(Type, ret);
-		return NULL;
-	}
+	ret->proxy = proxy;
 
 	return ret;
 }
@@ -45,5 +32,5 @@ void type_delete( Type **type ) {
 }
 
 const char *type_name( Type *type ) {
-	return type->sb.GetName();
+	return type->proxy->getName().c_str();
 }

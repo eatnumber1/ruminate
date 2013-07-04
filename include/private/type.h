@@ -1,8 +1,6 @@
-#include <lldb/API/LLDB.h>
-#include <glib.h>
+#include "ruminate/type.h"
 
-G_BEGIN_DECLS
+#include <Ice/Ice.h>
+#include "ice/type.h"
 
-Type *type_new( lldb::SBType &type, GError **err );
-
-G_END_DECLS
+Type *type_new( Ruminate::TypePrx &type, GError **err );

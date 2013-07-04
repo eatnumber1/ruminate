@@ -25,11 +25,11 @@ int main( int argc, char *argv[] ) {
 	GError *err = NULL;
 	RDebugger *ruminate = r_debugger_new(&err);
 
-#if 0
-	GError *err = NULL;
 	Rumination *rum = rumination_new(argv[0], &err);
 	die_if_error(err);
-	Type *type = rumination_find_type(rum, argv[1], &err);
+
+	Type *type = rumination_get_type(rum, &die_if_error, &err);
+	//Type *type = rumination_get_type(rum, 1 + 1, &err);
 	die_if_error(err);
 
 	if( type != NULL ) {
@@ -40,9 +40,7 @@ int main( int argc, char *argv[] ) {
 		printf("Type '%s' not found\n", argv[1]);
 	}
 
-	rumination_get_type(rum, argv, &err);
-
 	rumination_delete(&rum);
-#endif
+
 	r_debugger_delete(ruminate);
 }

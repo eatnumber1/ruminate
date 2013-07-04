@@ -1,4 +1,4 @@
-SRC_SOURCES := init.cpp gettid.c
+SRC_SOURCES := rdebugger.cpp rumination.cpp type.cpp gettid.c
 SRC_SOURCES := $(SRC_SOURCES:%=$(CURDIR)/%)
 
 SRC_OBJECTS := $(SRC_SOURCES:.c=.o)

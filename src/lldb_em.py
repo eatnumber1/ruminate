@@ -41,7 +41,8 @@ class LLDBEventMachine(threading.Thread):
 
 	def shutdown(self):
 		self.shutdownRequested = True
-		self.join()
+		if threading.currentThread() != self:
+			self.join()
 
 	def getProcess(self):
 		return self.process

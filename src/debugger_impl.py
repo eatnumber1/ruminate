@@ -31,27 +31,43 @@ class DebuggerImpl(Debugger):
 				err
 			))
 			validate(err)
-			unix_signals = validate(self.process.GetUnixSignals())
-			for sig in unix_signals.signals:
-				unix_signals.SetShouldSuppress(sig, False)
-				unix_signals.SetShouldStop(sig, False)
-				unix_signals.SetShouldNotify(sig, False)
 			return self.process
 
 		self.em = LLDBEventMachine(procgen)
 
+		running = threading.Event()
+		def onRunning(event):
+			print("onRunning")
+			self.em.removeCallback(lldb.eStateRunning, onRunning)
+			running.set()
+		self.em.addCallback(lldb.eStateRunning, onRunning)
+
 		def onStopped(event):
+			print("onStopped")
 			self.em.removeCallback(lldb.eStateStopped, onStopped)
-			SBProcess.GetProcessFromEvent(event).Continue()
+
+			process = SBProcess.GetProcessFromEvent(event)
+
+			unix_signals = validate(process.GetUnixSignals())
+			# This may not need to be here, we might be able to put it
+			# outside the onStopped func
+			for sig in unix_signals.signals:
+				unix_signals.SetShouldSuppress(sig, False)
+				unix_signals.SetShouldStop(sig, False)
+				unix_signals.SetShouldNotify(sig, False)
+
+			process.Continue()
 		self.em.addCallback(lldb.eStateStopped, onStopped)
 
 		def doShutdown(event):
-			print("doShutdown(" + str(event) + ")")
+			print("doShutdown(" + getDescription(event) + ")")
 			shutdown()
 		self.em.addCallback(lldb.eStateCrashed, doShutdown)
 		self.em.addCallback(lldb.eStateExited, doShutdown)
 
 		self.em.begin()
+		running.wait()
+		print("__init__: end")
 
 	def shutdown(self):
 		self.em.shutdown()
