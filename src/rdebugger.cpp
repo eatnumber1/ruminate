@@ -1,6 +1,5 @@
 #include "private/rdebugger.h"
 
-#include "ruminate/rdebugger.h"
 #include "ruminate/errors.h"
 
 #include <Ice/Ice.h>
