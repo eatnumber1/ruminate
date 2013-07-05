@@ -23,10 +23,10 @@ int main( int argc, char *argv[] ) {
 #endif
 
 	GError *err = NULL;
-	Rumination *rum = rumination_new(&argc, argv, &err);
+	rumination_init(&argc, argv, &err);
 	die_if_error(err);
 
-	Type *type = rumination_get_type(rum, &die_if_error, &err);
+	Type *type = rumination_get_type(&die_if_error, &err);
 	//Type *type = rumination_get_type(rum, 1 + 1, &err);
 	die_if_error(err);
 
@@ -37,6 +37,4 @@ int main( int argc, char *argv[] ) {
 	} else {
 		printf("Type '%s' not found\n", argv[1]);
 	}
-
-	rumination_delete(&rum);
 }
