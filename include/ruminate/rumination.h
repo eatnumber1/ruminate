@@ -5,6 +5,8 @@
 
 #include <glib.h>
 
+#include <stdbool.h>
+
 G_BEGIN_DECLS
 
 bool rumination_destroy( GError **err );
