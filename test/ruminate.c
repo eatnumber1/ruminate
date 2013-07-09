@@ -6,6 +6,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+typedef struct foo {
+	int bar;
+	char *baz;
+} foo;
+
 void die_if_error( GError *err ) {
 	if( err == NULL ) return;
 
@@ -15,26 +20,39 @@ void die_if_error( GError *err ) {
 }
 
 int main( int argc, char *argv[] ) {
-#if 0
-	if( argc != 2 ) {
-		fprintf(stderr, "Usage: %s type\n", argv[0]);
-		exit(EXIT_FAILURE);
-	}
-#endif
-
 	GError *err = NULL;
 	rumination_init(&argc, argv, &err);
 	die_if_error(err);
 
-	Type *type = rumination_get_type(&die_if_error, &err);
-	//Type *type = rumination_get_type(rum, 1 + 1, &err);
+	struct foo f = {
+		.bar = 1,
+		.baz = "hello"
+	};
+
+	Type *type = rumination_get_type(f, &err);
 	die_if_error(err);
 
-	if( type != NULL ) {
-		printf("%s\n", type_name(type));
+	StructType *st = type_as_struct(type, &err);
+	die_if_error(err);
+	type_unref(type);
 
-		type_delete(&type);
-	} else {
-		printf("Type '%s' not found\n", argv[1]);
+	printf("%s\n", st->type.name);
+
+	printf("{");
+	for( size_t i = 0; i < st->nfields; i++ ) {
+		StructMember *member = struct_type_field_at_index(st, i, &err);
+		die_if_error(err);
+		printf("\"%s\":", member->name);
+		switch( member->type->id ) {
+			case TYPE_CLASS_BUILTIN:
+				printf("\"builtin\"");
+				break;
+			default:
+				printf("\"unknown\"");
+		}
+		struct_member_unref(member);
 	}
+	printf("}\n");
+
+	type_unref((Type *) st);
 }
