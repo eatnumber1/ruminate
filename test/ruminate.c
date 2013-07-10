@@ -5,11 +5,14 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
-typedef struct foo {
-	int bar;
-	char *baz;
-} foo;
+typedef char *string;
+
+struct __attribute__((packed)) foo {
+	short bar;
+	string baz;
+};
 
 void die_if_error( GError *err ) {
 	if( err == NULL ) return;
@@ -17,6 +20,19 @@ void die_if_error( GError *err ) {
 	fprintf(stderr, "%s\n", err->message);
 
 	exit(EXIT_FAILURE);
+}
+
+static void print_basic_type_value( BasicTypeIdentifier id, void *data ) {
+	switch( id ) {
+		case BASIC_TYPE_INT:
+			printf("%d", *((int *) data));
+			break;
+		case BASIC_TYPE_SHORT:
+			printf("%hd", *((short *) data));
+			break;
+		default:
+			printf("\"unknown basic type\"");
+	}
 }
 
 int main( int argc, char *argv[] ) {
@@ -44,13 +60,26 @@ int main( int argc, char *argv[] ) {
 		die_if_error(err);
 		printf("\"%s\":", member->name);
 		switch( member->type->id ) {
-			case TYPE_CLASS_BUILTIN:
-				printf("\"builtin\"");
+			case TYPE_CLASS_BUILTIN: {
+				BasicType *bt = type_as_basic(member->type, &err);
+				die_if_error(err);
+				print_basic_type_value(bt->id, &f + member->offset);
+				type_unref((Type *) bt);
 				break;
-			default:
-				printf("\"unknown\"");
+			}
+			case TYPE_CLASS_TYPEDEF: {
+				if( strcmp(member->type->name, "string") == 0 ) {
+					printf("\"%s\"", *((char **) (((uint8_t *) &f) + member->offset)));
+					break;
+				}
+				// Fallthrough
+			}
+			default: {
+				printf("\"unknown type '%s' with id %d\"", member->type->name, member->type->id);
+			}
 		}
 		struct_member_unref(member);
+		if( i != st->nfields - 1 ) printf(",");
 	}
 	printf("}\n");
 

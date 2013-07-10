@@ -13,7 +13,7 @@
 #endif
 
 // Shamelessly copied & modified from lldb-enumerations.h
-typedef enum {
+typedef enum TypeIdentifier {
 	TYPE_CLASS_INVALID           = (0u),
 	TYPE_CLASS_ARRAY             = (1u << 0),
 	TYPE_CLASS_BLOCKPOINTER      = (1u << 1),
@@ -39,6 +39,42 @@ typedef enum {
 	TYPE_CLASS_ANY               = (0xffffffffu)
 } TypeIdentifier;
 
+typedef enum BasicTypeIdentifier {
+	BASIC_TYPE_INVALID = 0,
+	BASIC_TYPE_VOID = 1,
+	BASIC_TYPE_CHAR,
+	BASIC_TYPE_SIGNEDCHAR,
+	BASIC_TYPE_UNSIGNEDCHAR,
+	BASIC_TYPE_WCHAR,
+	BASIC_TYPE_SIGNEDWCHAR,
+	BASIC_TYPE_UNSIGNEDWCHAR,
+	BASIC_TYPE_CHAR16,
+	BASIC_TYPE_CHAR32,
+	BASIC_TYPE_SHORT,
+	BASIC_TYPE_UNSIGNEDSHORT,
+	BASIC_TYPE_INT,
+	BASIC_TYPE_UNSIGNEDINT,
+	BASIC_TYPE_LONG,
+	BASIC_TYPE_UNSIGNEDLONG,
+	BASIC_TYPE_LONGLONG,
+	BASIC_TYPE_UNSIGNEDLONGLONG,
+	BASIC_TYPE_INT128,
+	BASIC_TYPE_UNSIGNEDINT128,
+	BASIC_TYPE_BOOL,
+	BASIC_TYPE_HALF,
+	BASIC_TYPE_FLOAT,
+	BASIC_TYPE_DOUBLE,
+	BASIC_TYPE_LONGDOUBLE,
+	BASIC_TYPE_FLOATCOMPLEX,
+	BASIC_TYPE_DOUBLECOMPLEX,
+	BASIC_TYPE_LONGDOUBLECOMPLEX,
+	BASIC_TYPE_OBJCID,
+	BASIC_TYPE_OBJCCLASS,
+	BASIC_TYPE_OBJCSEL,
+	BASIC_TYPE_NULLPTR,
+	BASIC_TYPE_OTHER
+} BasicTypeIdentifier;
+
 typedef struct Type {
 	const char *name;
 	size_t size;
@@ -58,6 +94,11 @@ typedef struct StructMember {
 	void *priv;
 } StructMember;
 
+typedef struct BasicType {
+	Type type;
+	BasicTypeIdentifier id;
+} BasicType;
+
 G_BEGIN_DECLS
 
 void type_unref( Type * );
@@ -66,8 +107,7 @@ void type_ref( Type * );
 void struct_member_ref( StructMember * );
 void struct_member_unref( StructMember * );
 
-Type *type_basic( Type *, GError ** );
-
+BasicType *type_as_basic( Type *, GError ** );
 StructType *type_as_struct( Type *, GError ** );
 StructMember *struct_type_field_at_index( StructType *, size_t, GError ** );
 

@@ -10,6 +10,7 @@ module Ruminate {
 
 		idempotent int lldbGetTypeClass();
 		idempotent int lldbGetNumberOfFields();
+		idempotent int lldbGetBasicType();
 
 		Type *lldbGetFieldAtIndex( int index );
 		idempotent long lldbGetOffsetInBytes();

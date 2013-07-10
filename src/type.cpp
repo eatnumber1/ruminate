@@ -52,6 +52,8 @@ void type_unref( Type *type ) {
 		tp.~TypePrivate();
 		g_slice_free(TypePrivate, &tp);
 
+		g_free((char *) type->name);
+
 		switch( type->id ) {
 			case TYPE_CLASS_STRUCT: {
 				StructType *st = (StructType *) type;
@@ -80,6 +82,10 @@ Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 			ret = (Type *) g_slice_new(StructType);
 			new (ret) StructType();
 			break;
+		case TYPE_CLASS_BUILTIN:
+			ret = (Type *) g_slice_new(BasicType);
+			new (ret) BasicType();
+			break;
 		default:
 			ret = g_slice_new(Type);
 			new (ret) Type();
@@ -106,12 +112,18 @@ Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 	ret->size = size;
 
 	ret->id = id;
-	ret->name = proxy->getName().c_str();
+	ret->name = g_strdup(proxy->getName().c_str());
 
 	switch( ret->id ) {
 		case TYPE_CLASS_STRUCT: {
 			StructType *st = (StructType *) ret;
 			st->nfields = proxy->lldbGetNumberOfFields();
+			break;
+		}
+		case TYPE_CLASS_BUILTIN: {
+			BasicType *bt = (BasicType *) ret;
+			static_assert(sizeof(BasicTypeIdentifier) <= sizeof(uint32_t), "A BasicTypeIdentifier cannot fit within a uint32_t");
+			bt->id = (BasicTypeIdentifier) proxy->lldbGetBasicType();
 			break;
 		}
 		default:
@@ -121,8 +133,22 @@ Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 	return ret;
 }
 
-Type *type_basic( Type *type, GError **err ) {
-	return type_new(TYPE_PTR_PRIV(type).proxy->getBasicType(), err);
+BasicType *type_as_basic( Type *type, GError **err ) {
+	BasicType *bt;
+	switch( type->id ) {
+		case TYPE_CLASS_BUILTIN:
+			type_ref(type);
+			bt = (BasicType *) type;
+			break;
+		default: {
+			// TODO: Errors
+			Type *_bt = type_new(TYPE_PTR_PRIV(type).proxy->getBasicType(), err);
+			g_assert(_bt->id == TYPE_CLASS_BUILTIN);
+			// TODO: Errors
+			bt = type_as_basic(_bt, err);
+		}
+	}
+	return bt;
 }
 
 StructType *type_as_struct( Type *type, GError **err ) {
@@ -143,6 +169,7 @@ void struct_member_unref( StructMember *sm ) {
 		type_unref(sm->type);
 		smp.~StructMemberPrivate();
 		g_slice_free(StructMemberPrivate, sm->priv);
+		g_free((char *) sm->name);
 		sm->~StructMember();
 		g_slice_free(StructMember, sm);
 	}
@@ -173,7 +200,7 @@ StructMember *struct_type_field_at_index( StructType *type, size_t idx, GError *
 	ret->type = type_new(priv->proxy->lldbGetType(), err);
 	if( ret->type == NULL ) goto out_type_new;
 
-	ret->name = priv->proxy->getName().c_str();
+	ret->name = g_strdup(priv->proxy->getName().c_str());
 
 	ret->priv = priv;
 

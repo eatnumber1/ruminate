@@ -8,7 +8,7 @@ class TypeImpl(Type):
 		return self.sbtype.GetName()
 
 	def getBasicType(self, current = None):
-		return self.sbtype.GetBasicType(self.sbtype.GetBasicType())
+		return TypePrx.uncheckedCast(current.adapter.addWithUUID(TypeImpl(self.sbtype.GetBasicType(self.sbtype.GetBasicType()))))
 
 	def getSize(self, current = None):
 		return self.sbtype.GetByteSize()
@@ -27,3 +27,6 @@ class TypeImpl(Type):
 
 	def lldbGetType(self, current = None):
 		return TypePrx.uncheckedCast(current.adapter.addWithUUID(TypeImpl(self.sbtype.GetType())))
+
+	def lldbGetBasicType(self, current = None):
+		return self.sbtype.GetBasicType()
