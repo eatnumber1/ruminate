@@ -141,11 +141,24 @@ BasicType *type_as_basic( Type *type, GError **err ) {
 			bt = (BasicType *) type;
 			break;
 		default: {
-			// TODO: Errors
-			Type *_bt = type_new(TYPE_PTR_PRIV(type).proxy->getBasicType(), err);
-			g_assert(_bt->id == TYPE_CLASS_BUILTIN);
-			// TODO: Errors
+			TypePrivate priv = TYPE_PTR_PRIV(type);
+			if( priv.proxy->lldbGetBasicType() == BASIC_TYPE_INVALID ) {
+				g_set_error(
+					err,
+					RUMINATE_ERROR,
+					RUMINATE_ERROR_NO_BASIC_TYPE,
+					"No basic type found for type \"%s\"",
+					type->name
+				);
+				return NULL;
+			}
+
+			Type *_bt = type_new(priv.proxy->getBasicType(), err);
+			if( _bt == NULL ) return NULL;
+
 			bt = type_as_basic(_bt, err);
+			type_unref(_bt);
+			if( _bt == NULL ) return NULL;
 		}
 	}
 	return bt;
