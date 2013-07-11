@@ -6,13 +6,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+
+#define print_json_for_type(expr, err) ({ \
+	GError **_err = (err); \
+	typeof(expr) __expr = (expr); \
+	Type *_type = rumination_get_type(__expr, _err); \
+	bool ret = _type == NULL ? false : _print_json_for_type(_type, &__expr, _err); \
+	type_unref(_type); \
+	ret; \
+})
 
 typedef char *string;
 
-struct __attribute__((packed)) foo {
-	short bar;
-	string baz;
-};
+typedef struct __attribute__((packed)) MyStruct {
+	short a_short;
+	string a_string;
+	struct {
+		int an_int;
+	} a_struct;
+} MyTypedef;
 
 void die_if_error( GError *err ) {
 	if( err == NULL ) return;
@@ -22,17 +35,106 @@ void die_if_error( GError *err ) {
 	exit(EXIT_FAILURE);
 }
 
-static void print_basic_type_value( BasicTypeIdentifier id, void *data ) {
-	switch( id ) {
-		case BASIC_TYPE_INT:
+static bool _print_json_for_primitive( Type *type, void *data, GError **err ) {
+	PrimitiveType *pt = type_as_primitive(type, err);
+	if( pt == NULL ) return false;
+
+	switch( pt->id ) {
+		case PRIMITIVE_TYPE_INT:
 			printf("%d", *((int *) data));
 			break;
-		case BASIC_TYPE_SHORT:
+		case PRIMITIVE_TYPE_SHORT:
 			printf("%hd", *((short *) data));
 			break;
+		case PRIMITIVE_TYPE_CHAR:
+			printf("%c", *((char *) data));
+			break;
+		case PRIMITIVE_TYPE_SIGNEDCHAR:
+			printf("%hhd", *((signed char *) data));
+			break;
+		case PRIMITIVE_TYPE_UNSIGNEDCHAR:
+			printf("%hhu", *((unsigned char *) data));
+			break;
 		default:
-			printf("\"unknown basic type\"");
+			printf("\"unknown primitive type\"");
 	}
+
+	type_unref((Type *) pt);
+	return true;
+}
+
+static bool _print_json_for_type( Type *type, void *data, GError **err );
+
+static bool _print_json_for_struct( Type *type, void *data, GError **err ) {
+	StructType *st = type_as_struct(type, err);
+	if( st == NULL ) goto out_type_as_struct;
+
+	printf("{");
+	for( size_t i = 0; i < st->nfields; i++ ) {
+		StructMember *member = struct_type_field_at_index(st, i, err);
+		if( member == NULL ) goto out_struct_type_field_at_index;
+
+		printf("\"%s\":", member->name);
+
+		bool ret = _print_json_for_type(
+			member->type,
+			((uint8_t *) data) + member->offset,
+			err
+		);
+		if( !ret ) {
+			struct_member_unref(member);
+			goto out__print_json_for_type;
+		}
+
+		struct_member_unref(member);
+		if( i != st->nfields - 1 ) printf(",");
+	}
+	printf("}");
+
+	type_unref((Type *) st);
+	return true;
+
+out__print_json_for_type:
+out_struct_type_field_at_index:
+	type_unref((Type *) st);
+out_type_as_struct:
+	return false;
+}
+
+static bool _print_json_for_string( Type *type, void *data, GError **err ) {
+	printf("\"%s\"", *((char **) data));
+	return true;
+}
+
+static bool _print_json_for_type( Type *type, void *data, GError **err ) {
+	// Strings are special cased.
+	if( type->id == TYPE_CLASS_TYPEDEF && strcmp(type->name, "string") == 0 )
+		return _print_json_for_string(type, data, err);
+
+	type = type_as_canonical(type, err);
+	if( type == NULL ) return false;
+
+	bool ret;
+	switch( type->id ) {
+		case TYPE_CLASS_PRIMITIVE:
+			ret = _print_json_for_primitive(type, data, err);
+			break;
+		case TYPE_CLASS_STRUCT:
+			ret = _print_json_for_struct(type, data, err);
+			break;
+		case TYPE_CLASS_ARRAY:
+		case TYPE_CLASS_ENUMERATION:
+		case TYPE_CLASS_FUNCTION:
+		case TYPE_CLASS_POINTER:
+		case TYPE_CLASS_TYPEDEF:
+		case TYPE_CLASS_UNION:
+		default:
+			fprintf(stderr, "Unknown type with id %d\n", type->id);
+			abort();
+	}
+
+	type_unref(type);
+	return ret;
 }
 
 int main( int argc, char *argv[] ) {
@@ -40,48 +142,16 @@ int main( int argc, char *argv[] ) {
 	rumination_init(&argc, argv, &err);
 	die_if_error(err);
 
-	struct foo f = {
-		.bar = 1,
-		.baz = "hello"
+	MyTypedef f = {
+		.a_short = 1,
+		.a_string = "hello",
+		.a_struct = {
+			.an_int = 100
+		}
 	};
 
-	Type *type = rumination_get_type(f, &err);
+	print_json_for_type(f, &err);
 	die_if_error(err);
 
-	StructType *st = type_as_struct(type, &err);
-	die_if_error(err);
-	type_unref(type);
-
-	printf("%s\n", st->type.name);
-
-	printf("{");
-	for( size_t i = 0; i < st->nfields; i++ ) {
-		StructMember *member = struct_type_field_at_index(st, i, &err);
-		die_if_error(err);
-		printf("\"%s\":", member->name);
-		switch( member->type->id ) {
-			case TYPE_CLASS_BUILTIN: {
-				BasicType *bt = type_as_basic(member->type, &err);
-				die_if_error(err);
-				print_basic_type_value(bt->id, &f + member->offset);
-				type_unref((Type *) bt);
-				break;
-			}
-			case TYPE_CLASS_TYPEDEF: {
-				if( strcmp(member->type->name, "string") == 0 ) {
-					printf("\"%s\"", *((char **) (((uint8_t *) &f) + member->offset)));
-					break;
-				}
-				// Fallthrough
-			}
-			default: {
-				printf("\"unknown type '%s' with id %d\"", member->type->name, member->type->id);
-			}
-		}
-		struct_member_unref(member);
-		if( i != st->nfields - 1 ) printf(",");
-	}
-	printf("}\n");
-
-	type_unref((Type *) st);
+	printf("\n");
 }

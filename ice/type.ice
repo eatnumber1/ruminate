@@ -3,7 +3,9 @@
 
 module Ruminate {
 	interface Type {
-		Type *getBasicType();
+		Type *getPrimitiveType();
+		Type *getPointeeType();
+		Type *getCanonicalType();
 
 		idempotent string getName();
 		idempotent long getSize();

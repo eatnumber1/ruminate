@@ -82,9 +82,9 @@ Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 			ret = (Type *) g_slice_new(StructType);
 			new (ret) StructType();
 			break;
-		case TYPE_CLASS_BUILTIN:
-			ret = (Type *) g_slice_new(BasicType);
-			new (ret) BasicType();
+		case TYPE_CLASS_PRIMITIVE:
+			ret = (Type *) g_slice_new(PrimitiveType);
+			new (ret) PrimitiveType();
 			break;
 		default:
 			ret = g_slice_new(Type);
@@ -120,10 +120,10 @@ Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 			st->nfields = proxy->lldbGetNumberOfFields();
 			break;
 		}
-		case TYPE_CLASS_BUILTIN: {
-			BasicType *bt = (BasicType *) ret;
-			static_assert(sizeof(BasicTypeIdentifier) <= sizeof(uint32_t), "A BasicTypeIdentifier cannot fit within a uint32_t");
-			bt->id = (BasicTypeIdentifier) proxy->lldbGetBasicType();
+		case TYPE_CLASS_PRIMITIVE: {
+			PrimitiveType *bt = (PrimitiveType *) ret;
+			static_assert(sizeof(PrimitiveTypeIdentifier) <= sizeof(uint32_t), "A PrimitiveTypeIdentifier cannot fit within a uint32_t");
+			bt->id = (PrimitiveTypeIdentifier) proxy->lldbGetBasicType();
 			break;
 		}
 		default:
@@ -133,30 +133,30 @@ Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 	return ret;
 }
 
-BasicType *type_as_basic( Type *type, GError **err ) {
-	BasicType *bt;
+PrimitiveType *type_as_primitive( Type *type, GError **err ) {
+	PrimitiveType *bt;
 	switch( type->id ) {
-		case TYPE_CLASS_BUILTIN:
+		case TYPE_CLASS_PRIMITIVE:
 			type_ref(type);
-			bt = (BasicType *) type;
+			bt = (PrimitiveType *) type;
 			break;
 		default: {
 			TypePrivate priv = TYPE_PTR_PRIV(type);
-			if( priv.proxy->lldbGetBasicType() == BASIC_TYPE_INVALID ) {
+			if( priv.proxy->lldbGetBasicType() == PRIMITIVE_TYPE_INVALID ) {
 				g_set_error(
 					err,
 					RUMINATE_ERROR,
-					RUMINATE_ERROR_NO_BASIC_TYPE,
-					"No basic type found for type \"%s\"",
+					RUMINATE_ERROR_NO_PRIMITIVE_TYPE,
+					"No primitive type found for type \"%s\"",
 					type->name
 				);
 				return NULL;
 			}
 
-			Type *_bt = type_new(priv.proxy->getBasicType(), err);
+			Type *_bt = type_new(priv.proxy->getPrimitiveType(), err);
 			if( _bt == NULL ) return NULL;
 
-			bt = type_as_basic(_bt, err);
+			bt = type_as_primitive(_bt, err);
 			type_unref(_bt);
 			if( _bt == NULL ) return NULL;
 		}
@@ -226,6 +226,30 @@ out_lldb_get_offset_in_bytes:
 	ret->~StructMember();
 	g_slice_free(StructMember, ret);
 	return NULL;
+}
+
+Type *type_pointee( Type *type, GError **err ) {
+	if( type->id != TYPE_CLASS_POINTER ) {
+		g_set_error_literal(
+			err,
+			RUMINATE_ERROR,
+			RUMINATE_ERROR_INVALID_TYPE,
+			"Supplied type is not a pointer"
+		);
+		return NULL;
+	}
+
+	return type_new(TYPE_PTR_PRIV(type).proxy->getPointeeType(), err);
+}
+
+Type *type_as_canonical( Type *type, GError **err ) {
+	Ruminate::TypePrx proxy(TYPE_PTR_PRIV(type).proxy->getCanonicalType());
+	if( proxy == 0 ) {
+		type_ref(type);
+		return type;
+	}
+
+	return type_new(proxy, err);
 }
 
 G_END_DECLS
