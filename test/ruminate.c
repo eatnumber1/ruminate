@@ -76,26 +76,29 @@ static bool _print_json_for_struct( Type *type, void *data, GError **err ) {
 
 		printf("\"%s\":", member->name);
 
-		bool ret = _print_json_for_type(
-			member->type,
-			((uint8_t *) data) + member->offset,
-			err
-		);
-		if( !ret ) {
-			struct_member_unref(member);
-			goto out__print_json_for_type;
-		}
+		if( !
+			_print_json_for_type(
+				member->type,
+				((uint8_t *) data) + member->offset,
+				err
+			)
+		) goto out__print_json_for_type;
 
 		struct_member_unref(member);
 		if( i != st->nfields - 1 ) printf(",");
+		continue;
+
+out__print_json_for_type:
+		struct_member_unref(member);
+out_struct_type_field_at_index:
+		goto out_loop_exit;
 	}
 	printf("}");
 
 	type_unref((Type *) st);
 	return true;
 
-out__print_json_for_type:
-out_struct_type_field_at_index:
+out_loop_exit:
 	type_unref((Type *) st);
 out_type_as_struct:
 	return false;
