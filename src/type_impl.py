@@ -1,4 +1,5 @@
 from Ruminate import *
+from type_list_impl import *
 
 class TypeImpl(Type):
 	def __init__(self, sbtype):
@@ -8,7 +9,7 @@ class TypeImpl(Type):
 		return self.sbtype.GetName()
 
 	def getPrimitiveType(self, current = None):
-		return self._typeProxy(self.sbtype.GetBasicType(self.sbtype.GetBasicType()), current)
+		return TypeImpl.proxyFor(self.sbtype.GetBasicType(self.sbtype.GetBasicType()), current)
 
 	def getSize(self, current = None):
 		return self.sbtype.GetByteSize()
@@ -16,17 +17,11 @@ class TypeImpl(Type):
 	def lldbGetTypeClass(self, current = None):
 		return self.sbtype.GetTypeClass()
 
-	def lldbGetNumberOfFields(self, current = None):
-		return self.sbtype.GetNumberOfFields()
-
-	def lldbGetFieldAtIndex(self, index, current = None):
-		return self._typeProxy(self.sbtype.GetFieldAtIndex(index), current)
-
 	def lldbGetOffsetInBytes(self, current = None):
 		return self.sbtype.GetOffsetInBytes();
 
 	def lldbGetType(self, current = None):
-		return self._typeProxy(self.sbtype.GetType(), current)
+		return TypeImpl.proxyFor(self.sbtype.GetType(), current)
 
 	def lldbGetBasicType(self, current = None):
 		return self.sbtype.GetBasicType()
@@ -34,13 +29,35 @@ class TypeImpl(Type):
 	def getPointeeType(self, current = None):
 		if not self.sbtype.IsPointerType():
 			return None
-		return self._typeProxy(self.sbtype.GetPointerType(), current)
+		return TypeImpl.proxyFor(self.sbtype.GetPointeeType(), current)
 
 	def getCanonicalType(self, current = None):
 		canon = self.sbtype.GetCanonicalType()
 		if canon == self.sbtype:
 			return None
-		return self._typeProxy(canon, current)
+		return TypeImpl.proxyFor(canon, current)
 
-	def _typeProxy(self, sbtype, current):
-		return TypePrx.uncheckedCast(current.adapter.addWithUUID(TypeImpl(sbtype)))
+	def getStructFields(self, current = None):
+		return StructFieldList.proxyFor(self.sbtype, current)
+
+	def getFunctionArguments(self, current = None):
+		if not self.sbtype.IsFunctionType():
+			return None
+		return FunctionArgumentList.proxyFor(
+			self.sbtype.GetFunctionArgumentTypes(),
+			current
+		)
+
+	def getFunctionReturnType(self, current = None):
+		if not self.sbtype.IsFunctionType():
+			return None
+		return TypeImpl.proxyFor(
+			self.sbtype.GetFunctionReturnType(),
+			current
+		)
+
+	@staticmethod
+	def proxyFor(sbtype, current):
+		return TypePrx.uncheckedCast(
+			current.adapter.addWithUUID(TypeImpl(sbtype))
+		)

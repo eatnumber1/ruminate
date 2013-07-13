@@ -12,7 +12,6 @@ import threading
 import sys # For debugging only
 
 class DebuggerImpl(Debugger):
-
 	def __init__(self, options, shutdown):
 		self.debugger = validate(SBDebugger.Create())
 		self.debugger.SetAsync(True)

@@ -4,6 +4,7 @@
 
 #include <Ice/Ice.h>
 #include "ice/type.h"
+#include "ice/type_list.h"
 
 #include <glib.h>
 
@@ -23,43 +24,73 @@ typedef struct StructMemberPrivate {
 	Ruminate::TypePrx proxy;
 } StructMemberPrivate;
 
-static TypePrivate &priv( Type &type ) {
-	return *((TypePrivate *) type.priv);
+typedef struct StructTypePrivate {
+	Ruminate::TypeListPrx memberlist;
+} StructTypePrivate;
+
+typedef struct FunctionTypePrivate {
+	Ruminate::TypeListPrx arglist;
+} FunctionTypePrivate;
+
+static TypePrivate *priv( Type *type ) {
+	return (TypePrivate *) type->priv;
 }
 
-static TypePrivate &priv( Type *type ) {
-	return priv(*type);
+static StructTypePrivate *priv( StructType *type ) {
+	return (StructTypePrivate *) type->priv;
 }
 
-static StructMemberPrivate &priv( StructMember &sm ) {
-	return *((StructMemberPrivate *) sm.priv);
+static FunctionTypePrivate *priv( FunctionType *type ) {
+	return (FunctionTypePrivate *) type->priv;
 }
 
-static StructMemberPrivate &priv( StructMember *sm ) {
-	return priv(*sm);
+static StructMemberPrivate *priv( StructMember *sm ) {
+	return (StructMemberPrivate *) sm->priv;
 }
 
-#define TYPE_PTR_PRIV(p) (::priv((Type *) p))
-#define TYPE_PRIV(p) (::priv((Type) p))
-#define STRUCT_MEMBER_PTR_PRIV(p) (::priv((StructMember *) p))
-#define STRUCT_MEMBER_PRIV(p) (::priv((StructMember) p))
+#define TYPE_PRIV(p) (::priv((Type *) p))
+#define STRUCT_TYPE_PRIV(p) (::priv((StructType *) p))
+#define FUNCTION_TYPE_PRIV(p) (::priv((FunctionType *) p))
+
+#define STRUCT_MEMBER_PRIV(p) (::priv((StructMember *) p))
 
 G_BEGIN_DECLS
 
 void type_unref( Type *type ) {
-	TypePrivate &tp = TYPE_PTR_PRIV(type);
-	if( g_atomic_int_dec_and_test(&tp.refcnt) ) {
-		tp.~TypePrivate();
-		g_slice_free(TypePrivate, &tp);
+	TypePrivate *tp = TYPE_PRIV(type);
+	if( g_atomic_int_dec_and_test(&tp->refcnt) ) {
+		tp->~TypePrivate();
+		g_slice_free(TypePrivate, tp);
 
 		g_free((char *) type->name);
 
 		switch( type->id ) {
 			case TYPE_CLASS_STRUCT: {
 				StructType *st = (StructType *) type;
+				StructTypePrivate *priv = (StructTypePrivate *) st->priv;
+
+				priv->~StructTypePrivate();
 				st->~StructType();
+
+				g_slice_free(StructTypePrivate, priv);
 				g_slice_free(StructType, st);
 				break;
+			}
+			case TYPE_CLASS_PRIMITIVE: {
+				PrimitiveType *pt = (PrimitiveType *) type;
+				pt->~PrimitiveType();
+				g_slice_free(PrimitiveType, pt);
+				break;
+			}
+			case TYPE_CLASS_FUNCTION: {
+				FunctionType *ft = (FunctionType *) type;
+				FunctionTypePrivate *priv = (FunctionTypePrivate *) ft->priv;
+
+				priv->~FunctionTypePrivate();
+				ft->~FunctionType();
+
+				g_slice_free(FunctionTypePrivate, priv);
+				g_slice_free(FunctionType, ft);
 			}
 			default:
 				type->~Type();
@@ -69,7 +100,7 @@ void type_unref( Type *type ) {
 }
 
 void type_ref( Type *type ) {
-	g_atomic_int_inc(&TYPE_PTR_PRIV(type).refcnt);
+	g_atomic_int_inc(&TYPE_PRIV(type)->refcnt);
 }
 
 Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
@@ -78,14 +109,26 @@ Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 
 	Type *ret = NULL;
 	switch( id ) {
-		case TYPE_CLASS_STRUCT:
-			ret = (Type *) g_slice_new(StructType);
-			new (ret) StructType();
+		case TYPE_CLASS_STRUCT: {
+			StructType *st = g_slice_new(StructType);
+			new (st) StructType();
+			st->priv = g_slice_new(StructTypePrivate);
+			new (st->priv) StructTypePrivate();
+			ret = (Type *) st;
 			break;
+		}
 		case TYPE_CLASS_PRIMITIVE:
 			ret = (Type *) g_slice_new(PrimitiveType);
 			new (ret) PrimitiveType();
 			break;
+		case TYPE_CLASS_FUNCTION: {
+			FunctionType *ft = g_slice_new(FunctionType);
+			new (ft) FunctionType();
+			ft->priv = g_slice_new(FunctionTypePrivate);
+			new (ft->priv) FunctionTypePrivate();
+			ret = (Type *) ft;
+			break;
+		}
 		default:
 			ret = g_slice_new(Type);
 			new (ret) Type();
@@ -117,13 +160,24 @@ Type *type_new( Ruminate::TypePrx proxy, GError **err ) {
 	switch( ret->id ) {
 		case TYPE_CLASS_STRUCT: {
 			StructType *st = (StructType *) ret;
-			st->nfields = proxy->lldbGetNumberOfFields();
+			StructTypePrivate *priv = (StructTypePrivate *) st->priv;
+
+			priv->memberlist = proxy->getStructFields();
+			st->nfields = priv->memberlist->getLength();
 			break;
 		}
 		case TYPE_CLASS_PRIMITIVE: {
 			PrimitiveType *bt = (PrimitiveType *) ret;
 			static_assert(sizeof(PrimitiveTypeIdentifier) <= sizeof(uint32_t), "A PrimitiveTypeIdentifier cannot fit within a uint32_t");
 			bt->id = (PrimitiveTypeIdentifier) proxy->lldbGetBasicType();
+			break;
+		}
+		case TYPE_CLASS_FUNCTION: {
+			FunctionType *ft = (FunctionType *) ret;
+			FunctionTypePrivate *priv = (FunctionTypePrivate *) ft->priv;
+
+			priv->arglist = proxy->getFunctionArguments();
+			ft->narguments = priv->arglist->getLength();
 			break;
 		}
 		default:
@@ -141,8 +195,8 @@ PrimitiveType *type_as_primitive( Type *type, GError **err ) {
 			bt = (PrimitiveType *) type;
 			break;
 		default: {
-			TypePrivate priv = TYPE_PTR_PRIV(type);
-			if( priv.proxy->lldbGetBasicType() == PRIMITIVE_TYPE_INVALID ) {
+			TypePrivate *priv = TYPE_PRIV(type);
+			if( priv->proxy->lldbGetBasicType() == PRIMITIVE_TYPE_INVALID ) {
 				g_set_error(
 					err,
 					RUMINATE_ERROR,
@@ -153,7 +207,7 @@ PrimitiveType *type_as_primitive( Type *type, GError **err ) {
 				return NULL;
 			}
 
-			Type *_bt = type_new(priv.proxy->getPrimitiveType(), err);
+			Type *_bt = type_new(priv->proxy->getPrimitiveType(), err);
 			if( _bt == NULL ) return NULL;
 
 			bt = type_as_primitive(_bt, err);
@@ -173,15 +227,15 @@ StructType *type_as_struct( Type *type, GError **err ) {
 }
 
 void struct_member_ref( StructMember *sm ) {
-	g_atomic_int_inc(&TYPE_PTR_PRIV(sm).refcnt);
+	g_atomic_int_inc(&TYPE_PRIV(sm)->refcnt);
 }
 
 void struct_member_unref( StructMember *sm ) {
-	StructMemberPrivate &smp = STRUCT_MEMBER_PTR_PRIV(sm);
-	if( g_atomic_int_dec_and_test(&smp.refcnt) ) {
+	StructMemberPrivate *smp = STRUCT_MEMBER_PRIV(sm);
+	if( g_atomic_int_dec_and_test(&smp->refcnt) ) {
 		type_unref(sm->type);
-		smp.~StructMemberPrivate();
-		g_slice_free(StructMemberPrivate, sm->priv);
+		smp->~StructMemberPrivate();
+		g_slice_free(StructMemberPrivate, smp);
 		g_free((char *) sm->name);
 		sm->~StructMember();
 		g_slice_free(StructMember, sm);
@@ -195,7 +249,7 @@ StructMember *struct_type_field_at_index( StructType *type, size_t idx, GError *
 	StructMemberPrivate *priv = g_slice_new(StructMemberPrivate);
 	new (priv) StructMemberPrivate();
 
-	priv->proxy = TYPE_PTR_PRIV(type).proxy->lldbGetFieldAtIndex(idx);
+	priv->proxy = STRUCT_TYPE_PRIV(type)->memberlist->getTypeAtIndex(idx);
 	priv->refcnt = 1;
 
 	uint64_t offset = priv->proxy->lldbGetOffsetInBytes();
@@ -239,17 +293,33 @@ Type *type_pointee( Type *type, GError **err ) {
 		return NULL;
 	}
 
-	return type_new(TYPE_PTR_PRIV(type).proxy->getPointeeType(), err);
+	return type_new(TYPE_PRIV(type)->proxy->getPointeeType(), err);
 }
 
 Type *type_as_canonical( Type *type, GError **err ) {
-	Ruminate::TypePrx proxy(TYPE_PTR_PRIV(type).proxy->getCanonicalType());
+	Ruminate::TypePrx proxy(TYPE_PRIV(type)->proxy->getCanonicalType());
 	if( proxy == 0 ) {
 		type_ref(type);
 		return type;
 	}
 
 	return type_new(proxy, err);
+}
+
+FunctionType *type_as_function( Type *type, GError **err ) {
+	if( type->id != TYPE_CLASS_FUNCTION ) {
+		g_assert_cmpuint(type->id, ==, TYPE_CLASS_FUNCTION);
+	}
+	type_ref(type);
+	return (FunctionType *) type;
+}
+
+Type *function_argument_type_at_index( FunctionType *type, size_t idx, GError **err ) {
+	return type_new(FUNCTION_TYPE_PRIV(type)->arglist->getTypeAtIndex(idx), err);
+}
+
+Type *function_return_type( FunctionType *type, GError **err ) {
+	return type_new(TYPE_PRIV(type)->proxy->getFunctionReturnType(), err);
 }
 
 G_END_DECLS

@@ -85,6 +85,7 @@ typedef struct Type {
 typedef struct StructType {
 	Type type;
 	size_t nfields;
+	void *priv;
 } StructType;
 
 typedef struct StructMember {
@@ -99,6 +100,12 @@ typedef struct PrimitiveType {
 	PrimitiveTypeIdentifier id;
 } PrimitiveType;
 
+typedef struct FunctionType {
+	Type type;
+	size_t narguments;
+	void *priv;
+} FunctionType;
+
 G_BEGIN_DECLS
 
 void type_unref( Type * );
@@ -110,9 +117,13 @@ void struct_member_unref( StructMember * );
 PrimitiveType *type_as_primitive( Type *, GError ** );
 StructType *type_as_struct( Type *, GError ** );
 Type *type_as_canonical( Type *, GError ** );
+FunctionType *type_as_function( Type *, GError ** );
 
 Type *type_pointee( Type *, GError ** );
+
 StructMember *struct_type_field_at_index( StructType *, size_t, GError ** );
+Type *function_argument_type_at_index( FunctionType *, size_t, GError ** );
+Type *function_return_type( FunctionType *, GError ** );
 
 G_END_DECLS
 
