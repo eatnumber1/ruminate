@@ -25,6 +25,7 @@ typedef struct __attribute__((packed)) MyStruct {
 	struct {
 		int an_int;
 	} a_struct;
+	int *an_int_ptr;
 } MyTypedef;
 
 void die_if_error( GError *err ) {
@@ -156,9 +157,20 @@ static bool _print_json_for_type( Type *type, void *data, GError **err ) {
 			break;
 		case TYPE_CLASS_FUNCTION:
 			g_assert(false);
+		case TYPE_CLASS_POINTER: {
+			// TODO: It might be an array
+			Type *pointee = type_pointee(type, err);
+			if( pointee == NULL ) {
+				ret = false;
+				break;
+			}
+			type_unref(type);
+			type = pointee;
+			ret = _print_json_for_type(type, *((void **) data), err);
+			break;
+		}
 		case TYPE_CLASS_ARRAY:
 		case TYPE_CLASS_ENUMERATION:
-		case TYPE_CLASS_POINTER:
 		case TYPE_CLASS_TYPEDEF:
 		case TYPE_CLASS_UNION:
 		default:
@@ -180,7 +192,8 @@ int main( int argc, char *argv[] ) {
 		.a_string = "hello",
 		.a_struct = {
 			.an_int = 100
-		}
+		},
+		.an_int_ptr = &argc
 	};
 
 	print_json_for_type(f, &err);
