@@ -1,10 +1,3 @@
-#define _RUMINATE_TYPE_CPP_
-
-typedef struct RTypePrivate RTypePrivate;
-typedef struct RStructMemberPrivate RStructMemberPrivate;
-typedef struct RStructTypePrivate RStructTypePrivate;
-typedef struct RFunctionTypePrivate RFunctionTypePrivate;
-
 #include "private/type.h"
 
 #include "ruminate/errors.h"
@@ -21,43 +14,74 @@ typedef struct RFunctionTypePrivate RFunctionTypePrivate;
 #include <stdint.h>
 #include <limits.h>
 
-typedef struct RTypePrivate {
+struct RType {
+	char *name;
+	gint refcnt;
+	RTypeIdentifier id;
+	Ruminate::TypePrx proxy;
+
+	RType() :
+		name(NULL),
+		refcnt(1),
+		id(R_TYPE_CLASS_INVALID),
+		proxy(0)
+	{}
+};
+
+struct RStructMember {
+	RType *type;
 	gint refcnt;
 	Ruminate::TypePrx proxy;
-} TypePrivate;
+	char *name;
 
-typedef struct RStructMemberPrivate {
-	gint refcnt;
-	Ruminate::TypePrx proxy;
-} StructMemberPrivate;
+	RStructMember() :
+		type(NULL),
+		refcnt(1),
+		proxy(0),
+		name(NULL)
+	{}
+};
 
-typedef struct RStructTypePrivate {
+struct RStructType {
+	RType type;
 	Ruminate::TypeListPrx memberlist;
-} StructTypePrivate;
 
-typedef struct RFunctionTypePrivate {
+	RStructType() :
+		type(),
+		memberlist(0)
+	{}
+};
+
+struct RPrimitiveType {
+	RType type;
+	RPrimitiveTypeIdentifier id;
+
+	RPrimitiveType() :
+		type(),
+		id(R_PRIMITIVE_TYPE_INVALID)
+	{}
+};
+
+struct RFunctionType {
+	RType type;
 	Ruminate::TypeListPrx arglist;
-} FunctionTypePrivate;
+
+	RFunctionType() :
+		type(),
+		arglist(0)
+	{}
+};
 
 G_BEGIN_DECLS
 
 void r_type_unref( RType *type ) {
-	RTypePrivate *tp = type->priv;
-	if( g_atomic_int_dec_and_test(&tp->refcnt) ) {
-		tp->~RTypePrivate();
-		g_slice_free(RTypePrivate, tp);
-
-		g_free((char *) type->name);
+	if( g_atomic_int_dec_and_test(&type->refcnt) ) {
+		if( type->name != NULL ) g_free(type->name);
 
 		switch( type->id ) {
 			case R_TYPE_CLASS_STRUCT: {
 				RStructType *st = (RStructType *) type;
-				RStructTypePrivate *priv = st->priv;
-
-				priv->~RStructTypePrivate();
 				st->~RStructType();
-
-				g_slice_free(RStructTypePrivate, priv);
 				g_slice_free(RStructType, st);
 				break;
 			}
@@ -69,12 +93,7 @@ void r_type_unref( RType *type ) {
 			}
 			case R_TYPE_CLASS_FUNCTION: {
 				RFunctionType *ft = (RFunctionType *) type;
-				RFunctionTypePrivate *priv = ft->priv;
-
-				priv->~RFunctionTypePrivate();
 				ft->~RFunctionType();
-
-				g_slice_free(RFunctionTypePrivate, priv);
 				g_slice_free(RFunctionType, ft);
 			}
 			default:
@@ -85,7 +104,7 @@ void r_type_unref( RType *type ) {
 }
 
 void r_type_ref( RType *type ) {
-	g_atomic_int_inc(&type->priv->refcnt);
+	g_atomic_int_inc(&type->refcnt);
 }
 
 RType *r_type_new( Ruminate::TypePrx proxy, GError **err ) {
@@ -97,8 +116,6 @@ RType *r_type_new( Ruminate::TypePrx proxy, GError **err ) {
 		case R_TYPE_CLASS_STRUCT: {
 			RStructType *st = g_slice_new(RStructType);
 			new (st) RStructType();
-			st->priv = g_slice_new(RStructTypePrivate);
-			new (st->priv) RStructTypePrivate();
 			ret = (RType *) st;
 			break;
 		}
@@ -109,8 +126,6 @@ RType *r_type_new( Ruminate::TypePrx proxy, GError **err ) {
 		case R_TYPE_CLASS_FUNCTION: {
 			RFunctionType *ft = g_slice_new(RFunctionType);
 			new (ft) RFunctionType();
-			ft->priv = g_slice_new(RFunctionTypePrivate);
-			new (ft->priv) RFunctionTypePrivate();
 			ret = (RType *) ft;
 			break;
 		}
@@ -119,55 +134,8 @@ RType *r_type_new( Ruminate::TypePrx proxy, GError **err ) {
 			new (ret) RType();
 	}
 
-	ret->priv = g_slice_new(RTypePrivate);
-	new (ret->priv) RTypePrivate();
-
-	RTypePrivate *tp = ret->priv;
-	tp->proxy = proxy;
-	tp->refcnt = 1;
-
-	uint64_t size = proxy->getSize();
-	if( size > SIZE_MAX ) {
-		g_set_error_literal(
-			err,
-			RUMINATE_ERROR,
-			RUMINATE_ERROR_RANGE,
-			"Type size too large to fit in size_t"
-		);
-		// TODO: Free previously allocated resources
-		return NULL;
-	}
-	ret->size = size;
-
+	ret->proxy = proxy;
 	ret->id = id;
-	ret->name = g_strdup(proxy->getName().c_str());
-
-	switch( ret->id ) {
-		case R_TYPE_CLASS_STRUCT: {
-			RStructType *st = (RStructType *) ret;
-			RStructTypePrivate *priv = st->priv;
-
-			priv->memberlist = proxy->getStructFields();
-			st->nfields = priv->memberlist->getLength();
-			break;
-		}
-		case R_TYPE_CLASS_PRIMITIVE: {
-			RPrimitiveType *bt = (RPrimitiveType *) ret;
-			static_assert(sizeof(RPrimitiveTypeIdentifier) <= sizeof(uint32_t), "An RPrimitiveTypeIdentifier cannot fit within a uint32_t");
-			bt->id = (RPrimitiveTypeIdentifier) proxy->lldbGetBasicType();
-			break;
-		}
-		case R_TYPE_CLASS_FUNCTION: {
-			RFunctionType *ft = (RFunctionType *) ret;
-			RFunctionTypePrivate *priv = ft->priv;
-
-			priv->arglist = proxy->getFunctionArguments();
-			ft->narguments = priv->arglist->getLength();
-			break;
-		}
-		default:
-			break;
-	}
 
 	return ret;
 }
@@ -180,8 +148,7 @@ RPrimitiveType *r_type_as_primitive( RType *type, GError **err ) {
 			bt = (RPrimitiveType *) type;
 			break;
 		default: {
-			RTypePrivate *priv = type->priv;
-			if( priv->proxy->lldbGetBasicType() == R_PRIMITIVE_TYPE_INVALID ) {
+			if( type->proxy->lldbGetBasicType() == R_PRIMITIVE_TYPE_INVALID ) {
 				g_set_error(
 					err,
 					RUMINATE_ERROR,
@@ -192,7 +159,7 @@ RPrimitiveType *r_type_as_primitive( RType *type, GError **err ) {
 				return NULL;
 			}
 
-			RType *_bt = r_type_new(priv->proxy->getPrimitiveType(), err);
+			RType *_bt = r_type_new(type->proxy->getPrimitiveType(), err);
 			if( _bt == NULL ) return NULL;
 
 			bt = r_type_as_primitive(_bt, err);
@@ -212,59 +179,30 @@ RStructType *r_type_as_struct( RType *type, GError **err ) {
 }
 
 void r_struct_member_ref( RStructMember *sm ) {
-	g_atomic_int_inc(&((RType *)sm)->priv->refcnt);
+	g_atomic_int_inc(&sm->refcnt);
 }
 
 void r_struct_member_unref( RStructMember *sm ) {
-	RStructMemberPrivate *smp = sm->priv;
-	if( g_atomic_int_dec_and_test(&smp->refcnt) ) {
+	if( g_atomic_int_dec_and_test(&sm->refcnt) ) {
 		r_type_unref(sm->type);
-		smp->~RStructMemberPrivate();
-		g_slice_free(RStructMemberPrivate, smp);
 		g_free((char *) sm->name);
 		sm->~RStructMember();
 		g_slice_free(RStructMember, sm);
 	}
 }
 
+static Ruminate::TypeListPrx struct_type_memberlist( RStructType *type ) {
+	if( type->memberlist == 0 )
+		type->memberlist = ((RType *) type)->proxy->getStructFields();
+	return type->memberlist;
+}
+
 RStructMember *r_struct_type_field_at_index( RStructType *type, size_t idx, GError **err ) {
 	RStructMember *ret = g_slice_new(RStructMember);
 	new (ret) RStructMember();
-
-	RStructMemberPrivate *priv = g_slice_new(RStructMemberPrivate);
-	new (priv) RStructMemberPrivate();
-
-	priv->proxy = type->priv->memberlist->getTypeAtIndex(idx);
-	priv->refcnt = 1;
-
-	uint64_t offset = priv->proxy->lldbGetOffsetInBytes();
-	if( offset > SIZE_MAX ) {
-		g_set_error_literal(
-			err,
-			RUMINATE_ERROR,
-			RUMINATE_ERROR_RANGE,
-			"Field offset too large to fit in size_t"
-		);
-		goto out_lldb_get_offset_in_bytes;
-	}
-	ret->offset = offset;
-
-	ret->type = r_type_new(priv->proxy->lldbGetType(), err);
-	if( ret->type == NULL ) goto out_type_new;
-
-	ret->name = g_strdup(priv->proxy->getName().c_str());
-
-	ret->priv = priv;
+	ret->proxy = struct_type_memberlist(type)->getTypeAtIndex(idx);
 
 	return ret;
-
-out_type_new:
-out_lldb_get_offset_in_bytes:
-	priv->~RStructMemberPrivate();
-	g_slice_free(RStructMemberPrivate, priv);
-	ret->~RStructMember();
-	g_slice_free(RStructMember, ret);
-	return NULL;
 }
 
 RType *r_type_pointee( RType *type, GError **err ) {
@@ -278,11 +216,11 @@ RType *r_type_pointee( RType *type, GError **err ) {
 		return NULL;
 	}
 
-	return r_type_new(type->priv->proxy->getPointeeType(), err);
+	return r_type_new(type->proxy->getPointeeType(), err);
 }
 
 RType *r_type_as_canonical( RType *type, GError **err ) {
-	Ruminate::TypePrx proxy(type->priv->proxy->getCanonicalType());
+	Ruminate::TypePrx proxy(type->proxy->getCanonicalType());
 	if( proxy == 0 ) {
 		r_type_ref(type);
 		return type;
@@ -299,12 +237,86 @@ RFunctionType *r_type_as_function( RType *type, GError **err ) {
 	return (RFunctionType *) type;
 }
 
+static Ruminate::TypeListPrx r_function_type_arglist( RFunctionType *type ) {
+	if( type->arglist == 0 )
+		type->arglist = ((RType *) type)->proxy->getFunctionArguments();
+	return type->arglist;
+}
+
 RType *r_function_argument_type_at_index( RFunctionType *type, size_t idx, GError **err ) {
-	return r_type_new(type->priv->arglist->getTypeAtIndex(idx), err);
+	;
+	return r_type_new(r_function_type_arglist(type)->getTypeAtIndex(idx), err);
 }
 
 RType *r_function_return_type( RFunctionType *type, GError **err ) {
-	return r_type_new(((RType *) type)->priv->proxy->getFunctionReturnType(), err);
+	return r_type_new(((RType *) type)->proxy->getFunctionReturnType(), err);
+}
+
+const char *r_type_name( RType *type, GError **err ) {
+	if( type->name == NULL )
+		type->name = g_strdup(type->proxy->getName().c_str());
+	return type->name;
+}
+
+size_t r_type_size( RType *type, GError **err ) {
+	uint64_t size = type->proxy->getSize();
+	if( size > SIZE_MAX ) {
+		g_set_error_literal(
+			err,
+			RUMINATE_ERROR,
+			RUMINATE_ERROR_RANGE,
+			"Type size too large to fit in size_t"
+		);
+		// TODO: Free previously allocated resources
+		return 0;
+	}
+	return (size_t) size;
+}
+
+RTypeIdentifier r_type_id( RType *type, GError **err ) {
+	return type->id;
+}
+
+size_t r_struct_type_nfields( RStructType *type, GError **err ) {
+	if( type->memberlist == 0 )
+		type->memberlist = ((RType *) type)->proxy->getStructFields();
+	return type->memberlist->getLength();
+}
+
+RPrimitiveTypeIdentifier r_primitive_type_id( RPrimitiveType *type, GError **err ) {
+	static_assert(sizeof(RPrimitiveTypeIdentifier) <= sizeof(uint32_t), "An RPrimitiveTypeIdentifier cannot fit within a uint32_t");
+	return (RPrimitiveTypeIdentifier) ((RType *) type)->proxy->lldbGetBasicType();
+}
+
+size_t r_function_type_narguments( RFunctionType *type, GError **err ) {
+	return r_function_type_arglist(type)->getLength();
+}
+
+const char *r_struct_member_name( RStructMember *sm, GError **err ) {
+	if( sm->name == NULL )
+		sm->name = g_strdup(sm->proxy->getName().c_str());
+	return sm->name;
+}
+
+off_t r_struct_member_offset( RStructMember *sm, GError **err ) {
+	uint64_t offset = sm->proxy->lldbGetOffsetInBytes();
+	// TODO: OFF_MAX
+	if( offset > SIZE_MAX ) {
+		g_set_error_literal(
+			err,
+			RUMINATE_ERROR,
+			RUMINATE_ERROR_RANGE,
+			"Field offset too large to fit in size_t"
+		);
+		return 0;
+	}
+	return offset;
+}
+
+RType *r_struct_member_type( RStructMember *sm, GError **err ) {
+	if( sm->type == NULL )
+		sm->type = r_type_new(sm->proxy->lldbGetType(), err);
+	return sm->type;
 }
 
 G_END_DECLS

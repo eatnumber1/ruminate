@@ -40,7 +40,10 @@ static bool _print_json_for_primitive( RType *type, void *data, GError **err ) {
 	RPrimitiveType *pt = r_type_as_primitive(type, err);
 	if( pt == NULL ) return false;
 
-	switch( pt->id ) {
+	RPrimitiveTypeIdentifier id = r_primitive_type_id(pt, err);
+	// TODO: Error checking
+
+	switch( id ) {
 		case R_PRIMITIVE_TYPE_INT:
 			printf("%d", *((int *) data));
 			break;
@@ -70,24 +73,35 @@ static bool _print_json_for_struct( RType *type, void *data, GError **err ) {
 	RStructType *st = r_type_as_struct(type, err);
 	if( st == NULL ) goto out_type_as_struct;
 
+	size_t nfields = r_struct_type_nfields(st, err);
+	// TODO: Error checking
 
 	printf("{");
-	for( size_t i = 0; i < st->nfields; i++ ) {
+	for( size_t i = 0; i < nfields; i++ ) {
 		RStructMember *member = r_struct_type_field_at_index(st, i, err);
 		if( member == NULL ) goto out_struct_type_field_at_index;
 
-		printf("\"%s\":", member->name);
+		const char *name = r_struct_member_name(member, err);
+		// TODO: Error checking
+
+		printf("\"%s\":", name);
+
+		RType *member_type = r_struct_member_type(member, err);
+		// TODO: Error checking
+
+		off_t offset = r_struct_member_offset(member, err);
+		// TODO: Error checking
 
 		if( !
 			_print_json_for_type(
-				member->type,
-				((uint8_t *) data) + member->offset,
+				member_type,
+				((uint8_t *) data) + offset,
 				err
 			)
 		) goto out__print_json_for_type;
 
 		r_struct_member_unref(member);
-		if( i != st->nfields - 1 ) printf(",");
+		if( i != nfields - 1 ) printf(",");
 		continue;
 
 out__print_json_for_type:
@@ -118,16 +132,25 @@ static bool print_function_type( RType *type, GError **err ) {
 	RType *rtype = r_function_return_type(ft, err);
 	if( rtype == NULL ) return false; // TODO: Clean up resources
 
-	printf("(%s (", rtype->name);
+	const char *rtname = r_type_name(rtype, err);
+	// TODO: Error checking
+
+	printf("(%s (", rtname);
 
 	r_type_unref(rtype);
 
-	for( size_t i = 0; i < ft->narguments; i++ ) {
+	size_t narguments = r_function_type_narguments(ft, err);
+	// TODO: Error checking
+
+	for( size_t i = 0; i < narguments; i++ ) {
 		RType *arg = r_function_argument_type_at_index(ft, i, err);
 		if( arg == NULL ) return false; // TODO: Clean up resources
 
-		printf(" %s", arg->name);
-		if( i != ft->narguments - 1 ) printf(",");
+		const char *name = r_type_name(arg, err);
+		// TODO: Error checking
+
+		printf(" %s", name);
+		if( i != narguments - 1 ) printf(",");
 
 		r_type_unref(arg);
 	}
@@ -140,15 +163,24 @@ static bool print_function_type( RType *type, GError **err ) {
 }
 
 static bool _print_json_for_type( RType *type, void *data, GError **err ) {
+	RTypeIdentifier id = r_type_id(type, err);
+	// TODO: Error checking
+
+	const char *name = r_type_name(type, err);
+	// TODO: Error checking
+
 	// Strings are special cased.
-	if( type->id == R_TYPE_CLASS_TYPEDEF && strcmp(type->name, "string") == 0 )
+	if( id == R_TYPE_CLASS_TYPEDEF && strcmp(name, "string") == 0 )
 		return _print_json_for_string(type, data, err);
 
 	type = r_type_as_canonical(type, err);
 	if( type == NULL ) return false;
 
+	id = r_type_id(type, err);
+	// TODO: Error checking
+
 	bool ret;
-	switch( type->id ) {
+	switch( id ) {
 		case R_TYPE_CLASS_PRIMITIVE:
 			ret = _print_json_for_primitive(type, data, err);
 			break;
@@ -174,7 +206,7 @@ static bool _print_json_for_type( RType *type, void *data, GError **err ) {
 		case R_TYPE_CLASS_TYPEDEF:
 		case R_TYPE_CLASS_UNION:
 		default:
-			fprintf(stderr, "Unknown type with id %d\n", type->id);
+			fprintf(stderr, "Unknown type with id %d\n", id);
 			abort();
 	}
 

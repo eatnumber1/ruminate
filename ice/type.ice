@@ -13,7 +13,7 @@ module Ruminate {
 		TypeList *getStructFields();
 		TypeList *getFunctionArguments();
 
-		idempotent string getName();
+		string getName(); // This is cached in the C++ API layer
 		idempotent long getSize();
 
 		idempotent int lldbGetTypeClass();

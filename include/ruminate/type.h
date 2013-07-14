@@ -75,43 +75,12 @@ typedef enum RPrimitiveTypeIdentifier {
 	R_PRIMITIVE_TYPE_OTHER
 } RPrimitiveTypeIdentifier;
 
-#ifndef _RUMINATE_TYPE_CPP_
-typedef void RTypePrivate;
-typedef void RStructTypePrivate;
-typedef void RStructMemberPrivate;
-typedef void RFunctionTypePrivate;
-#endif
+typedef struct RType RType;
+typedef struct RPrimitiveType RPrimitiveType;
+typedef struct RStructType RStructType;
+typedef struct RFunctionType RFunctionType;
 
-typedef struct RType {
-	const char *name;
-	size_t size;
-	RTypeIdentifier id;
-	RTypePrivate *priv;
-} RType;
-
-typedef struct RStructType {
-	RType type;
-	size_t nfields;
-	RStructTypePrivate *priv;
-} RStructType;
-
-typedef struct RStructMember {
-	RType *type;
-	const char *name;
-	off_t offset;
-	RStructMemberPrivate *priv;
-} RStructMember;
-
-typedef struct RPrimitiveType {
-	RType type;
-	RPrimitiveTypeIdentifier id;
-} RPrimitiveType;
-
-typedef struct RFunctionType {
-	RType type;
-	size_t narguments;
-	RFunctionTypePrivate *priv;
-} RFunctionType;
+typedef struct RStructMember RStructMember;
 
 G_BEGIN_DECLS
 
@@ -125,6 +94,20 @@ RPrimitiveType *r_type_as_primitive( RType *, GError ** );
 RStructType *r_type_as_struct( RType *, GError ** );
 RType *r_type_as_canonical( RType *, GError ** );
 RFunctionType *r_type_as_function( RType *, GError ** );
+
+const char *r_type_name( RType *, GError ** );
+size_t r_type_size( RType *, GError ** );
+RTypeIdentifier r_type_id( RType *, GError ** );
+
+size_t r_struct_type_nfields( RStructType *, GError ** );
+
+RPrimitiveTypeIdentifier r_primitive_type_id( RPrimitiveType *, GError ** );
+
+size_t r_function_type_narguments( RFunctionType *, GError ** );
+
+const char *r_struct_member_name( RStructMember *, GError ** );
+off_t r_struct_member_offset( RStructMember *, GError **);
+RType *r_struct_member_type( RStructMember *, GError ** );
 
 RType *r_type_pointee( RType *, GError ** );
 
