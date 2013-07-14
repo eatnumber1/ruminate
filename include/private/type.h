@@ -7,6 +7,6 @@
 
 G_BEGIN_DECLS
 
-Type *type_new( Ruminate::TypePrx, GError ** );
+RType *r_type_new( Ruminate::TypePrx, GError ** );
 
 G_END_DECLS

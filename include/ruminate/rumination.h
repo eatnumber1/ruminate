@@ -13,7 +13,7 @@ bool rumination_destroy( GError **err );
 bool rumination_init( int *argc, char *argv[], GError **err );
 
 void rumination_begin_get_type_by_variable_name( const char *varname, GError **err );
-Type *rumination_end_get_type_by_variable_name( GError **err );
+RType *rumination_end_get_type_by_variable_name( GError **err );
 
 __attribute__((noinline))
 void rumination_hit_breakpoint();

@@ -108,10 +108,10 @@ void rumination_begin_get_type_by_variable_name( const char *varname, GError **e
 	rumination->arp = rumination->debugger->begin_getTypeByVariableName(varname, gettid());
 }
 
-Type *rumination_end_get_type_by_variable_name( GError **err ) {
+RType *rumination_end_get_type_by_variable_name( GError **err ) {
 	Ruminate::TypePrx t(rumination->debugger->end_getTypeByVariableName(rumination->arp));
 	rumination->arp = NULL;
-	return type_new(t, err);
+	return r_type_new(t, err);
 }
 
 G_END_DECLS
