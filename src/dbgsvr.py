@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, Ice
+import sys, os, signal, Ice
 from Ruminate import *
 from debugger_factory_impl import *
 
@@ -10,12 +10,16 @@ class Server(Ice.Application):
 
 	def run(self, args):
 		self.shutdownOnInterrupt()
-		adapter = self.communicator().createObjectAdapterWithEndpoints("RuminateAdapter", "default -p 1024")
+		adapter = self.communicator().createObjectAdapterWithEndpoints("RuminateAdapter", "default -h 127.0.0.1")
 		self.factory = DebuggerFactoryImpl(adapter)
 
-		adapter.add(self.factory, Ice.Identity("DebuggerFactory"))
+		adapter.add(self.factory, Ice.Identity("DebuggerFactory -h 127.0.0.1 -p 1024"))
 
 		adapter.activate()
+
+		# Signal that we're ready
+		os.kill(int(sys.argv[1]), signal.SIGUSR1)
+
 		self.communicator().waitForShutdown()
 		return 0
 

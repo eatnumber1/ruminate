@@ -17,6 +17,8 @@
 #include <string.h>
 #include <stddef.h>
 #include <sys/wait.h>
+#include <stdio.h>
+#include <signal.h>
 
 #define die_unless(...)
 
@@ -41,6 +43,7 @@ void rumination_hit_breakpoint() {
 }
 
 static void setup_env() {
+	// TODO: Remove this
 	setenv("PYTHONPATH", "ice:src:.:/usr/local/lib/python2.7/site-packages", true);
 }
 
@@ -48,11 +51,15 @@ static bool fork_child( GError **err ) {
 	size_t len = strlen(RUMINATION_DEBUGGER_CONTROLLER_PATH) + 1;
 	char controller_path[len];
 	memcpy(controller_path, RUMINATION_DEBUGGER_CONTROLLER_PATH, len);
+	gchar *lockstr = g_strdup_printf("%d", getpid());
 	char *argv[] = {
 		controller_path,
+		lockstr,
 		NULL
 	};
-	return g_spawn_async(NULL, argv, NULL, (GSpawnFlags) 0, (GSpawnChildSetupFunc) &setup_env, NULL, &rumination->child_pid, err);
+	bool ret = g_spawn_async(NULL, argv, NULL, (GSpawnFlags) 0, (GSpawnChildSetupFunc) &setup_env, NULL, &rumination->child_pid, err);
+	g_free(lockstr);
+	return ret;
 }
 
 __attribute__((destructor))
@@ -61,15 +68,53 @@ static void rumination_destroy_atexit() {
 	rumination_destroy(NULL);
 }
 
+static GCond child_ready_cond;
+static GMutex child_ready_mutex;
+
+static void child_ready( int sig ) {
+	(void) sig;
+
+	g_mutex_lock(&child_ready_mutex);
+	g_cond_signal(&child_ready_cond);
+	g_mutex_unlock(&child_ready_mutex);
+}
+
+static struct sigaction setup_child_ready() {
+	g_cond_init(&child_ready_cond);
+	g_mutex_init(&child_ready_mutex);
+
+	struct sigaction old_sigact, sigact;
+	memset(&sigact, 0, sizeof(struct sigaction));
+	sigact.sa_handler = child_ready;
+	sigaction(SIGUSR1, &sigact, &old_sigact);
+	// TODO: Errors
+
+	return old_sigact;
+}
+
+static void block_until_child_ready( struct sigaction old_sigact ) {
+	g_mutex_lock(&child_ready_mutex);
+	g_cond_wait(&child_ready_cond, &child_ready_mutex);
+	g_mutex_unlock(&child_ready_mutex);
+
+	struct sigaction ign;
+	sigaction(SIGUSR1, &old_sigact, &ign);
+	// TODO: Errors
+}
+
 bool rumination_init( int *argc, char *argv[], GError **err ) {
 	// TODO Thread safety
 	if( rumination != NULL ) return true;
 	rumination = new Rumination();
+
+	struct sigaction old_sigact = setup_child_ready();
+
 	if( !fork_child(err) ) return false;
-	// Give python time to start up
-	sleep(1); // TODO
+
+	block_until_child_ready(old_sigact);
+
 	rumination->communicator = Ice::initialize(*argc, argv);
-	auto factory_proxy = rumination->communicator->stringToProxy("DebuggerFactory:default -p 1024");
+	auto factory_proxy = rumination->communicator->stringToProxy("DebuggerFactory:default -h 127.0.0.1 -p 1024");
 	rumination->factory = Ruminate::DebuggerFactoryPrx::checkedCast(factory_proxy);
 	die_unless(rumination->factory);
 
