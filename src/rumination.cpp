@@ -18,7 +18,6 @@
 #include <stddef.h>
 #include <sys/wait.h>
 #include <stdio.h>
-#include <signal.h>
 
 #define die_unless(...)
 
@@ -47,19 +46,31 @@ static void setup_env() {
 	setenv("PYTHONPATH", "ice:src:.:/usr/local/lib/python2.7/site-packages", true);
 }
 
-static bool fork_child( GError **err ) {
+static gint fork_child( GError **err ) {
 	size_t len = strlen(RUMINATION_DEBUGGER_CONTROLLER_PATH) + 1;
 	char controller_path[len];
 	memcpy(controller_path, RUMINATION_DEBUGGER_CONTROLLER_PATH, len);
-	gchar *lockstr = g_strdup_printf("%d", getpid());
 	char *argv[] = {
 		controller_path,
-		lockstr,
 		NULL
 	};
-	bool ret = g_spawn_async(NULL, argv, NULL, (GSpawnFlags) 0, (GSpawnChildSetupFunc) &setup_env, NULL, &rumination->child_pid, err);
-	g_free(lockstr);
-	return ret;
+	gint child_stdout;
+	if( !g_spawn_async_with_pipes(
+		NULL,
+		argv,
+		NULL,
+		(GSpawnFlags) 0,
+		(GSpawnChildSetupFunc) &setup_env,
+		NULL,
+		&rumination->child_pid,
+		NULL,
+		&child_stdout,
+		NULL,
+		err)
+	) {
+		return 0;
+	}
+	return child_stdout;
 }
 
 __attribute__((destructor))
@@ -68,38 +79,25 @@ static void rumination_destroy_atexit() {
 	rumination_destroy(NULL);
 }
 
-static GCond child_ready_cond;
-static GMutex child_ready_mutex;
+static int read_child_port( gint child_stdout ) {
+	int port;
+	size_t nb_read = 0;
+	uint8_t *port_ptr = (uint8_t *) &port;
 
-static void child_ready( int sig ) {
-	(void) sig;
+	do {
+		ssize_t count = read(child_stdout, port_ptr, sizeof(int) - nb_read);
+		if( count == -1 ) {
+			// TODO: Error handling
+			g_assert(false);
+		}
+		nb_read += count;
+		port_ptr += count;
+		g_assert(nb_read > 0);
+		g_assert(nb_read <= sizeof(int));
+	} while( nb_read != sizeof(int) );
 
-	g_mutex_lock(&child_ready_mutex);
-	g_cond_signal(&child_ready_cond);
-	g_mutex_unlock(&child_ready_mutex);
-}
-
-static struct sigaction setup_child_ready() {
-	g_cond_init(&child_ready_cond);
-	g_mutex_init(&child_ready_mutex);
-
-	struct sigaction old_sigact, sigact;
-	memset(&sigact, 0, sizeof(struct sigaction));
-	sigact.sa_handler = child_ready;
-	sigaction(SIGUSR1, &sigact, &old_sigact);
-	// TODO: Errors
-
-	return old_sigact;
-}
-
-static void block_until_child_ready( struct sigaction old_sigact ) {
-	g_mutex_lock(&child_ready_mutex);
-	g_cond_wait(&child_ready_cond, &child_ready_mutex);
-	g_mutex_unlock(&child_ready_mutex);
-
-	struct sigaction ign;
-	sigaction(SIGUSR1, &old_sigact, &ign);
-	// TODO: Errors
+	close(child_stdout);
+	return port;
 }
 
 bool rumination_init( int *argc, char *argv[], GError **err ) {
@@ -107,14 +105,16 @@ bool rumination_init( int *argc, char *argv[], GError **err ) {
 	if( rumination != NULL ) return true;
 	rumination = new Rumination();
 
-	struct sigaction old_sigact = setup_child_ready();
+	gint child_stdout = fork_child(err);
+	// TODO: Check for errors
 
-	if( !fork_child(err) ) return false;
-
-	block_until_child_ready(old_sigact);
+	int port = read_child_port(child_stdout);
 
 	rumination->communicator = Ice::initialize(*argc, argv);
-	auto factory_proxy = rumination->communicator->stringToProxy("DebuggerFactory:default -h 127.0.0.1 -p 1024");
+	char *proxy_str = g_strdup_printf("DebuggerFactory:default -h 127.0.0.1 -p %d", port);
+	printf("Connecting to proxy: \"%s\"\n", proxy_str);
+	auto factory_proxy = rumination->communicator->stringToProxy(proxy_str);
+	g_free(proxy_str);
 	rumination->factory = Ruminate::DebuggerFactoryPrx::checkedCast(factory_proxy);
 	die_unless(rumination->factory);
 
@@ -142,6 +142,7 @@ bool rumination_destroy( GError **err ) {
 	rumination->communicator->destroy();
 	// TODO: Check child return code
 	waitpid(rumination->child_pid, NULL, 0);
+	g_spawn_close_pid(rumination->child_pid);
 	delete rumination;
 	rumination = NULL;
 

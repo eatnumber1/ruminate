@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, os, signal, Ice
+import sys, os, struct, Ice
 from Ruminate import *
 from debugger_factory_impl import *
 
@@ -13,12 +13,18 @@ class Server(Ice.Application):
 		adapter = self.communicator().createObjectAdapterWithEndpoints("RuminateAdapter", "default -h 127.0.0.1")
 		self.factory = DebuggerFactoryImpl(adapter)
 
-		adapter.add(self.factory, Ice.Identity("DebuggerFactory -h 127.0.0.1 -p 1024"))
+		adapter.add(self.factory, Ice.Identity("DebuggerFactory"))
 
 		adapter.activate()
 
-		# Signal that we're ready
-		os.kill(int(sys.argv[1]), signal.SIGUSR1)
+		# Signal that we're ready and tell the parent our port
+		packed_port = struct.pack("i", adapter.getEndpoints()[0].getInfo().port)
+		sys.stdout.write(packed_port)
+
+		sys.stdout.close()
+		os.close(1)
+		sys.stdout = sys.stderr
+		os.dup2(2, 1)
 
 		self.communicator().waitForShutdown()
 		return 0

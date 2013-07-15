@@ -1,6 +1,6 @@
 from __future__ import print_function, absolute_import
 
-import threading
+import threading, sys
 import lldb
 
 from lldb_utils import validate, getDescription
