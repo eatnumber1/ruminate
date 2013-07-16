@@ -86,5 +86,5 @@ int main( int argc, char **argv ) {
 	};
 	g_test_add_data_func("/signal", &test_signal_delivery_data, (GTestDataFunc) test_with_subprocess);
 
-	g_test_run();
+	return g_test_run();
 }
