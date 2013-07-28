@@ -1,8 +1,6 @@
 #ifndef _RUMINATE_ERRORS_H_
 #define _RUMINATE_ERRORS_H_
 
-#include <glib.h>
-
 G_BEGIN_DECLS
 
 GQuark ruminate_error_quark();

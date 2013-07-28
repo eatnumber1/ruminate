@@ -1,16 +1,5 @@
-#include "private/gettid.h"
-#include "private/type.h"
-
-#include "ruminate/rumination.h"
-#include "ruminate/errors.h"
-
-#include <Ice/Ice.h>
-#include "ice/debugger_factory.h"
-#include "ice/debugger.h"
-#include "ice/type.h"
-
-#include <glib.h>
-
+#include <sys/types.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <spawn.h>
 #include <stdlib.h>
@@ -18,6 +7,26 @@
 #include <stddef.h>
 #include <sys/wait.h>
 #include <stdio.h>
+#include <stdbool.h>
+
+#include <glib.h>
+
+#include <Ice/Ice.h>
+#include "ice/debugger_factory.h"
+#include "ice/debugger.h"
+#include "ice/frame.h"
+#include "ice/type.h"
+
+#define RUMINATE_PRIVATE
+
+#include "ruminate/type.h"
+#include "ruminate/frame.h"
+#include "ruminate/rumination.h"
+#include "ruminate/errors.h"
+
+#include "private/gettid.h"
+#include "private/type.h"
+#include "private/frame.h"
 
 #define die_unless(...)
 
@@ -27,8 +36,8 @@ typedef struct {
 	Ice::CommunicatorPtr communicator;
 	Ruminate::DebuggerFactoryPrx factory;
 	Ruminate::DebuggerPrx debugger;
-	Ice::AsyncResultPtr arp;
 	// TODO: Deal with bad states
+	Ice::AsyncResultPtr arp;
 	GPid child_pid;
 } Rumination;
 static Rumination *rumination;
@@ -151,13 +160,22 @@ bool rumination_destroy( GError **err ) {
 
 
 void rumination_begin_get_type_by_variable_name( const char *varname, GError **err ) {
+	g_assert(rumination->arp == 0);
 	rumination->arp = rumination->debugger->begin_getTypeByVariableName(varname, gettid());
 }
 
 RType *rumination_end_get_type_by_variable_name( GError **err ) {
+	g_assert(rumination->arp != 0);
 	Ruminate::TypePrx t(rumination->debugger->end_getTypeByVariableName(rumination->arp));
-	rumination->arp = NULL;
+	rumination->arp = 0;
 	return r_type_new(t, err);
+}
+
+RFrameList *rumination_backtrace( GError **err ) {
+	Ice::AsyncResultPtr arp(rumination->debugger->begin_getBacktrace(gettid()));
+	rumination_hit_breakpoint();
+	RFrameList *ret = r_frame_list_new(rumination->debugger->end_getBacktrace(arp), err);
+	return ret;
 }
 
 G_END_DECLS

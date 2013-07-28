@@ -1,18 +1,21 @@
-#include "private/type.h"
+#include <sys/types.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <limits.h>
 
-#include "ruminate/errors.h"
+#include <exception>
+
+#include <glib.h>
 
 #include <Ice/Ice.h>
 #include "ice/type.h"
 #include "ice/type_list.h"
 
-#include <glib.h>
+#include "ruminate/errors.h"
+#include "ruminate/type.h"
 
-#include <exception>
-
-#include <stddef.h>
-#include <stdint.h>
-#include <limits.h>
+#include "private/type.h"
 
 struct RType {
 	char *name;

@@ -1,11 +1,10 @@
 #ifndef _RUMINATE_RUMINATION_H_
 #define _RUMINATE_RUMINATION_H_
 
-#include "ruminate/type.h"
-
-#include <glib.h>
-
-#include <stdbool.h>
+// include <stdbool.h>
+// include <glib.h>
+// include "type.h"
+// include "frame.h"
 
 G_BEGIN_DECLS
 
@@ -14,6 +13,8 @@ bool rumination_init( int *argc, char *argv[], GError **err );
 
 void rumination_begin_get_type_by_variable_name( const char *varname, GError **err );
 RType *rumination_end_get_type_by_variable_name( GError **err );
+
+RFrameList *rumination_backtrace( GError **err );
 
 __attribute__((noinline))
 void rumination_hit_breakpoint();

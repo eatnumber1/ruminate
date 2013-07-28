@@ -1,4 +1,4 @@
-SRC_SOURCES := rumination.cpp type.cpp gettid.c errors.c
+SRC_SOURCES := rumination.cpp type.cpp gettid.c errors.c util.c frame.cpp
 SRC_SOURCES := $(SRC_SOURCES:%=$(CURDIR)/%)
 
 SRC_OBJECTS := $(SRC_SOURCES:.c=.o)

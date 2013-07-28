@@ -11,5 +11,6 @@ import debugger_factory_ice
 import exceptions_ice
 import type_inspector_ice
 import type_list_ice
+import frame_ice
 
 # Submodules:

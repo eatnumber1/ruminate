@@ -71,21 +71,32 @@ class DebuggerImpl(Debugger):
 	def shutdown(self):
 		self.em.shutdown()
 
-	def getTypeByVariableName(self, variable, tid, current):
-		print("getTypeByVariableName: begin")
+	class StoppedThread(object):
+		def __init__(self, em, process, tid):
+			self.tid = tid
+			self.em = em
+			self.process = process
 
-		try:
-			thread = validate(self.process.GetThreadByID(tid))
-
+		def __enter__(self):
+			thread = validate(self.process.GetThreadByID(self.tid))
 			stoppedAtBreakpoint = threading.Event()
 			def onStopped(event):
 				if thread.stop_reason == eStopReasonBreakpoint:
 					stoppedAtBreakpoint.set()
 					self.em.removeCallback(lldb.eStateStopped, onStopped)
 			self.em.addCallback(lldb.eStateStopped, onStopped)
+			stoppedAtBreakpoint.wait()
+			return thread
 
-			try:
-				stoppedAtBreakpoint.wait()
+		def __exit__(self, *args):
+			self.process.Continue()
+			return False
+
+	def getTypeByVariableName(self, variable, tid, current):
+		print("getTypeByVariableName: begin")
+
+		try:
+			with self.StoppedThread(self.em, self.process, tid) as thread:
 
 				frame = validate(thread.frame[1])
 				print(frame)
@@ -96,13 +107,25 @@ class DebuggerImpl(Debugger):
 				typ = validate(value.GetType())
 				print(typ)
 
-				return TypePrx.uncheckedCast(current.adapter.addWithUUID(TypeImpl(typ)))
-			except:
-				try:
-					self.em.removeCallback(lldb.eStateStopped, onStopped)
-				except:
-					pass
+				return TypeImpl.proxyFor(typ, current)
 		finally:
-			self.process.Continue()
-			print("Process continued")
 			print("getTypeByVariableName: exit")
+
+	def getBacktrace(self, tid, current):
+		print("getBacktrace: begin")
+		try:
+			with self.StoppedThread(self.em, self.process, tid) as thread:
+				frame_list = []
+
+				for sbframe in thread.frames:
+					frame = Frame()
+					frame.functionName = sbframe.name
+					frame.moduleName = sbframe.module.file.basename
+					frame.compileUnitName = sbframe.compile_unit.file.basename
+					frame.functionType = TypeImpl.proxyFor(sbframe.function.type, current)
+					frame.line = sbframe.line_entry.line
+					frame_list.append(frame)
+
+				return frame_list
+		finally:
+			print("getBacktrace: end")

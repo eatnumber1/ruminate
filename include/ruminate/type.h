@@ -1,17 +1,6 @@
 #ifndef _RUMINATE_TYPE_H_
 #define _RUMINATE_TYPE_H_
 
-#include <glib.h>
-
-#include <sys/types.h>
-#include <stdint.h>
-
-#ifdef __cplusplus
-#define STATIC_ASSERT(...) static_assert(__VA_ARGS__)
-#else
-#define STATIC_ASSERT(...) _Static_assert(__VA_ARGS__)
-#endif
-
 // Shamelessly copied & modified from lldb-enumerations.h
 typedef enum RTypeIdentifier {
 	R_TYPE_CLASS_INVALID           = (0u),
@@ -39,6 +28,7 @@ typedef enum RTypeIdentifier {
 	R_TYPE_CLASS_ANY               = (0xffffffffu)
 } RTypeIdentifier;
 
+// Shamelessly copied & modified from lldb-enumerations.h
 typedef enum RPrimitiveTypeIdentifier {
 	R_PRIMITIVE_TYPE_INVALID = 0,
 	R_PRIMITIVE_TYPE_VOID = 1,
