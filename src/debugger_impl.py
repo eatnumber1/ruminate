@@ -97,7 +97,6 @@ class DebuggerImpl(Debugger):
 
 		try:
 			with self.StoppedThread(self.em, self.process, tid) as thread:
-
 				frame = validate(thread.frame[1])
 				print(frame)
 

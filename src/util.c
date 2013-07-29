@@ -30,7 +30,7 @@ void abort_with_backtrace( const char *message ) {
 		const char *mname = r_frame_module_name(frame);
 		const char *cuname = r_frame_compile_unit_name(frame);
 		uint32_t line = r_frame_line(frame);
-		fprintf(stderr, "\tat %s(%s:%s:%d)\n", fname, mname, cuname, line);
+		fprintf(stderr, "\tat %s(%s, %s:%d)\n", fname, mname, cuname, line);
 	}
 
 	r_frame_list_unref(frames);
