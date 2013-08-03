@@ -145,7 +145,6 @@ bool rumination_init( int *argc, char *argv[], GError **err ) {
 }
 
 bool rumination_destroy( GError **err ) {
-	(void) err;
 	if( rumination == NULL ) return true;
 	rumination->factory->shutdown();
 	rumination->communicator->destroy();

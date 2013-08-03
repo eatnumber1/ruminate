@@ -16,8 +16,8 @@ SRCDIR := $(TOPDIR)/src
 ICEDIR := $(TOPDIR)/ice
 
 CPPFLAGS := $(CPPFLAGS) -ggdb -fno-omit-frame-pointer -O1 -fno-optimize-sibling-calls
-CFLAGS := $(CFLAGS) -fPIC -Wall -Wnonnull -ferror-limit=3 -Werror -std=gnu11
-CXXFLAGS := $(CXXFLAGS) -std=gnu++11 -Wall -Wnonnull -fPIC -ferror-limit=3 -Werror
+CFLAGS := $(CFLAGS) -fPIC -Wall -Wnonnull -ferror-limit=3 -std=gnu11 -Wextra
+CXXFLAGS := $(CXXFLAGS) -std=gnu++11 -Wall -Wnonnull -fPIC -ferror-limit=3 -Wextra
 LIBRARIES := $(LIBRARIES) -lIce -lIceUtil
 
 GTHREAD_CPPFLAGS ?= $(shell $(PKG_CONFIG) --cflags gthread-2.0)
