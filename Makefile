@@ -6,8 +6,6 @@ SLICE2PY := slice2py
 
 PKG_CONFIG ?= pkg-config
 
--include config.mk
-
 SUBDIRS := ice include src test
 
 CSCOPE_FILES := cscope.out cscope.po.out cscope.in.out
@@ -29,6 +27,8 @@ GLIB_LIBRARIES ?= $(shell $(PKG_CONFIG) --libs glib-2.0)
 
 CPPFLAGS := $(CPPFLAGS) $(GLIB_CPPFLAGS) $(GTHREAD_CPPFLAGS)
 LIBRARIES := $(LIBRARIES) $(GLIB_LIBRARIES) $(GTHREAD_LIBRARIES)
+
+-include config.mk
 
 CLEAN_TARGETS := $(SUBDIRS:=/clean)
 DEPCLEAN_TARGETS := $(SUBDIRS:=/depclean)
@@ -77,7 +77,7 @@ $(foreach subdir, $(SUBDIRS), $(eval $(call subdirRule, $(subdir))))
 CURDIR := $(TOPDIR)
 
 %.exe:
-	$(CC) $(LDFLAGS) -o $@ $(EXE_OBJECTS) $(LIBRARIES)
+	$(CXX) $(LDFLAGS) -o $@ $(EXE_OBJECTS) $(LIBRARIES)
 
 %.d: %.c
 	$(DEPGEN) -MM $(CPPFLAGS) -MQ $(@:.d=.o) -MQ $@ -MF $*.d $<
