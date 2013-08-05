@@ -69,8 +69,10 @@ typedef struct RType RType;
 typedef struct RPrimitiveType RPrimitiveType;
 typedef struct RStructType RStructType;
 typedef struct RFunctionType RFunctionType;
+typedef struct RBitFieldType RBitFieldType;
 
 typedef struct RStructMember RStructMember;
+typedef struct RBitFieldMember RBitFieldMember;
 
 G_BEGIN_DECLS
 
@@ -80,28 +82,41 @@ void r_type_ref( RType * );
 void r_struct_member_ref( RStructMember * );
 void r_struct_member_unref( RStructMember * );
 
+void r_bit_field_member_ref( RBitFieldMember * );
+void r_bit_field_member_unref( RBitFieldMember * );
+
 RPrimitiveType *r_type_as_primitive( RType *, GError ** );
 RStructType *r_type_as_struct( RType *, GError ** );
 RType *r_type_as_canonical( RType *, GError ** );
 RFunctionType *r_type_as_function( RType *, GError ** );
+RBitFieldType *r_type_as_bit_field( RType *, GError ** );
 
 const char *r_type_name( RType *, GError ** );
 size_t r_type_size( RType *, GError ** );
 RTypeIdentifier r_type_id( RType *, GError ** );
 
-size_t r_struct_type_nfields( RStructType *, GError ** );
+size_t r_struct_type_nmembers( RStructType *, GError ** );
 
 RPrimitiveTypeIdentifier r_primitive_type_id( RPrimitiveType *, GError ** );
 
 size_t r_function_type_narguments( RFunctionType *, GError ** );
 
 const char *r_struct_member_name( RStructMember *, GError ** );
-off_t r_struct_member_offset( RStructMember *, GError **);
+off_t r_struct_member_offset( RStructMember *, GError ** );
 RType *r_struct_member_type( RStructMember *, GError ** );
 
 RType *r_type_pointee( RType *, GError ** );
+RType *r_type_as_pointer( RType *, GError ** );
 
-RStructMember *r_struct_type_field_at_index( RStructType *, size_t, GError ** );
+RBitFieldMember *r_bit_field_type_field_at_index( RBitFieldType *, size_t, GError ** );
+size_t r_bit_field_type_nmembers( RBitFieldType *, GError ** );
+size_t r_bit_field_size_bits( RBitFieldType *, GError ** );
+
+off_t r_bit_field_member_offset_bits( RBitFieldMember *, GError ** );
+const char *r_bit_field_member_name( RBitFieldMember *, GError ** );
+RType *r_bit_field_member_type( RBitFieldMember *, GError ** );
+
+RStructMember *r_struct_type_member_at_index( RStructType *, size_t, GError ** );
 RType *r_function_argument_type_at_index( RFunctionType *, size_t, GError ** );
 RType *r_function_return_type( RFunctionType *, GError ** );
 

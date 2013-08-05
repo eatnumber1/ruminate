@@ -73,12 +73,12 @@ static bool _print_json_for_struct( RType *type, void *data, GError **err ) {
 	RStructType *st = r_type_as_struct(type, err);
 	if( st == NULL ) goto out_type_as_struct;
 
-	size_t nfields = r_struct_type_nfields(st, err);
+	size_t nfields = r_struct_type_nmembers(st, err);
 	// TODO: Error checking
 
 	printf("{");
 	for( size_t i = 0; i < nfields; i++ ) {
-		RStructMember *member = r_struct_type_field_at_index(st, i, err);
+		RStructMember *member = r_struct_type_member_at_index(st, i, err);
 		if( member == NULL ) goto out_struct_type_field_at_index;
 
 		const char *name = r_struct_member_name(member, err);

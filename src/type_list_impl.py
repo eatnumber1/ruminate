@@ -22,7 +22,7 @@ class FunctionArgumentList(TypeListImpl):
 	def proxyFor(tlist, current):
 		return TypeListImpl.proxyFor(FunctionArgumentList(tlist), current)
 
-class StructFieldList(TypeListImpl):
+class MemberList(TypeListImpl):
 	def __init__(self, struct):
 		self.struct = struct
 
@@ -35,4 +35,4 @@ class StructFieldList(TypeListImpl):
 
 	@staticmethod
 	def proxyFor(struct, current):
-		return TypeListImpl.proxyFor(StructFieldList(struct), current)
+		return TypeListImpl.proxyFor(MemberList(struct), current)

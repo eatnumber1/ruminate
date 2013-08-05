@@ -20,6 +20,15 @@ class TypeImpl(Type):
 	def lldbGetOffsetInBytes(self, current = None):
 		return self.sbtype.GetOffsetInBytes();
 
+	def lldbGetOffsetInBits(self, current = None):
+		return self.sbtype.GetOffsetInBits();
+
+	def lldbGetBitfieldSizeInBits(self, current = None):
+		return self.sbtype.GetBitfieldSizeInBits();
+
+	def lldbIsBitfield(self, current = None):
+		return self.sbtype.IsBitfield()
+
 	def lldbGetType(self, current = None):
 		return TypeImpl.proxyFor(self.sbtype.GetType(), current)
 
@@ -31,14 +40,20 @@ class TypeImpl(Type):
 			return None
 		return TypeImpl.proxyFor(self.sbtype.GetPointeeType(), current)
 
+	def getPointerType(self, current = None):
+		return TypeImpl.proxyFor(self.sbtype.GetPointerType(), current)
+
+	def isComplete(self, current = None):
+		return self.sbtype.IsTypeComplete()
+
 	def getCanonicalType(self, current = None):
 		canon = self.sbtype.GetCanonicalType()
 		if canon == self.sbtype:
 			return None
 		return TypeImpl.proxyFor(canon, current)
 
-	def getStructFields(self, current = None):
-		return StructFieldList.proxyFor(self.sbtype, current)
+	def getMembers(self, current = None):
+		return MemberList.proxyFor(self.sbtype, current)
 
 	def getFunctionArguments(self, current = None):
 		if not self.sbtype.IsFunctionType():

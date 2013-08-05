@@ -7,19 +7,28 @@ module Ruminate {
 	interface Type {
 		Type *getPrimitiveType();
 		Type *getPointeeType();
+		Type *getPointerType();
 		Type *getCanonicalType();
 		Type *getFunctionReturnType();
 
-		TypeList *getStructFields();
+		TypeList *getMembers();
 		TypeList *getFunctionArguments();
 
 		string getName(); // This is cached in the C++ API layer
 		idempotent long getSize();
 
+		idempotent bool isComplete();
+
 		idempotent int lldbGetTypeClass();
 		idempotent int lldbGetBasicType();
 
 		idempotent long lldbGetOffsetInBytes();
+		idempotent long lldbGetOffsetInBits();
+
+		idempotent long lldbGetBitfieldSizeInBits();
+
+		idempotent bool lldbIsBitfield();
+
 		Type *lldbGetType();
 	};
 };
