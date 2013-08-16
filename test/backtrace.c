@@ -2,6 +2,8 @@
 
 #include <glib.h>
 
+#include "util.h"
+
 void bar( int i ) {
 	if( i < 2 ) {
 		bar(i + 1);

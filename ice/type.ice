@@ -1,18 +1,27 @@
 #ifndef _TYPE_ICE_
 #define _TYPE_ICE_
 
-#include <type_list.ice>
+#include <type_member.ice>
 
 module Ruminate {
+	enum TypeId {
+		TypeIdStructure
+	};
+
+	interface Type;
+	sequence<Type *> TypeList;
+
 	interface Type {
+		TypeId getId();
+
 		Type *getPrimitiveType();
 		Type *getPointeeType();
 		Type *getPointerType();
 		Type *getCanonicalType();
-		Type *getFunctionReturnType();
+		Type *getReturnType();
 
-		TypeList *getMembers();
-		TypeList *getFunctionArguments();
+		TypeMemberList getMembers();
+		TypeList getArguments();
 
 		string getName(); // This is cached in the C++ API layer
 		idempotent long getSize();
@@ -21,13 +30,6 @@ module Ruminate {
 
 		idempotent int lldbGetTypeClass();
 		idempotent int lldbGetBasicType();
-
-		idempotent long lldbGetOffsetInBytes();
-		idempotent long lldbGetOffsetInBits();
-
-		idempotent long lldbGetBitfieldSizeInBits();
-
-		idempotent bool lldbIsBitfield();
 
 		Type *lldbGetType();
 	};

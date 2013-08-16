@@ -1,26 +1,22 @@
-#ifndef _RUMINATE_FRAME_H_
-#define _RUMINATE_FRAME_H_
-
 typedef struct RFrameList RFrameList;
 typedef struct RFrame RFrame;
 
 G_BEGIN_DECLS
 
-size_t r_frame_list_size( RFrameList * );
-RFrame *r_frame_list_at( RFrameList *, size_t );
+size_t RUMINATE_EXPORT r_frame_list_size( RFrameList *, GError ** ) RUMINATE_NOEXCEPT;
+RFrame * RUMINATE_EXPORT r_frame_list_at( RFrameList *, size_t, GError ** ) RUMINATE_NOEXCEPT;
 
-void r_frame_list_ref( RFrameList * );
-void r_frame_list_unref( RFrameList * );
+void RUMINATE_EXPORT r_frame_list_ref( RFrameList * ) RUMINATE_NOEXCEPT;
+void RUMINATE_EXPORT r_frame_list_unref( RFrameList * ) RUMINATE_NOEXCEPT;
 
-void r_frame_ref( RFrame * );
-void r_frame_unref( RFrame * );
+void RUMINATE_EXPORT r_frame_ref( RFrame * ) RUMINATE_NOEXCEPT;
+void RUMINATE_EXPORT r_frame_unref( RFrame * ) RUMINATE_NOEXCEPT;
 
-const char *r_frame_function_name( RFrame * );
-const char *r_frame_module_name( RFrame * );
-const char *r_frame_compile_unit_name( RFrame * );
-RType *r_frame_function_type( RFrame *, GError ** );
-uint32_t r_frame_line( RFrame * );
+// TODO: These should be returning RStrings
+const char * RUMINATE_EXPORT r_frame_function_name( RFrame *, GError ** ) RUMINATE_NOEXCEPT;
+const char * RUMINATE_EXPORT r_frame_module_name( RFrame *, GError ** ) RUMINATE_NOEXCEPT;
+const char * RUMINATE_EXPORT r_frame_compile_unit_name( RFrame *, GError ** ) RUMINATE_NOEXCEPT;
+RType * RUMINATE_EXPORT r_frame_function_type( RFrame *, GError ** ) RUMINATE_NOEXCEPT;
+uint32_t RUMINATE_EXPORT r_frame_line( RFrame *, GError ** ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS
-
-#endif

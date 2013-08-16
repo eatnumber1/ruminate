@@ -1,32 +1,25 @@
-#ifndef _RUMINATE_RUMINATION_H_
-#define _RUMINATE_RUMINATION_H_
-
-// include <stdbool.h>
-// include <glib.h>
-// include "type.h"
-// include "frame.h"
-
 G_BEGIN_DECLS
 
-bool rumination_destroy( GError **err );
-bool rumination_init( int *argc, char *argv[], GError **err );
+bool RUMINATE_EXPORT rumination_destroy( GError ** ) RUMINATE_NOEXCEPT;
+bool RUMINATE_EXPORT rumination_init( int *, char *[], GError ** ) RUMINATE_NOEXCEPT;
 
-void rumination_begin_get_type_by_variable_name( const char *varname, GError **err );
-RType *rumination_end_get_type_by_variable_name( GError **err );
+bool RUMINATE_EXPORT rumination_begin_get_type_by_variable_name( const char *, GError ** ) RUMINATE_NOEXCEPT;
+RType * RUMINATE_EXPORT rumination_end_get_type_by_variable_name( GError ** ) RUMINATE_NOEXCEPT;
 
-RFrameList *rumination_backtrace( GError **err );
+RFrameList * RUMINATE_EXPORT rumination_backtrace( GError ** ) RUMINATE_NOEXCEPT;
 
 __attribute__((noinline))
-void rumination_hit_breakpoint();
+void RUMINATE_EXPORT rumination_hit_breakpoint() RUMINATE_NOEXCEPT;
 
 G_END_DECLS
 
-#define rumination_get_type(expr, err) ({ \
-	typeof(expr) _expr = (expr); \
-	(void) _expr; \
-	rumination_begin_get_type_by_variable_name("_expr", err); \
-	rumination_hit_breakpoint(); \
-	rumination_end_get_type_by_variable_name(err); \
+#define rumination_get_type(type, err) ({ \
+	type expr = ((type) 0); \
+	(void) expr; \
+	if( !rumination_begin_get_type_by_variable_name("expr", err) ) { \
+		NULL; \
+	} else { \
+		rumination_hit_breakpoint(); \
+		rumination_end_get_type_by_variable_name(err); \
+	} \
 })
-
-#endif
