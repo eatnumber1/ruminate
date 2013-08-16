@@ -1,6 +1,5 @@
 CC := clang
 CXX := clang++
-DEPGEN := gcc
 SLICE2CPP := slice2cpp
 SLICE2PY := slice2py
 
@@ -16,8 +15,9 @@ SRCDIR := $(TOPDIR)/src
 ICEDIR := $(TOPDIR)/ice
 
 CPPFLAGS := $(CPPFLAGS) -ggdb -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls
+CXXPPFLAGS := $(CXXPPFLAGS) $(CPPFLAGS) -std=gnu++11 -stdlib=libc++
 CFLAGS := $(CFLAGS) -fPIC -Wall -Wnonnull -ferror-limit=3 -std=gnu11 -Wextra
-CXXFLAGS := $(CXXFLAGS) -std=gnu++11 -Wall -Wnonnull -fPIC -ferror-limit=3 -Wextra -stdlib=libc++
+CXXFLAGS := $(CXXFLAGS) -Wall -Wnonnull -fPIC -ferror-limit=3 -Wextra
 LIBRARIES := $(LIBRARIES) -lIce -lIceUtil
 
 GTHREAD_CPPFLAGS ?= $(shell $(PKG_CONFIG) --cflags gthread-2.0)
@@ -26,6 +26,7 @@ GLIB_CPPFLAGS ?= $(shell $(PKG_CONFIG) --cflags glib-2.0)
 GLIB_LIBRARIES ?= $(shell $(PKG_CONFIG) --libs glib-2.0)
 
 CPPFLAGS := $(CPPFLAGS) $(GLIB_CPPFLAGS) $(GTHREAD_CPPFLAGS)
+CXXPPFLAGS := $(CXXPPFLAGS) $(GLIB_CPPFLAGS) $(GTHREAD_CPPFLAGS)
 LIBRARIES := $(LIBRARIES) $(GLIB_LIBRARIES) $(GTHREAD_LIBRARIES)
 
 -include config.mk
@@ -80,10 +81,10 @@ CURDIR := $(TOPDIR)
 	$(CXX) $(LDFLAGS) -o $@ $(EXE_OBJECTS) $(LIBRARIES)
 
 %.d: %.c
-	$(DEPGEN) -MM $(CPPFLAGS) -MQ $(@:.d=.o) -MQ $@ -MF $*.d $<
+	$(CC) -MM $(CPPFLAGS) -MQ $(@:.d=.o) -MQ $@ -MF $*.d $<
 
 %.d: %.cpp
-	$(DEPGEN) -MM $(CPPFLAGS) -MQ $(@:.d=.o) -MQ $@ -MF $*.d $<
+	$(CXX) -MM $(CXXPPFLAGS) -MQ $(@:.d=.o) -MQ $@ -MF $*.d $<
 
 %.d: %.ice
 	$(SLICE2CPP) $(SLICE2CPPFLAGS) --depend $< > $@
@@ -92,7 +93,7 @@ CURDIR := $(TOPDIR)
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 %.o: %.cpp
-	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) -o $@ $<
+	$(CXX) -c $(CXXPPFLAGS) $(CXXFLAGS) -o $@ $<
 
 %.cpp %.h: %.ice
 	$(SLICE2CPP) $(SLICE2CPP_FLAGS) $<
