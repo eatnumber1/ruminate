@@ -14,34 +14,35 @@ INCDIR := $(TOPDIR)/include
 SRCDIR := $(TOPDIR)/src
 ICEDIR := $(TOPDIR)/ice
 
-CPPFLAGS := $(CPPFLAGS) -ggdb -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls
-CXXPPFLAGS := $(CXXPPFLAGS) $(CPPFLAGS) -std=gnu++11 -stdlib=libc++
-CFLAGS := $(CFLAGS) -fPIC -Wall -Wnonnull -ferror-limit=3 -std=gnu11 -Wextra
-CXXFLAGS := $(CXXFLAGS) -Wall -Wnonnull -fPIC -ferror-limit=3 -Wextra
-LIBRARIES := $(LIBRARIES) -lIce -lIceUtil
+FLAGS_ALL := $(FLAGS_ALL) -ferror-limit=3
+FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) -Wall -Wextra -Wnonnull
+FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER_CXX) -std=gnu++11 -stdlib=libc++
+FLAGS_COMPILER := $(FLAGS_COMPILER) -g -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls -fPIC
 
-GTHREAD_CPPFLAGS ?= $(shell $(PKG_CONFIG) --cflags gthread-2.0)
-GTHREAD_LIBRARIES ?= $(shell $(PKG_CONFIG) --libs gthread-2.0)
-GLIB_CPPFLAGS ?= $(shell $(PKG_CONFIG) --cflags glib-2.0)
-GLIB_LIBRARIES ?= $(shell $(PKG_CONFIG) --libs glib-2.0)
+FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) $(shell $(PKG_CONFIG) --cflags gthread-2.0) $(shell $(PKG_CONFIG) --cflags glib-2.0)
+FLAGS_LINKER := $(FLAGS_LINKER) $(shell $(PKG_CONFIG) --libs gthread-2.0) $(shell $(PKG_CONFIG) --libs glib-2.0)
 
-CPPFLAGS := $(CPPFLAGS) $(GLIB_CPPFLAGS) $(GTHREAD_CPPFLAGS)
-CXXPPFLAGS := $(CXXPPFLAGS) $(GLIB_CPPFLAGS) $(GTHREAD_CPPFLAGS)
-LIBRARIES := $(LIBRARIES) $(GLIB_LIBRARIES) $(GTHREAD_LIBRARIES)
+ifeq ($(shell uname),Darwin)
+SO_SUFFIX := dylib
+else
+SO_SUFFIX := so
+endif
 
 -include config.mk
 
 CLEAN_TARGETS := $(SUBDIRS:=/clean)
 DEPCLEAN_TARGETS := $(SUBDIRS:=/depclean)
 ALL_TARGETS := $(SUBDIRS:=/all)
+INSTALL_TARGETS := $(SUBDIRS:=/install)
 
-.PHONY: all clean depclean cscope pristine cscope-clean
+.PHONY: all clean depclean cscope pristine cscope-clean install
 .DEFAULT_GOAL: all
 
 all: $(ALL_TARGETS)
 clean: $(CLEAN_TARGETS)
 depclean: clean $(DEPCLEAN_TARGETS)
 pristine: depclean cscope-clean
+install: $(INSTALL_TARGETS)
 
 cscope-clean:
 	$(RM) $(CSCOPE_FILES)
@@ -53,12 +54,26 @@ cscope:
 $(CLEAN_TARGETS):
 $(DEPCLEAN_TARGETS):
 $(ALL_TARGETS):
+$(INSTALL_TARGETS):
 
 define variableRule
  CURDIR := $$(TOPDIR)/$$$(1)
  include $$(CURDIR)/variables.mk
 endef
 $(foreach subdir, $(SUBDIRS), $(eval $(call variableRule, $(subdir))))
+
+FLAGS_PREPROC_AND_COMPILER_C := $(FLAGS_PREPROC_AND_COMPILER) $(FLAGS_PREPROC_AND_COMPILER_C)
+FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER) $(FLAGS_PREPROC_AND_COMPILER_CXX)
+
+FLAGS_PREPROCESSOR := $(FLAGS_ALL) $(FLAGS_PREPROCESSOR)
+FLAGS_PREPROCESSOR_C := $(FLAGS_PREPROCESSOR) $(FLAGS_PREPROCESSOR_C)
+FLAGS_PREPROCESSOR_CXX := $(FLAGS_PREPROCESSOR) $(FLAGS_PREPROCESSOR_CXX)
+
+FLAGS_COMPILER := $(FLAGS_ALL) $(FLAGS_COMPILER)
+FLAGS_COMPILER_C := $(FLAGS_COMPILER) $(FLAGS_COMPILER_C)
+FLAGS_COMPILER_CXX := $(FLAGS_COMPILER) $(FLAGS_COMPILER_CXX)
+
+FLAGS_LINKER := $(FLAGS_ALL) $(FLAGS_LINKER)
 
 # This defines the following for every dir in SUBDIRS:
 #   Sets CURDIR to the $(TOPDIR)/$(dir)
@@ -68,6 +83,7 @@ define subdirRule
  $$$(1)/all: CURDIR := $$(CURDIR)
  $$$(1)/clean: CURDIR := $$(CURDIR)
  $$$(1)/depclean: CURDIR := $$(CURDIR)
+ $$$(1)/install: CURDIR := $$(CURDIR)
  include $$(CURDIR)/Makefile
 endef
 # This is what actually does the work.
@@ -78,27 +94,30 @@ $(foreach subdir, $(SUBDIRS), $(eval $(call subdirRule, $(subdir))))
 CURDIR := $(TOPDIR)
 
 %.exe:
-	$(CXX) $(LDFLAGS) -o $@ $(EXE_OBJECTS) $(LIBRARIES)
+	$(CXX) -o $@ $(EXE_OBJECTS) $(FLAGS_LINKER)
 
 %.d: %.c
-	$(CC) -MM $(CPPFLAGS) -MQ $(@:.d=.o) -MQ $@ -MF $*.d $<
+	$(CC) -MM -MQ $(@:.d=.o) -MQ $@ -MF $*.d $< $(FLAGS_PREPROCESSOR_C) $(FLAGS_PREPROC_AND_COMPILER_C)
 
 %.d: %.cpp
-	$(CXX) -MM $(CXXPPFLAGS) -MQ $(@:.d=.o) -MQ $@ -MF $*.d $<
+	$(CXX) -MM -MQ $(@:.d=.o) -MQ $@ -MF $*.d $< $(FLAGS_PREPROCESSOR_CXX) $(FLAGS_PREPROC_AND_COMPILER_CXX)
 
 %.d: %.ice
-	$(SLICE2CPP) $(SLICE2CPPFLAGS) --depend $< > $@
+	$(SLICE2CPP) --depend $< $(FLAGS_SLICE2CPP) > $@
 
 %.o: %.c
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+	$(CC) -c -o $@ $< $(FLAGS_PREPROCESSOR_C) $(FLAGS_COMPILER_C) $(FLAGS_PREPROC_AND_COMPILER_C)
 
 %.o: %.cpp
-	$(CXX) -c $(CXXPPFLAGS) $(CXXFLAGS) -o $@ $<
+	$(CXX) -c -o $@ $< $(FLAGS_PREPROCESSOR_CXX) $(FLAGS_COMPILER_CXX) $(FLAGS_PREPROC_AND_COMPILER_CXX)
 
 %.cpp %.h: %.ice
-	$(SLICE2CPP) $(SLICE2CPP_FLAGS) $<
+	$(SLICE2CPP) $(FLAGS_SLICE2CPP) $<
 
 %_ice.py: %.ice
-	$(SLICE2PY) $(SLICE2PY_FLAGS) $<
+	$(SLICE2PY) $(FLAGS_SLICE2PY) $<
+
+%.$(SO_SUFFIX):
+	$(CXX) -shared -o $@ $(SO_OBJECTS) $(FLAGS_LINKER)
 
 # vim:tw=80

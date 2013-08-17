@@ -1,10 +1,14 @@
 .PHONY: src/all src/clean src/depclean
 
 src/clean:
-	$(RM) $(SRC_OBJECTS)
+	$(RM) $(SRC_OBJECTS) $(LIBRUMINATE)
 
 src/depclean:
 	$(RM) $(SRC_DEPS)
+
+$(LIBRUMINATE): $(SRC_OBJECTS) $(ICE_OBJECTS)
+$(LIBRUMINATE): SO_OBJECTS := $(SRC_OBJECTS) $(ICE_OBJECTS)
+$(LIBRUMINATE): FLAGS_LINKER := $(SRC_FLAGS_LINKER) $(FLAGS_LINKER)
 
 $(SRC_DEPS): $(ICE_HEADERS)
 

@@ -2,17 +2,20 @@
 
 test/all: test/backtrace.exe test/ruminate.exe test/main.exe
 
-test/ruminate.exe: $(ALL_OBJECTS) $(RUMINATE_TEST_OBJECTS)
-test/ruminate.exe: EXE_OBJECTS := $(ALL_OBJECTS) $(RUMINATE_TEST_OBJECTS)
-test/ruminate.exe: CPPFLAGS := $(CPPFLAGS) $(TEST_CPPFLAGS)
+test/ruminate.exe: $(LIBRUMINATE) $(RUMINATE_TEST_OBJECTS)
+test/ruminate.exe: EXE_OBJECTS := $(RUMINATE_TEST_OBJECTS)
+test/ruminate.exe: FLAGS_PREPROCESSOR := $(FLAGS_PREPROCESSOR) $(TEST_FLAGS_PREPROCESSOR)
+test/ruminate.exe: FLAGS_LINKER := $(FLAGS_LINKER) $(LIBRUMINATE_FLAGS_LINKER)
 
-test/main.exe: $(ALL_OBJECTS) $(TEST_OBJECTS)
-test/main.exe: EXE_OBJECTS := $(ALL_OBJECTS) $(TEST_OBJECTS)
-test/main.exe: CPPFLAGS := $(CPPFLAGS) $(TEST_CPPFLAGS)
+test/main.exe: $(LIBRUMINATE) $(TEST_OBJECTS)
+test/main.exe: EXE_OBJECTS := $(TEST_OBJECTS)
+test/main.exe: FLAGS_PREPROCESSOR := $(FLAGS_PREPROCESSOR) $(TEST_FLAGS_PREPROCESSOR)
+test/main.exe: FLAGS_LINKER := $(FLAGS_LINKER) $(LIBRUMINATE_FLAGS_LINKER)
 
-test/backtrace.exe: $(ALL_OBJECTS) $(BACKTRACE_TEST_OBJECTS)
-test/backtrace.exe: EXE_OBJECTS := $(ALL_OBJECTS) $(BACKTRACE_TEST_OBJECTS)
-test/backtrace.exe: CPPFLAGS := $(CPPFLAGS) $(TEST_CPPFLAGS)
+test/backtrace.exe: $(LIBRUMINATE) $(BACKTRACE_TEST_OBJECTS)
+test/backtrace.exe: EXE_OBJECTS := $(BACKTRACE_TEST_OBJECTS)
+test/backtrace.exe: FLAGS_PREPROCESSOR := $(FLAGS_PREPROCESSOR) $(TEST_FLAGS_PREPROCESSOR)
+test/backtrace.exe: FLAGS_LINKER := $(FLAGS_LINKER) $(LIBRUMINATE_FLAGS_LINKER)
 
 test/clean:
 	$(RM) $(TEST_OBJECTS) $(RUMINATE_TEST_OBJECTS) $(BACKTRACE_TEST_OBJECTS)
