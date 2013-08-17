@@ -12,13 +12,13 @@
 #include <spawn.h>
 #include <sys/wait.h>
 
-#include <glib.h>
-
 #include <Ice/Ice.h>
 #include "ice/debugger_factory.h"
 #include "ice/debugger.h"
 #include "ice/frame.h"
 #include "ice/type.h"
+
+#include "private/glib.h"
 
 #include "ruminate/common.h"
 #include "ruminate/errors.h"

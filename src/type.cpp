@@ -3,11 +3,11 @@
 #include <string>
 #include <cstddef>
 
-#include <glib.h>
-
 #include <Ice/Ice.h>
 #include "ice/type.h"
 #include "ice/type_member.h"
+
+#include "private/glib.h"
 
 #include "ruminate/common.h"
 #include "ruminate/errors.h"

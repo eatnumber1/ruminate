@@ -5,10 +5,10 @@
 #include <cstdint>
 #include <utility>
 
-#include <glib.h>
-
 #include <Ice/Ice.h>
 #include "ice/frame.h"
+
+#include "private/glib.h"
 
 #include "ruminate/common.h"
 #include "ruminate/errors.h"

@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <glib.h>
+#include "private/glib.h"
 
 #include "ruminate/common.h"
 #include "ruminate/string.h"
