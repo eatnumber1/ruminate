@@ -11,7 +11,7 @@
 #define print_json_for_type(expr, err) ({ \
 	GError **_err = (err); \
 	typeof(expr) __expr = (expr); \
-	RType *_type = rumination_get_type(__expr, _err); \
+	RType *_type = rumination_get_type(typeof(expr), _err); \
 	bool ret = _type == NULL ? false : _print_json_for_type(_type, &__expr, _err); \
 	r_type_unref(_type); \
 	ret; \
@@ -36,182 +36,185 @@ void die_if_error( GError *err ) {
 	exit(EXIT_FAILURE);
 }
 
-static bool _print_json_for_primitive( RType *type, void *data, GError **err ) {
-	RPrimitiveType *pt = r_type_as_primitive(type, err);
-	if( pt == NULL ) return false;
-
-	RPrimitiveTypeIdentifier id = r_primitive_type_id(pt, err);
+static bool _print_json_for_builtin( RBuiltinType *type, void *data, GError **error ) {
+	RBuiltinTypeId id = r_builtin_type_id(type, error);
 	// TODO: Error checking
 
 	switch( id ) {
-		case R_PRIMITIVE_TYPE_INT:
-			printf("%d", *((int *) data));
+		case R_BUILTIN_TYPE_INT:
+			// TODO: Errors
+			if( r_builtin_type_is_unsigned(type, error) ) {
+				printf("%u", *((unsigned int *) data));
+			} else {
+				printf("%d", *((int *) data));
+			}
 			break;
-		case R_PRIMITIVE_TYPE_SHORT:
-			printf("%hd", *((short *) data));
+		case R_BUILTIN_TYPE_SHORT:
+			if( r_builtin_type_is_unsigned(type, error) ) {
+				printf("%hu", *((unsigned short *) data));
+			} else {
+				printf("%hd", *((short *) data));
+			}
 			break;
-		case R_PRIMITIVE_TYPE_CHAR:
-			printf("%c", *((char *) data));
-			break;
-		case R_PRIMITIVE_TYPE_SIGNEDCHAR:
-			printf("%hhd", *((signed char *) data));
-			break;
-		case R_PRIMITIVE_TYPE_UNSIGNEDCHAR:
-			printf("%hhu", *((unsigned char *) data));
+		case R_BUILTIN_TYPE_CHAR:
+			if( r_builtin_type_is_unsigned(type, error) ) {
+				printf("%hhu", *((unsigned char *) data));
+			} else if( r_builtin_type_is_signed(type, error) ) {
+				printf("%hhd", *((signed char *) data));
+			} else {
+				printf("%c", *((char *) data));
+			}
 			break;
 		default:
 			printf("\"unknown primitive type\"");
 	}
 
-	r_type_unref((RType *) pt);
+	r_type_unref((RType *) type);
 	return true;
 }
 
 static bool _print_json_for_type( RType *type, void *data, GError **err );
 
-static bool _print_json_for_struct( RType *type, void *data, GError **err ) {
-	RStructType *st = r_type_as_struct(type, err);
-	if( st == NULL ) goto out_type_as_struct;
+static bool _print_json_for_record( RRecordType *rt, void *data, GError **error ) {
+	RRecordTypeId id = r_record_type_id(rt, error);
+	// TODO: Error checking
 
-	size_t nfields = r_struct_type_nmembers(st, err);
+	switch( id ) {
+		case R_RECORD_TYPE_STRUCTURE:
+			break;
+		default:
+			g_assert_not_reached();
+	}
+
+	size_t nmembers = r_record_type_nmembers(rt, error);
 	// TODO: Error checking
 
 	printf("{");
-	for( size_t i = 0; i < nfields; i++ ) {
-		RStructMember *member = r_struct_type_member_at_index(st, i, err);
-		if( member == NULL ) goto out_struct_type_field_at_index;
-
-		const char *name = r_struct_member_name(member, err);
+	for( size_t i = 0; i < nmembers; i++ ) {
+		RRecordMember *member = r_record_type_member_at(rt, i, error);
 		// TODO: Error checking
 
-		printf("\"%s\":", name);
-
-		RType *member_type = r_struct_member_type(member, err);
+		RString *name = r_record_member_name(member, error);
 		// TODO: Error checking
 
-		off_t offset = r_struct_member_offset(member, err);
+		printf("\"%s\":", r_string_bytes(name));
+
+		r_string_unref(name);
+
+		RType *member_type = r_record_member_type(member, error);
 		// TODO: Error checking
 
-		if( !
-			_print_json_for_type(
-				member_type,
-				((uint8_t *) data) + offset,
-				err
-			)
-		) goto out__print_json_for_type;
+		off_t offset = r_record_member_offset(member, error);
+		// TODO: Error checking
 
-		r_struct_member_unref(member);
-		if( i != nfields - 1 ) printf(",");
-		continue;
+		_print_json_for_type(
+			member_type,
+			((uint8_t *) data) + offset,
+			error
+		);
 
-out__print_json_for_type:
-		r_struct_member_unref(member);
-out_struct_type_field_at_index:
-		goto out_loop_exit;
+		r_record_member_unref(member);
+		if( i != nmembers - 1 ) printf(",");
 	}
 	printf("}");
 
-	r_type_unref((RType *) st);
+	r_type_unref((RType *) rt);
 	return true;
-
-out_loop_exit:
-	r_type_unref((RType *) st);
-out_type_as_struct:
-	return false;
 }
 
-static bool _print_json_for_string( RType *type, void *data, GError **err ) {
+static bool _print_json_for_string( RType *rt, void *data, GError **err ) {
+	(void) rt, (void) err;
 	printf("\"%s\"", *((char **) data));
+	// TODO: Check for errors
 	return true;
 }
 
-static bool print_function_type( RType *type, GError **err ) {
-	RFunctionType *ft = r_type_as_function(type, err);
-	if( ft == NULL ) return false;
-
-	RType *rtype = r_function_return_type(ft, err);
-	if( rtype == NULL ) return false; // TODO: Clean up resources
-
-	const char *rtname = r_type_name(rtype, err);
+static bool print_function_type( RFunctionType *rft, GError **error ) {
+	RRecordType *rrt = (RRecordType *) rft;
+	RType *rtype = r_function_type_return_type(rft, error);
 	// TODO: Error checking
 
-	printf("(%s (", rtname);
+	RString *rtname = r_type_name(rtype, error);
+	// TODO: Error checking
 
 	r_type_unref(rtype);
 
-	size_t narguments = r_function_type_narguments(ft, err);
+	printf("(%s (", r_string_bytes(rtname));
+
+	r_string_unref(rtname);
+
+	size_t narguments = r_record_type_nmembers(rrt, error);
 	// TODO: Error checking
 
 	for( size_t i = 0; i < narguments; i++ ) {
-		RType *arg = r_function_argument_type_at_index(ft, i, err);
-		if( arg == NULL ) return false; // TODO: Clean up resources
-
-		const char *name = r_type_name(arg, err);
+		RRecordMember *arg = r_record_type_member_at(rrt, i, error);
 		// TODO: Error checking
 
-		printf(" %s", name);
+		RString *name = r_record_member_name(arg, error);
+		// TODO: Error checking
+
+		printf(" %s", r_string_bytes(name));
 		if( i != narguments - 1 ) printf(",");
 
-		r_type_unref(arg);
+		r_string_unref(name);
+		r_record_member_unref(arg);
 	}
 
 	printf(" ))");
 
-	r_type_unref((RType *) ft);
+	r_type_unref((RType *) rft);
 
 	return true;
 }
 
-static bool _print_json_for_type( RType *type, void *data, GError **err ) {
-	RTypeIdentifier id = r_type_id(type, err);
+static bool _print_json_for_type( RType *type, void *data, GError **error ) {
+	RTypeId id = r_type_id(type, error);
 	// TODO: Error checking
 
-	const char *name = r_type_name(type, err);
-	// TODO: Error checking
+	if( id == R_TYPE_TYPEDEF ) {
+		RString *name = r_type_name(type, error);
+		// TODO: Error checking
 
-	// Strings are special cased.
-	if( id == R_TYPE_CLASS_TYPEDEF && strcmp(name, "string") == 0 )
-		return _print_json_for_string(type, data, err);
+		// Strings are special cased.
+		int cmp = strcmp(r_string_bytes(name), "string");
+		r_string_unref(name);
 
-	type = r_type_as_canonical(type, err);
-	if( type == NULL ) return false;
+		if( cmp == 0 )
+			return _print_json_for_string(type, data, error);
 
-	id = r_type_id(type, err);
-	// TODO: Error checking
+		type = r_typedef_type_canonical((RTypedefType *) type, error);
+		// TODO: Error checking
+	} else {
+		r_type_ref(type);
+	}
 
-	bool ret;
 	switch( id ) {
-		case R_TYPE_CLASS_PRIMITIVE:
-			ret = _print_json_for_primitive(type, data, err);
+		case R_TYPE_BUILTIN:
+			_print_json_for_builtin((RBuiltinType *) type, data, error);
+			// TODO: Error checking
 			break;
-		case R_TYPE_CLASS_STRUCT:
-			ret = _print_json_for_struct(type, data, err);
+		case R_TYPE_TAG:
+			// TODO: Support other tag types.
+			_print_json_for_record((RRecordType *) type, data, error);
+			// TODO: Error checking
 			break;
-		case R_TYPE_CLASS_FUNCTION:
-			g_assert(false);
-		case R_TYPE_CLASS_POINTER: {
+		case R_TYPE_POINTER: {
 			// TODO: It might be an array
-			RType *pointee = r_type_pointee(type, err);
-			if( pointee == NULL ) {
-				ret = false;
-				break;
-			}
+			RType *pointee = r_pointer_type_pointee((RPointerType *) type, error);
+			// TODO: Error checking
 			r_type_unref(type);
 			type = pointee;
-			ret = _print_json_for_type(type, *((void **) data), err);
+			_print_json_for_type(type, *((void **) data), error);
+			// TODO: Error checking
 			break;
 		}
-		case R_TYPE_CLASS_ARRAY:
-		case R_TYPE_CLASS_ENUMERATION:
-		case R_TYPE_CLASS_TYPEDEF:
-		case R_TYPE_CLASS_UNION:
 		default:
 			fprintf(stderr, "Unknown type with id %d\n", id);
 			abort();
 	}
 
 	r_type_unref(type);
-	return ret;
+	return true;
 }
 
 int main( int argc, char *argv[] ) {
@@ -228,19 +231,15 @@ int main( int argc, char *argv[] ) {
 		.an_int_ptr = &argc
 	};
 
-	(void) print_json_for_type(f, &err);
+	print_json_for_type(f, &err);
 	die_if_error(err);
 
 	printf("\n");
 
-	RType *type = rumination_get_type(&print_function_type, &err);
+	RType *type = rumination_get_type(typeof(print_function_type), &err);
 	die_if_error(err);
 
-	RType *pointee = r_type_pointee(type, &err);
-	die_if_error(err);
-	r_type_unref(type);
-
-	print_function_type(pointee, &err);
+	print_function_type((RFunctionType *) type, &err);
 	die_if_error(err);
 
 	r_type_unref(type);

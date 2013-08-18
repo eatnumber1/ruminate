@@ -14,12 +14,14 @@ void RUMINATE_EXPORT rumination_hit_breakpoint() RUMINATE_NOEXCEPT;
 G_END_DECLS
 
 #define rumination_get_type(type, err) ({ \
-	type expr = ((type) 0); \
+	type expr; \
 	(void) expr; \
+	RType *ret; \
 	if( !rumination_begin_get_type_by_variable_name("expr", err) ) { \
-		NULL; \
+		ret = NULL; \
 	} else { \
 		rumination_hit_breakpoint(); \
-		rumination_end_get_type_by_variable_name(err); \
+		ret = rumination_end_get_type_by_variable_name(err); \
 	} \
+	ret; \
 })

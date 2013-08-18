@@ -10,7 +10,7 @@
 
 RString *r_string_new( const char *init, size_t len ) noexcept {
 	RString *ret = g_slice_new(RString);
-	ret->str = g_string_new_len(init, len);
+	ret->gstr = g_string_new_len(init, len);
 	ret->refcnt = 1;
 	return ret;
 }
@@ -28,9 +28,13 @@ RString *r_string_ref( RString *rs ) noexcept {
 
 void r_string_unref( RString *rs ) noexcept {
 	if( g_atomic_int_dec_and_test(&rs->refcnt) ) {
-		g_string_free(rs->str, true);
+		g_string_free(rs->gstr, true);
 		g_slice_free(RString, rs);
 	}
+}
+
+const char *r_string_bytes( const RString *rs ) noexcept {
+	return rs->gstr->str;
 }
 
 G_END_DECLS

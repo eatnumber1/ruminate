@@ -1,6 +1,6 @@
-.PHONY: test/all test/clean test/depclean
+.PHONY: test/test test/clean test/depclean
 
-test/all: test/backtrace.exe test/ruminate.exe test/main.exe
+test/test: test/backtrace.exe test/ruminate.exe test/main.exe
 
 test/ruminate.exe: $(LIBRUMINATE) $(RUMINATE_TEST_OBJECTS)
 test/ruminate.exe: EXE_OBJECTS := $(RUMINATE_TEST_OBJECTS)

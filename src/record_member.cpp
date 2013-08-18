@@ -12,12 +12,14 @@
 #include "ruminate/common.h"
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
+#include "ruminate/type.h"
 #include "ruminate/record_member.h"
 
 #define _RECORD_MEMBER_CPP_
 
 #include "private/common.h"
 #include "private/string.h"
+#include "private/type.h"
 #include "private/record_member.h"
 
 bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, GError **error ) noexcept {
@@ -66,16 +68,31 @@ RRecordMemberId r_record_member_id( RRecordMember *rm, GError ** ) noexcept {
 	return rm->id;
 }
 
-const RString *r_record_member_name( RRecordMember *rm, GError **error ) noexcept {
+RString *r_record_member_name( RRecordMember *rm, GError **error ) noexcept {
 	if( rm->name == NULL ) {
 		std::string name;
-		if( !gxx_call<std::string>([rm](){ return rm->member->getName(); }, &name, error) )
+		if( !gxx_call([rm, &name](){ name = rm->member->getName(); }, error) )
 			return NULL;
 
 		rm->name = r_string_new(name.c_str());
 	}
 
 	return r_string_ref(rm->name);
+}
+
+RType *r_record_member_type( RRecordMember *rm, GError **error ) noexcept {
+	Ruminate::TypePrx t;
+	if( !gxx_call([rm, &t](){ t = rm->member->getType(); }, error) )
+		return NULL;
+
+	return r_type_new(t, error);
+}
+
+off_t r_record_member_offset( RRecordMember *rm, GError **error ) noexcept {
+	G_STATIC_ASSERT(sizeof(off_t) >= sizeof(decltype(rm->member->getOffsetInBytes())));
+	off_t off = 0;
+	gxx_call([rm, &off](){ off = rm->member->getOffsetInBytes(); }, error);
+	return off;
 }
 
 RRecordMember *r_record_member_ref( RRecordMember *rm ) noexcept {

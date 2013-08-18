@@ -14,12 +14,18 @@
 #include "ruminate/string.h"
 #include "ruminate/type.h"
 #include "ruminate/tag_type.h"
+#include "ruminate/builtin_type.h"
+#include "ruminate/pointer_type.h"
+#include "ruminate/typedef_type.h"
 
 #define _TYPE_CPP_
 
 #include "private/common.h"
 #include "private/type.h"
 #include "private/tag_type.h"
+#include "private/builtin_type.h"
+#include "private/pointer_type.h"
+#include "private/typedef_type.h"
 #include "private/string.h"
 
 template gxx_call_proto(Ruminate::TypeId);
@@ -33,6 +39,16 @@ bool r_type_init( RType *rt, GError **error ) noexcept {
 		case Ruminate::TypeIdStructure:
 			rt->id = R_TYPE_TAG;
 			break;
+		case Ruminate::TypeIdInt:
+		case Ruminate::TypeIdLong:
+		case Ruminate::TypeIdDouble:
+		case Ruminate::TypeIdVoid:
+			rt->id = R_TYPE_BUILTIN;
+			break;
+		case Ruminate::TypeIdTypedef:
+			rt->id = R_TYPE_TYPEDEF;
+		case Ruminate::TypeIdPointer:
+			rt->id = R_TYPE_POINTER;
 		default:
 			g_assert_not_reached();
 	}
@@ -41,6 +57,15 @@ bool r_type_init( RType *rt, GError **error ) noexcept {
 	switch( rt->id ) {
 		case R_TYPE_TAG:
 			ret = r_tag_type_init((RTagType *) rt, error);
+			break;
+		case R_TYPE_BUILTIN:
+			ret = r_builtin_type_init((RBuiltinType *) rt, error);
+			break;
+		case R_TYPE_TYPEDEF:
+			ret = r_typedef_type_init((RTypedefType *) rt, error);
+			break;
+		case R_TYPE_POINTER:
+			ret = r_pointer_type_init((RPointerType *) rt, error);
 			break;
 		default:
 			g_assert_not_reached();
@@ -53,6 +78,15 @@ void r_type_destroy( RType *rt ) noexcept {
 	switch( rt->id ) {
 		case R_TYPE_TAG:
 			r_tag_type_destroy((RTagType *) rt);
+			break;
+		case R_TYPE_BUILTIN:
+			r_builtin_type_destroy((RBuiltinType *) rt);
+			break;
+		case R_TYPE_TYPEDEF:
+			r_typedef_type_destroy((RTypedefType *) rt);
+			break;
+		case R_TYPE_POINTER:
+			r_pointer_type_destroy((RPointerType *) rt);
 			break;
 		default:
 			g_assert_not_reached();
@@ -67,6 +101,15 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) noexcept {
 	switch( id ) {
 		case Ruminate::TypeIdStructure:
 			return (RType *) r_tag_type_alloc(id, error);
+		case Ruminate::TypeIdInt:
+		case Ruminate::TypeIdLong:
+		case Ruminate::TypeIdDouble:
+		case Ruminate::TypeIdVoid:
+			return (RType *) r_builtin_type_alloc(id, error);
+		case Ruminate::TypeIdTypedef:
+			return (RType *) r_typedef_type_alloc(id, error);
+		case Ruminate::TypeIdPointer:
+			return (RType *) r_pointer_type_alloc(id, error);
 		default:
 			g_assert_not_reached();
 	}
@@ -76,6 +119,19 @@ void r_type_free( RType *rt ) noexcept {
 	switch( rt->type_id ) {
 		case Ruminate::TypeIdStructure:
 			r_tag_type_free((RTagType *) rt);
+			break;
+		case Ruminate::TypeIdInt:
+		case Ruminate::TypeIdLong:
+		case Ruminate::TypeIdDouble:
+		case Ruminate::TypeIdVoid:
+			r_builtin_type_free((RBuiltinType *) rt);
+			break;
+		case Ruminate::TypeIdTypedef:
+			r_typedef_type_free((RTypedefType *) rt);
+			break;
+		case Ruminate::TypeIdPointer:
+			r_pointer_type_free((RPointerType *) rt);
+			break;
 		default:
 			g_assert_not_reached();
 	}
@@ -117,7 +173,7 @@ RTypeId r_type_id( RType *rt, GError **error ) noexcept {
 	return rt->id;
 }
 
-const RString *r_type_name( RType *rt, GError **error ) noexcept {
+RString *r_type_name( RType *rt, GError **error ) noexcept {
 	if( rt->name == NULL ) {
 		std::string name;
 		if( !gxx_call<std::string>([rt](){ return rt->type->getName(); }, &name, error) )
@@ -136,6 +192,13 @@ RType *r_type_ref( RType *rt ) noexcept {
 void r_type_unref( RType *rt ) noexcept {
 	if( g_atomic_int_dec_and_test(&rt->refcnt) )
 		r_type_delete(rt);
+}
+
+RType *r_type_pointer( RType *rt, GError **error ) noexcept {
+	Ruminate::TypePrx t;
+	if( !gxx_call([rt, &t](){ t = rt->type->getPointerType(); }, error) )
+		return NULL;
+	return r_type_new(t, error);
 }
 
 G_END_DECLS

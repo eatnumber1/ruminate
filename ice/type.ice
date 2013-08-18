@@ -5,7 +5,17 @@
 
 module Ruminate {
 	enum TypeId {
-		TypeIdStructure
+		TypeIdStructure,
+		TypeIdFunction,
+		TypeIdTypedef,
+		TypeIdPointer,
+
+		TypeIdInt,
+		TypeIdLong,
+		TypeIdDouble,
+		TypeIdShort,
+		TypeIdChar,
+		TypeIdVoid
 	};
 
 	interface Type;
@@ -27,6 +37,8 @@ module Ruminate {
 		idempotent long getSize();
 
 		idempotent bool isComplete();
+		idempotent bool isSigned();
+		idempotent bool isUnsigned();
 
 		idempotent int lldbGetTypeClass();
 		idempotent int lldbGetBasicType();

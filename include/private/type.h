@@ -6,7 +6,7 @@ struct RType {
 	Ruminate::TypeId type_id;
 };
 
-bool r_type_init( RType *, Ruminate::TypePrx &, GError ** ) noexcept;
+bool r_type_init( RType *, GError ** ) noexcept;
 void r_type_destroy( RType * ) noexcept;
 
 RType *r_type_alloc( Ruminate::TypeId, GError ** ) noexcept;

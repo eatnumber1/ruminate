@@ -11,9 +11,9 @@
 #include "ruminate/common.h"
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
-#include "ruminate/record_member.h"
 #include "ruminate/type.h"
 #include "ruminate/tag_type.h"
+#include "ruminate/record_member.h"
 #include "ruminate/record_type.h"
 
 #define _TAG_TYPE_CPP_

@@ -4,6 +4,9 @@ SRC_SOURCES := \
 	common.cpp \
 	string.cpp \
 	type.cpp \
+	builtin_type.cpp \
+	pointer_type.cpp \
+	typedef_type.cpp \
 	tag_type.cpp \
 	record_type.cpp \
 	record_member.cpp \

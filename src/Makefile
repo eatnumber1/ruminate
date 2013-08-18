@@ -1,5 +1,7 @@
 .PHONY: src/all src/clean src/depclean
 
+src/all: $(LIBRUMINATE)
+
 src/clean:
 	$(RM) $(SRC_OBJECTS) $(LIBRUMINATE)
 

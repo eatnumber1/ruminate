@@ -34,8 +34,9 @@ CLEAN_TARGETS := $(SUBDIRS:=/clean)
 DEPCLEAN_TARGETS := $(SUBDIRS:=/depclean)
 ALL_TARGETS := $(SUBDIRS:=/all)
 INSTALL_TARGETS := $(SUBDIRS:=/install)
+TEST_TARGETS := $(SUBDIRS:=/test)
 
-.PHONY: all clean depclean cscope pristine cscope-clean install
+.PHONY: all clean depclean cscope pristine cscope-clean install test
 .DEFAULT_GOAL: all
 
 all: $(ALL_TARGETS)
@@ -43,6 +44,7 @@ clean: $(CLEAN_TARGETS)
 depclean: clean $(DEPCLEAN_TARGETS)
 pristine: depclean cscope-clean
 install: $(INSTALL_TARGETS)
+test: $(TEST_TARGETS)
 
 cscope-clean:
 	$(RM) $(CSCOPE_FILES)
@@ -55,6 +57,7 @@ $(CLEAN_TARGETS):
 $(DEPCLEAN_TARGETS):
 $(ALL_TARGETS):
 $(INSTALL_TARGETS):
+$(TEST_TARGETS):
 
 define variableRule
  CURDIR := $$(TOPDIR)/$$$(1)
@@ -84,6 +87,7 @@ define subdirRule
  $$$(1)/clean: CURDIR := $$(CURDIR)
  $$$(1)/depclean: CURDIR := $$(CURDIR)
  $$$(1)/install: CURDIR := $$(CURDIR)
+ $$$(1)/test: CURDIR := $$(CURDIR)
  include $$(CURDIR)/Makefile
 endef
 # This is what actually does the work.
@@ -97,10 +101,10 @@ CURDIR := $(TOPDIR)
 	$(CXX) -o $@ $(EXE_OBJECTS) $(FLAGS_LINKER)
 
 %.d: %.c
-	$(CC) -MM -MQ $(@:.d=.o) -MQ $@ -MF $*.d $< $(FLAGS_PREPROCESSOR_C) $(FLAGS_PREPROC_AND_COMPILER_C)
+	$(CC) -MM -MQ $(@:.d=.o) -MQ $@ -MF $*.d $< $(FLAGS_PREPROCESSOR_C) $(FLAGS_PREPROC_AND_COMPILER_C) -w
 
 %.d: %.cpp
-	$(CXX) -MM -MQ $(@:.d=.o) -MQ $@ -MF $*.d $< $(FLAGS_PREPROCESSOR_CXX) $(FLAGS_PREPROC_AND_COMPILER_CXX)
+	$(CXX) -MM -MQ $(@:.d=.o) -MQ $@ -MF $*.d $< $(FLAGS_PREPROCESSOR_CXX) $(FLAGS_PREPROC_AND_COMPILER_CXX) -w
 
 %.d: %.ice
 	$(SLICE2CPP) --depend $< $(FLAGS_SLICE2CPP) > $@
