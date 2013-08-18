@@ -8,7 +8,7 @@
 //#error Don't know how to get tid on this platform
 #endif
 
-#include <glib.h>
+#include "private/glib.h"
 
 #include "private/gettid.h"
 

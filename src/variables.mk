@@ -23,3 +23,14 @@ SRC_FLAGS_LINKER := $(SRC_LIBRARIES) -lIce -lIceUtil
 
 LIBRUMINATE_FLAGS_LINKER := -L$(CURDIR) -lruminate
 LIBRUMINATE := $(CURDIR)/libruminate.$(SO_SUFFIX)
+
+SRC_PYTHON := \
+	src/dbgsvr.py \
+	src/debugger_impl.py \
+	src/lldb_utils.py \
+	src/type_member_impl.py \
+	src/debugger_factory_impl.py \
+	src/lldb_em.py \
+	src/type_impl.py
+
+SRC_PYTHON_OBJECTS := $(SRC_PYTHON:%=%c)

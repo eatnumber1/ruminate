@@ -3,7 +3,7 @@
 src/all: $(LIBRUMINATE)
 
 src/clean:
-	$(RM) $(SRC_OBJECTS) $(LIBRUMINATE)
+	$(RM) $(SRC_OBJECTS) $(LIBRUMINATE) $(SRC_PYTHON_OBJECTS)
 
 src/depclean:
 	$(RM) $(SRC_DEPS)
