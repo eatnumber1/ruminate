@@ -26,6 +26,7 @@ typedef struct __attribute__((packed)) MyStruct {
 		int an_int;
 	} a_struct;
 	int *an_int_ptr;
+	char an_array[6];
 } MyTypedef;
 
 void die_if_error( GError *err ) {
@@ -228,7 +229,8 @@ int main( int argc, char *argv[] ) {
 		.a_struct = {
 			.an_int = 100
 		},
-		.an_int_ptr = &argc
+		.an_int_ptr = &argc,
+		.an_array = "hello"
 	};
 
 	print_json_for_type(f, &err);
