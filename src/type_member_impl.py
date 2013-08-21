@@ -4,7 +4,7 @@ class TypeMemberImpl(TypeMember):
 	@staticmethod
 	def proxyFor(sbtypemember, current):
 		return TypeMemberPrx.uncheckedCast(
-			current.adapter.addWithUUID(sbtypemember)
+			current.adapter.addWithUUID(TypeMemberImpl(sbtypemember))
 		)
 
 	def __init__(self, sbtypemember):
