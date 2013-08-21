@@ -34,6 +34,8 @@ template gxx_call_proto(Ruminate::TypePrx);
 #endif
 
 bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
+	new (rt) RType();
+
 	rt->refcnt = 1;
 	rt->name = NULL;
 
@@ -102,6 +104,8 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 
 	if( rt->name != NULL ) r_string_unref(rt->name);
 	rt->type = 0;
+
+	rt->~RType();
 }
 
 

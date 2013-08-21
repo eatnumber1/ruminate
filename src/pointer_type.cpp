@@ -19,11 +19,14 @@
 #include "private/type.h"
 #include "private/pointer_type.h"
 
-bool r_pointer_type_init( RPointerType *, GError ** ) RUMINATE_NOEXCEPT {
+bool r_pointer_type_init( RPointerType *rpt, GError ** ) RUMINATE_NOEXCEPT {
+	new (rpt) RPointerType();
 	return true;
 }
 
-void r_pointer_type_destroy( RPointerType * ) RUMINATE_NOEXCEPT {}
+void r_pointer_type_destroy( RPointerType *rpt ) RUMINATE_NOEXCEPT {
+	rpt->~RPointerType();
+}
 
 RPointerType *r_pointer_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
 	return g_slice_new(RPointerType);

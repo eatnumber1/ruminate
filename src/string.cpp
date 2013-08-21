@@ -13,6 +13,7 @@
 
 RString *r_string_new( const char *init, size_t len ) RUMINATE_NOEXCEPT {
 	RString *ret = g_slice_new(RString);
+	new (ret) RString();
 	ret->gstr = g_string_new_len(init, len);
 	ret->refcnt = 1;
 	return ret;
@@ -32,6 +33,7 @@ RString *r_string_ref( RString *rs ) RUMINATE_NOEXCEPT {
 void r_string_unref( RString *rs ) RUMINATE_NOEXCEPT {
 	if( g_atomic_int_dec_and_test(&rs->refcnt) ) {
 		g_string_free(rs->gstr, true);
+		rs->~RString();
 		g_slice_free(RString, rs);
 	}
 }

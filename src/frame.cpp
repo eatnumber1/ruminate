@@ -24,6 +24,7 @@
 
 RFrame *r_frame_new( Ruminate::Frame &frame, GError ** ) RUMINATE_NOEXCEPT {
 	RFrame *ret = g_slice_new(RFrame);
+	new (ret) RFrame();
 	ret->refcnt = 1;
 	ret->frame = frame;
 	return ret;
@@ -31,6 +32,7 @@ RFrame *r_frame_new( Ruminate::Frame &frame, GError ** ) RUMINATE_NOEXCEPT {
 
 RFrameList *r_frame_list_new( Ruminate::FrameList &list, GError **error ) RUMINATE_NOEXCEPT {
 	RFrameList *ret = g_slice_new(RFrameList);
+	new (ret) RFrameList();
 	ret->refcnt = 1;
 	ret->nframes = list.size();
 	ret->frames = g_new(RFrame *, ret->nframes);
@@ -69,6 +71,7 @@ void r_frame_list_unref( RFrameList *list ) RUMINATE_NOEXCEPT {
 		for( size_t i = 0; i < list->nframes; i++ )
 			r_frame_unref(list->frames[i]);
 		g_free(list->frames);
+		list->~RFrameList();
 		g_slice_free(RFrameList, list);
 	}
 }
@@ -78,8 +81,10 @@ void r_frame_ref( RFrame *frame ) RUMINATE_NOEXCEPT {
 }
 
 void r_frame_unref( RFrame *frame ) RUMINATE_NOEXCEPT {
-	if( g_atomic_int_dec_and_test(&frame->refcnt) )
+	if( g_atomic_int_dec_and_test(&frame->refcnt) ) {
+		frame->~RFrame();
 		g_slice_free(RFrame, frame);
+	}
 }
 
 const char *r_frame_function_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {

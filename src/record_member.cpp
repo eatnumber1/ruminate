@@ -22,6 +22,8 @@
 #include "private/record_member.h"
 
 bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, GError **error ) RUMINATE_NOEXCEPT {
+	new (rm) RRecordMember();
+
 	bool bitfield;
 
 	if( !gxx_call(bitfield = member->isBitfield(), error) )
@@ -38,6 +40,7 @@ bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, G
 void r_record_member_destroy( RRecordMember *rm ) RUMINATE_NOEXCEPT {
 	if( rm->name != NULL ) r_string_unref(rm->name);
 	rm->member = 0;
+	rm->~RRecordMember();
 }
 
 RRecordMember *r_record_member_alloc( Ruminate::TypeMemberPrx &, GError ** ) RUMINATE_NOEXCEPT {

@@ -25,11 +25,13 @@
 #include "private/record_type.h"
 #include "private/function_type.h"
 
-bool r_function_type_init( RFunctionType *, GError ** ) RUMINATE_NOEXCEPT {
+bool r_function_type_init( RFunctionType *rft, GError ** ) RUMINATE_NOEXCEPT {
+	new (rft) RFunctionType();
 	return true;
 }
 
-void r_function_type_destroy( RFunctionType * ) RUMINATE_NOEXCEPT {
+void r_function_type_destroy( RFunctionType *rft ) RUMINATE_NOEXCEPT {
+	rft->~RFunctionType();
 }
 
 RFunctionType *r_function_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {

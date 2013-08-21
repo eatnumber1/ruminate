@@ -23,6 +23,8 @@
 #include "private/record_type.h"
 
 bool r_tag_type_init( RTagType *rtt, GError **error ) RUMINATE_NOEXCEPT {
+	new (rtt) RTagType();
+
 	switch( ((RType *) rtt)->type_id ) {
 		case Ruminate::TypeIdStructure:
 			rtt->id = R_TAG_TYPE_RECORD;
@@ -42,6 +44,8 @@ void r_tag_type_destroy( RTagType *rtt ) RUMINATE_NOEXCEPT {
 		default:
 			g_assert_not_reached();
 	}
+
+	rtt->~RTagType();
 }
 
 RTagType *r_tag_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
