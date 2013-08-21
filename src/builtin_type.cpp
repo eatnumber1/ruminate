@@ -20,8 +20,6 @@
 #include "private/builtin_type.h"
 
 bool r_builtin_type_init( RBuiltinType *rbt, GError ** ) RUMINATE_NOEXCEPT {
-	new (rbt) RBuiltinType();
-
 	switch( ((RType *) rbt)->type_id ) {
 		case Ruminate::TypeIdInt:
 			rbt->id = R_BUILTIN_TYPE_INT;
@@ -48,15 +46,16 @@ bool r_builtin_type_init( RBuiltinType *rbt, GError ** ) RUMINATE_NOEXCEPT {
 	return true;
 }
 
-void r_builtin_type_destroy( RBuiltinType *rbt ) RUMINATE_NOEXCEPT {
-	rbt->~RBuiltinType();
-}
+void r_builtin_type_destroy( RBuiltinType * ) RUMINATE_NOEXCEPT {}
 
 RBuiltinType *r_builtin_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
-	return g_slice_new(RBuiltinType);
+	RBuiltinType *ret = g_slice_new(RBuiltinType);
+	new (ret) RBuiltinType();
+	return ret;
 }
 
 void r_builtin_type_free( RBuiltinType *rbt ) RUMINATE_NOEXCEPT {
+	rbt->~RBuiltinType();
 	g_slice_free(RBuiltinType, rbt);
 }
 

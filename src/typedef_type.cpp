@@ -19,20 +19,20 @@
 #include "private/type.h"
 #include "private/typedef_type.h"
 
-bool r_typedef_type_init( RTypedefType *rtt, GError ** ) RUMINATE_NOEXCEPT {
-	new (rtt) RTypedefType();
+bool r_typedef_type_init( RTypedefType *, GError ** ) RUMINATE_NOEXCEPT {
 	return true;
 }
 
-void r_typedef_type_destroy( RTypedefType *rtt ) RUMINATE_NOEXCEPT {
-	rtt->~RTypedefType();
-}
+void r_typedef_type_destroy( RTypedefType * ) RUMINATE_NOEXCEPT {}
 
 RTypedefType *r_typedef_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
-	return g_slice_new(RTypedefType);
+	RTypedefType *ret = g_slice_new(RTypedefType);
+	new (ret) RTypedefType();
+	return ret;
 }
 
 void r_typedef_type_free( RTypedefType *rtt ) RUMINATE_NOEXCEPT {
+	rtt->~RTypedefType();
 	g_slice_free(RTypedefType, rtt);
 }
 

@@ -26,16 +26,6 @@
 #include "private/function_type.h"
 
 bool r_record_type_init( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
-	switch( ((RType *) rrt)->type_id ) {
-		case Ruminate::TypeIdStructure:
-			new (rrt) RRecordType();
-			break;
-		case Ruminate::TypeIdFunction:
-			break;
-		default:
-			g_assert_not_reached();
-	}
-
 	rrt->members_init = false;
 
 	switch( ((RType *) rrt)->type_id ) {
@@ -65,24 +55,17 @@ void r_record_type_destroy( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 
 	rrt->members.clear();
 	rrt->members_init = false;
-
-	switch( rrt->id ) {
-		case R_RECORD_TYPE_STRUCTURE:
-			rrt->~RRecordType();
-			break;
-		case R_RECORD_TYPE_FUNCTION:
-			break;
-		default:
-			g_assert_not_reached();
-	}
 }
 
 RRecordType *r_record_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 	switch( id ) {
 		case Ruminate::TypeIdFunction:
 			return (RRecordType *) r_function_type_alloc(id, error);
-		case Ruminate::TypeIdStructure:
-			return g_slice_new(RRecordType);
+		case Ruminate::TypeIdStructure: {
+			RRecordType *ret = g_slice_new(RRecordType);
+			new (ret) RRecordType();
+			return ret;
+		}
 		default:
 			g_assert_not_reached();
 	}
@@ -93,6 +76,7 @@ RRecordType *r_record_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE
 void r_record_type_free( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 	switch( rrt->id ) {
 		case R_RECORD_TYPE_STRUCTURE:
+			rrt->~RRecordType();
 			g_slice_free(RRecordType, rrt);
 			break;
 		case R_RECORD_TYPE_FUNCTION:

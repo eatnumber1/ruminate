@@ -25,20 +25,20 @@
 #include "private/record_type.h"
 #include "private/function_type.h"
 
-bool r_function_type_init( RFunctionType *rft, GError ** ) RUMINATE_NOEXCEPT {
-	new (rft) RFunctionType();
+bool r_function_type_init( RFunctionType *, GError ** ) RUMINATE_NOEXCEPT {
 	return true;
 }
 
-void r_function_type_destroy( RFunctionType *rft ) RUMINATE_NOEXCEPT {
-	rft->~RFunctionType();
-}
+void r_function_type_destroy( RFunctionType * ) RUMINATE_NOEXCEPT {}
 
 RFunctionType *r_function_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
-	return g_slice_new(RFunctionType);
+	RFunctionType *ret = g_slice_new(RFunctionType);
+	new (ret) RFunctionType();
+	return ret;
 }
 
 void r_function_type_free( RFunctionType *rft ) RUMINATE_NOEXCEPT {
+	rft->~RFunctionType();
 	g_slice_free(RFunctionType, rft);
 }
 
