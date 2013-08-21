@@ -171,8 +171,8 @@ error_fork_child:
 bool rumination_destroy( GError **error ) RUMINATE_NOEXCEPT {
 	if( rumination == NULL ) return true;
 	// TODO: Error check these
-	gxx_call(rumination->factory->shutdown(), error);
-	gxx_call(rumination->communicator->destroy(), error);
+	(void) gxx_call(rumination->factory->shutdown(), error);
+	(void) gxx_call(rumination->communicator->destroy(), error);
 	// TODO: Check child return code
 	waitpid(rumination->child_pid, NULL, 0);
 	g_spawn_close_pid(rumination->child_pid);

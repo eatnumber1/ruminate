@@ -59,7 +59,9 @@ class TypeImpl(Type):
 				lldb.eTypeClassStruct: TypeId.TypeIdStructure,
 				lldb.eTypeClassFunction: TypeId.TypeIdFunction,
 				lldb.eTypeClassPointer: TypeId.TypeIdPointer,
-				lldb.eTypeClassTypedef: TypeId.TypeIdTypedef
+				lldb.eTypeClassTypedef: TypeId.TypeIdTypedef,
+				lldb.eTypeClassInvalid: TypeId.TypeIdUnknown,
+				lldb.eTypeClassOther: TypeId.TypeIdUnknown
 			}[sbtype.type]
 
 	def getName(self, current = None):

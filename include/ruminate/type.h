@@ -2,7 +2,8 @@ typedef enum RTypeId {
 	R_TYPE_BUILTIN,
 	R_TYPE_TAG,
 	R_TYPE_TYPEDEF,
-	R_TYPE_POINTER
+	R_TYPE_POINTER,
+	R_TYPE_UNKNOWN
 } RTypeId;
 
 typedef struct RType RType;

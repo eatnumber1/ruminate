@@ -64,13 +64,13 @@ RBuiltinTypeId r_builtin_type_id( RBuiltinType *rbt, GError ** ) RUMINATE_NOEXCE
 
 bool r_builtin_type_is_signed( RBuiltinType *rbt, GError **error ) RUMINATE_NOEXCEPT {
 	bool ret = false;
-	gxx_call(ret = ((RType *) rbt)->type->isSigned(), error);
+	(void) gxx_call(ret = ((RType *) rbt)->type->isSigned(), error);
 	return ret;
 }
 
 bool r_builtin_type_is_unsigned( RBuiltinType *rbt, GError **error ) RUMINATE_NOEXCEPT {
 	bool ret = false;
-	gxx_call(ret = ((RType *) rbt)->type->isUnsigned(), error);
+	(void) gxx_call(ret = ((RType *) rbt)->type->isUnsigned(), error);
 	return ret;
 }
 

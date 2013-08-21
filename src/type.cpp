@@ -51,6 +51,8 @@ bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 			rt->id = R_TYPE_TYPEDEF;
 		case Ruminate::TypeIdPointer:
 			rt->id = R_TYPE_POINTER;
+		case Ruminate::TypeIdUnknown:
+			rt->id = R_TYPE_UNKNOWN;
 		default:
 			g_assert_not_reached();
 	}
@@ -68,6 +70,8 @@ bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 			break;
 		case R_TYPE_POINTER:
 			ret = r_pointer_type_init((RPointerType *) rt, error);
+			break;
+		case R_TYPE_UNKNOWN:
 			break;
 		default:
 			g_assert_not_reached();
@@ -89,6 +93,8 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 			break;
 		case R_TYPE_POINTER:
 			r_pointer_type_destroy((RPointerType *) rt);
+			break;
+		case R_TYPE_UNKNOWN:
 			break;
 		default:
 			g_assert_not_reached();
@@ -112,6 +118,8 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 			return (RType *) r_typedef_type_alloc(id, error);
 		case Ruminate::TypeIdPointer:
 			return (RType *) r_pointer_type_alloc(id, error);
+		case Ruminate::TypeIdUnknown:
+			return g_slice_new(RType);
 		default:
 			g_assert_not_reached();
 	}
@@ -133,6 +141,9 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 			break;
 		case Ruminate::TypeIdPointer:
 			r_pointer_type_free((RPointerType *) rt);
+			break;
+		case Ruminate::TypeIdUnknown:
+			g_slice_free(RType, rt);
 			break;
 		default:
 			g_assert_not_reached();

@@ -90,7 +90,7 @@ RType *r_record_member_type( RRecordMember *rm, GError **error ) RUMINATE_NOEXCE
 off_t r_record_member_offset( RRecordMember *rm, GError **error ) RUMINATE_NOEXCEPT {
 	G_STATIC_ASSERT(sizeof(off_t) >= sizeof(__typeof__(rm->member->getOffsetInBytes())));
 	off_t off = 0;
-	gxx_call(off = rm->member->getOffsetInBytes(), error);
+	(void) gxx_call(off = rm->member->getOffsetInBytes(), error);
 	return off;
 }
 

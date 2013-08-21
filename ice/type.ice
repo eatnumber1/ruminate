@@ -15,7 +15,9 @@ module Ruminate {
 		TypeIdDouble,
 		TypeIdShort,
 		TypeIdChar,
-		TypeIdVoid
+		TypeIdVoid,
+
+		TypeIdUnknown
 	};
 
 	interface Type;
