@@ -58,8 +58,14 @@ class LLDBEventMachine(threading.Thread):
 			self.onEvent(event)
 
 	def onEvent(self, event):
-		for cb in self.callbacks[lldb.SBProcess.GetStateFromEvent(event)]:
-			cb(event)
+		state = lldb.SBProcess.GetStateFromEvent(event)
+		callbacks = self.callbacks[state]
+		if callbacks:
+			for cb in callbacks:
+				cb(event)
+		elif state == lldb.eStateStopped:
+			# TODO: This is a hack
+			self.process.Continue()
 
 	def addCallback(self, state, cb):
 		self.callbacks[state].append(cb)
