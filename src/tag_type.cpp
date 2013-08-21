@@ -25,6 +25,7 @@
 bool r_tag_type_init( RTagType *rtt, GError **error ) RUMINATE_NOEXCEPT {
 	switch( ((RType *) rtt)->type_id ) {
 		case Ruminate::TypeIdStructure:
+		case Ruminate::TypeIdFunction:
 			rtt->id = R_TAG_TYPE_RECORD;
 			return r_record_type_init((RRecordType *) rtt, error);
 		default:
@@ -47,6 +48,7 @@ void r_tag_type_destroy( RTagType *rtt ) RUMINATE_NOEXCEPT {
 RTagType *r_tag_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 	switch( id ) {
 		case Ruminate::TypeIdStructure:
+		case Ruminate::TypeIdFunction:
 			return (RTagType *) r_record_type_alloc(id, error);
 		default:
 			g_assert_not_reached();

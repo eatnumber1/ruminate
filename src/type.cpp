@@ -39,6 +39,7 @@ bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 
 	switch( rt->type_id ) {
 		case Ruminate::TypeIdStructure:
+		case Ruminate::TypeIdFunction:
 			rt->id = R_TYPE_TAG;
 			break;
 		case Ruminate::TypeIdInt:
@@ -110,6 +111,7 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 	switch( id ) {
 		case Ruminate::TypeIdStructure:
+		case Ruminate::TypeIdFunction:
 			return (RType *) r_tag_type_alloc(id, error);
 		case Ruminate::TypeIdInt:
 		case Ruminate::TypeIdLong:
@@ -132,6 +134,7 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 	switch( rt->type_id ) {
 		case Ruminate::TypeIdStructure:
+		case Ruminate::TypeIdFunction:
 			r_tag_type_free((RTagType *) rt);
 			break;
 		case Ruminate::TypeIdInt:
