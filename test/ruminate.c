@@ -39,28 +39,34 @@ void die_if_error( GError *err ) {
 
 static bool _print_json_for_builtin( RBuiltinType *type, void *data, GError **error ) {
 	RBuiltinTypeId id = r_builtin_type_id(type, error);
+	die_if_error(*error);
 	// TODO: Error checking
 
+	bool is_unsigned = r_builtin_type_is_unsigned(type, error);
+	die_if_error(*error);
+	// TODO: Errors
+	bool is_signed = r_builtin_type_is_signed(type, error);
+	die_if_error(*error);
+	// TODO: Errors
 	switch( id ) {
 		case R_BUILTIN_TYPE_INT:
-			// TODO: Errors
-			if( r_builtin_type_is_unsigned(type, error) ) {
+			if( is_unsigned ) {
 				printf("%u", *((unsigned int *) data));
 			} else {
 				printf("%d", *((int *) data));
 			}
 			break;
 		case R_BUILTIN_TYPE_SHORT:
-			if( r_builtin_type_is_unsigned(type, error) ) {
+			if( is_unsigned ) {
 				printf("%hu", *((unsigned short *) data));
 			} else {
 				printf("%hd", *((short *) data));
 			}
 			break;
 		case R_BUILTIN_TYPE_CHAR:
-			if( r_builtin_type_is_unsigned(type, error) ) {
+			if( is_unsigned ) {
 				printf("%hhu", *((unsigned char *) data));
-			} else if( r_builtin_type_is_signed(type, error) ) {
+			} else if( is_signed ) {
 				printf("%hhd", *((signed char *) data));
 			} else {
 				printf("%c", *((char *) data));
@@ -78,6 +84,7 @@ static bool _print_json_for_type( RType *type, void *data, GError **err );
 
 static bool _print_json_for_record( RRecordType *rt, void *data, GError **error ) {
 	RRecordTypeId id = r_record_type_id(rt, error);
+	die_if_error(*error);
 	// TODO: Error checking
 
 	switch( id ) {
@@ -88,6 +95,7 @@ static bool _print_json_for_record( RRecordType *rt, void *data, GError **error 
 	}
 
 	size_t nmembers = r_record_type_nmembers(rt, error);
+	die_if_error(*error);
 	// TODO: Error checking
 
 	printf("{");
@@ -96,6 +104,7 @@ static bool _print_json_for_record( RRecordType *rt, void *data, GError **error 
 		// TODO: Error checking
 
 		RString *name = r_record_member_name(member, error);
+		die_if_error(*error);
 		// TODO: Error checking
 
 		printf("\"%s\":", r_string_bytes(name));
@@ -103,9 +112,11 @@ static bool _print_json_for_record( RRecordType *rt, void *data, GError **error 
 		r_string_unref(name);
 
 		RType *member_type = r_record_member_type(member, error);
+		die_if_error(*error);
 		// TODO: Error checking
 
 		off_t offset = r_record_member_offset(member, error);
+		die_if_error(*error);
 		// TODO: Error checking
 
 		_print_json_for_type(
@@ -133,9 +144,11 @@ static bool _print_json_for_string( RType *rt, void *data, GError **err ) {
 static bool print_function_type( RFunctionType *rft, GError **error ) {
 	RRecordType *rrt = (RRecordType *) rft;
 	RType *rtype = r_function_type_return_type(rft, error);
+	die_if_error(*error);
 	// TODO: Error checking
 
 	RString *rtname = r_type_name(rtype, error);
+	die_if_error(*error);
 	// TODO: Error checking
 
 	r_type_unref(rtype);
@@ -145,13 +158,16 @@ static bool print_function_type( RFunctionType *rft, GError **error ) {
 	r_string_unref(rtname);
 
 	size_t narguments = r_record_type_nmembers(rrt, error);
+	die_if_error(*error);
 	// TODO: Error checking
 
 	for( size_t i = 0; i < narguments; i++ ) {
 		RRecordMember *arg = r_record_type_member_at(rrt, i, error);
+		die_if_error(*error);
 		// TODO: Error checking
 
 		RString *name = r_record_member_name(arg, error);
+		die_if_error(*error);
 		// TODO: Error checking
 
 		printf(" %s", r_string_bytes(name));
@@ -174,6 +190,7 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 
 	if( id == R_TYPE_TYPEDEF ) {
 		RString *name = r_type_name(type, error);
+		die_if_error(*error);
 		// TODO: Error checking
 
 		// Strings are special cased.
@@ -184,6 +201,7 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 			return _print_json_for_string(type, data, error);
 
 		type = r_typedef_type_canonical((RTypedefType *) type, error);
+		die_if_error(*error);
 		// TODO: Error checking
 	} else {
 		r_type_ref(type);
@@ -192,20 +210,24 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 	switch( id ) {
 		case R_TYPE_BUILTIN:
 			_print_json_for_builtin((RBuiltinType *) type, data, error);
+			die_if_error(*error);
 			// TODO: Error checking
 			break;
 		case R_TYPE_TAG:
 			// TODO: Support other tag types.
 			_print_json_for_record((RRecordType *) type, data, error);
+			die_if_error(*error);
 			// TODO: Error checking
 			break;
 		case R_TYPE_POINTER: {
 			// TODO: It might be an array
 			RType *pointee = r_pointer_type_pointee((RPointerType *) type, error);
+			die_if_error(*error);
 			// TODO: Error checking
 			r_type_unref(type);
 			type = pointee;
 			_print_json_for_type(type, *((void **) data), error);
+			die_if_error(*error);
 			// TODO: Error checking
 			break;
 		}
