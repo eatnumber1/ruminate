@@ -12,7 +12,7 @@ class TypeMemberImpl(TypeMember):
 
 	def getType(self, current = None):
 		from type_impl import TypeImpl
-		return TypeImpl.proxyFor(self.sbtypemember.type)
+		return TypeImpl.proxyFor(self.sbtypemember.type, current)
 
 	def getName(self, current = None):
 		return self.sbtypemember.name

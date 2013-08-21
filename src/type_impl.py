@@ -92,7 +92,7 @@ class TypeImpl(Type):
 		return TypeImpl.proxyFor(canon, current)
 
 	def getMembers(self, current = None):
-		map(lambda f: TypeMemberImpl.proxyFor(f, current), self.sbtype.fields)
+		return map(lambda f: TypeMemberImpl.proxyFor(f, current), self.sbtype.fields)
 
 	def getArguments(self, current = None):
 		atl = self.sbtype.GetFunctionArgumentTypes()
@@ -142,7 +142,7 @@ class TypeImpl(Type):
 			#lldb.eBasicTypeUnsignedWChar: ,
 			lldb.eBasicTypeVoid: False,
 			#lldb.eBasicTypeWChar: ,
-		}[sbtype.GetBasicType()]
+		}[self.sbtype.GetBasicType()]
 
 	def isUnsigned(self, current = None):
 		# TODO: Check that this is a builtin type
@@ -179,7 +179,7 @@ class TypeImpl(Type):
 			#lldb.eBasicTypeUnsignedWChar: ,
 			lldb.eBasicTypeVoid: False,
 			#lldb.eBasicTypeWChar: ,
-		}[sbtype.GetBasicType()]
+		}[self.sbtype.GetBasicType()]
 
 	@staticmethod
 	def proxyFor(sbtype, current):
