@@ -39,11 +39,6 @@ module Ruminate {
 		idempotent bool isComplete();
 		idempotent bool isSigned();
 		idempotent bool isUnsigned();
-
-		idempotent int lldbGetTypeClass();
-		idempotent int lldbGetBasicType();
-
-		Type *lldbGetType();
 	};
 };
 

@@ -1,22 +1,24 @@
 #define _GNU_SOURCE
 
 #include <unistd.h>
+#include <stdint.h>
 
-#ifdef __linux__
+#if defined(__linux__) || ( defined(__APPLE__) && defined(__MACH__) )
 #include <sys/syscall.h>
 #else
-//#error Don't know how to get tid on this platform
+#error Don't know how to get tid on this platform
 #endif
 
 #include "private/glib.h"
 
 #include "private/gettid.h"
 
-pid_t gettid() {
-#ifdef __linux__
+uint64_t gettid() {
+#if defined(__linux__)
 	return syscall(SYS_gettid);
+#elif defined(__APPLE__) && defined(__MACH__)
+	return syscall(SYS_thread_selfid);
 #else
-#warning REMOVEME
-	return (pid_t) 0;
+#error Don't know how to get tid on this platform
 #endif
 }
