@@ -30,7 +30,7 @@ SO_SUFFIX := dylib
 SO_LINK_FLAGS := $(FLAGS_LINKER) -dynamiclib
 else
 SO_SUFFIX := so
-SO_LINK_FLAGS := $(FLAGS_LINKER) -shared
+SO_LINK_FLAGS := $(FLAGS_LINKER) -shared -Wl,-no-undefined
 endif
 
 -include config.mk
