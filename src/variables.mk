@@ -8,6 +8,7 @@ SRC_SOURCES := \
 	pointer_type.cpp \
 	typedef_type.cpp \
 	tag_type.cpp \
+	function_type.cpp \
 	record_type.cpp \
 	record_member.cpp \
 	frame.cpp \

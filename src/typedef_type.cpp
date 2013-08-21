@@ -1,6 +1,5 @@
-#include <functional>
-#include <memory>
-#include <string>
+#include <exception>
+#include <sstream>
 #include <cstddef>
 
 #include <Ice/Ice.h>
@@ -20,25 +19,25 @@
 #include "private/type.h"
 #include "private/typedef_type.h"
 
-bool r_typedef_type_init( RTypedefType *, GError ** ) noexcept {
+bool r_typedef_type_init( RTypedefType *, GError ** ) RUMINATE_NOEXCEPT {
 	return true;
 }
 
-void r_typedef_type_destroy( RTypedefType * ) noexcept {}
+void r_typedef_type_destroy( RTypedefType * ) RUMINATE_NOEXCEPT {}
 
-RTypedefType *r_typedef_type_alloc( Ruminate::TypeId, GError ** ) noexcept {
+RTypedefType *r_typedef_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
 	return g_slice_new(RTypedefType);
 }
 
-void r_typedef_type_free( RTypedefType *rtt ) noexcept {
+void r_typedef_type_free( RTypedefType *rtt ) RUMINATE_NOEXCEPT {
 	g_slice_free(RTypedefType, rtt);
 }
 
 G_BEGIN_DECLS
 
-RType *r_typedef_type_canonical( RTypedefType *rtt, GError **error ) noexcept {
+RType *r_typedef_type_canonical( RTypedefType *rtt, GError **error ) RUMINATE_NOEXCEPT {
 	Ruminate::TypePrx t;
-	if( !gxx_call([rtt, &t](){ t = ((RType *) rtt)->type->getCanonicalType(); }, error) )
+	if( !gxx_call(t = ((RType *) rtt)->type->getCanonicalType(), error) )
 		return NULL;
 
 	return r_type_new(t, error);

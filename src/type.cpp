@@ -1,5 +1,5 @@
-#include <functional>
-#include <memory>
+#include <exception>
+#include <sstream>
 #include <string>
 #include <cstddef>
 
@@ -28,10 +28,12 @@
 #include "private/typedef_type.h"
 #include "private/string.h"
 
+#if 0
 template gxx_call_proto(Ruminate::TypeId);
 template gxx_call_proto(Ruminate::TypePrx);
+#endif
 
-bool r_type_init( RType *rt, GError **error ) noexcept {
+bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	rt->refcnt = 1;
 	rt->name = NULL;
 
@@ -74,7 +76,7 @@ bool r_type_init( RType *rt, GError **error ) noexcept {
 	return ret;
 }
 
-void r_type_destroy( RType *rt ) noexcept {
+void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 	switch( rt->id ) {
 		case R_TYPE_TAG:
 			r_tag_type_destroy((RTagType *) rt);
@@ -97,7 +99,7 @@ void r_type_destroy( RType *rt ) noexcept {
 }
 
 
-RType *r_type_alloc( Ruminate::TypeId id, GError **error ) noexcept {
+RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 	switch( id ) {
 		case Ruminate::TypeIdStructure:
 			return (RType *) r_tag_type_alloc(id, error);
@@ -115,7 +117,7 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) noexcept {
 	}
 }
 
-void r_type_free( RType *rt ) noexcept {
+void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 	switch( rt->type_id ) {
 		case Ruminate::TypeIdStructure:
 			r_tag_type_free((RTagType *) rt);
@@ -137,11 +139,11 @@ void r_type_free( RType *rt ) noexcept {
 	}
 }
 
-RType *r_type_new( Ruminate::TypePrx &type, GError **error ) noexcept {
+RType *r_type_new( Ruminate::TypePrx &type, GError **error ) RUMINATE_NOEXCEPT {
 	RType *rt;
 	Ruminate::TypeId id;
 
-	if( !gxx_call<Ruminate::TypeId>([&type](){ return type->getId(); }, &id, error) )
+	if( !gxx_call(id = type->getId(), error) )
 		goto error_getId;
 
 	if( (rt = r_type_alloc(id, error)) == NULL ) goto error_r_type_alloc;
@@ -161,22 +163,22 @@ error_getId:
 	return NULL;
 }
 
-void r_type_delete( RType *rt ) noexcept {
+void r_type_delete( RType *rt ) RUMINATE_NOEXCEPT {
 	r_type_destroy(rt);
 	r_type_free(rt);
 }
 
 G_BEGIN_DECLS
 
-RTypeId r_type_id( RType *rt, GError **error ) noexcept {
+RTypeId r_type_id( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	(void) error;
 	return rt->id;
 }
 
-RString *r_type_name( RType *rt, GError **error ) noexcept {
+RString *r_type_name( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	if( rt->name == NULL ) {
 		std::string name;
-		if( !gxx_call<std::string>([rt](){ return rt->type->getName(); }, &name, error) )
+		if( !gxx_call(name = rt->type->getName(),  error) )
 			return NULL;
 		rt->name = r_string_new(name.c_str());
 	}
@@ -184,19 +186,19 @@ RString *r_type_name( RType *rt, GError **error ) noexcept {
 	return r_string_ref(rt->name);
 }
 
-RType *r_type_ref( RType *rt ) noexcept {
+RType *r_type_ref( RType *rt ) RUMINATE_NOEXCEPT {
 	g_atomic_int_inc(&rt->refcnt);
 	return rt;
 }
 
-void r_type_unref( RType *rt ) noexcept {
+void r_type_unref( RType *rt ) RUMINATE_NOEXCEPT {
 	if( g_atomic_int_dec_and_test(&rt->refcnt) )
 		r_type_delete(rt);
 }
 
-RType *r_type_pointer( RType *rt, GError **error ) noexcept {
+RType *r_type_pointer( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	Ruminate::TypePrx t;
-	if( !gxx_call([rt, &t](){ t = rt->type->getPointerType(); }, error) )
+	if( !gxx_call(t = rt->type->getPointerType(), error) )
 		return NULL;
 	return r_type_new(t, error);
 }

@@ -1,12 +1,11 @@
-#include <functional>
-#include <memory>
-#include <string>
+#include <exception>
+#include <sstream>
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
-#include <cstdint>
 
+#include <stdint.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <spawn.h>
@@ -39,26 +38,20 @@
 
 static Rumination *rumination;
 
-template gxx_call_proto(Ice::CommunicatorPtr);
-template gxx_call_proto(Ice::ObjectPrx);
-template gxx_call_proto(Ice::AsyncResultPtr);
-template gxx_call_proto(Ruminate::DebuggerFactoryPrx);
-template gxx_call_proto(Ruminate::DebuggerPrx);
-
 G_BEGIN_DECLS
 
 __attribute__((noinline))
-void rumination_hit_breakpoint() noexcept {
+void rumination_hit_breakpoint() RUMINATE_NOEXCEPT {
 	// We try really hard to not be optimized away.
 	asm("");
 }
 
-static void setup_env() noexcept {
+static void setup_env() RUMINATE_NOEXCEPT {
 	// TODO: Remove this
 	setenv("PYTHONPATH", "ice:src:.:/usr/local/lib/python2.7/site-packages", true);
 }
 
-static gint fork_child( GError **err ) noexcept {
+static gint fork_child( GError **err ) RUMINATE_NOEXCEPT {
 	size_t len = strlen(RUMINATION_DEBUGGER_CONTROLLER_PATH) + 1;
 	char controller_path[len];
 	memcpy(controller_path, RUMINATION_DEBUGGER_CONTROLLER_PATH, len);
@@ -86,12 +79,12 @@ static gint fork_child( GError **err ) noexcept {
 }
 
 __attribute__((destructor))
-static void rumination_destroy_atexit() noexcept {
+static void rumination_destroy_atexit() RUMINATE_NOEXCEPT {
 	// TODO: Error handling
 	rumination_destroy(NULL);
 }
 
-static int read_child_port( gint child_stdout, GError **error ) noexcept {
+static int read_child_port( gint child_stdout, GError **error ) RUMINATE_NOEXCEPT {
 	int port;
 	size_t nb_read = 0;
 	uint8_t *port_ptr = (uint8_t *) &port;
@@ -112,7 +105,10 @@ static int read_child_port( gint child_stdout, GError **error ) noexcept {
 	return port;
 }
 
-bool rumination_init( int *argc, char *argv[], GError **error ) noexcept {
+G_STATIC_ASSERT(sizeof(::Ice::Long) >= sizeof(pid_t) && "A pid cannot fit in a long!");
+G_STATIC_ASSERT(sizeof(::Ice::Long) >= sizeof(size_t) && "A pointer cannot fit in a long!");
+
+bool rumination_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT {
 	GError *err = NULL;
 	Ruminate::DebuggerFactoryOptions opts;
 	char *proxy_str;
@@ -136,25 +132,23 @@ bool rumination_init( int *argc, char *argv[], GError **error ) noexcept {
 		goto error_read_child_port;
 	}
 
-	if( !gxx_call<Ice::CommunicatorPtr>([argc, argv](){ return Ice::initialize(*argc, argv); }, &rumination->communicator, error) )
+	if( !gxx_call(rumination->communicator = Ice::initialize(*argc, argv), error) )
 		goto error_ice_initialize;
 
 	proxy_str = g_strdup_printf("DebuggerFactory:default -h 127.0.0.1 -p %d", port);
 	printf("Connecting to proxy: \"%s\"\n", proxy_str);
 
-	if( !gxx_call<Ice::ObjectPrx>([proxy_str](){ return rumination->communicator->stringToProxy(proxy_str); }, &factory_proxy, error) )
+	if( !gxx_call(factory_proxy = rumination->communicator->stringToProxy(proxy_str), error) )
 		goto error_communicator_stringToProxy;
 
-	if( !gxx_call<Ruminate::DebuggerFactoryPrx>([&factory_proxy](){ return Ruminate::DebuggerFactoryPrx::checkedCast(factory_proxy); }, &rumination->factory, error) )
+	if( !gxx_call(rumination->factory = Ruminate::DebuggerFactoryPrx::checkedCast(factory_proxy), error) )
 		goto error_checkedCast;
 
 	opts.exename = argv[0];
-	static_assert(sizeof(::Ice::Long) >= sizeof(pid_t), "A pid cannot fit in a long!");
 	opts.pid = getpid();
-	static_assert(sizeof(::Ice::Long) >= sizeof(size_t), "A pointer cannot fit in a long!");
 	opts.breakpointAddress = (::Ice::Long) &rumination_hit_breakpoint;
 
-	if( !gxx_call<Ruminate::DebuggerPrx>([&opts](){ return rumination->factory->create(opts); }, &rumination->debugger, error) )
+	if( !gxx_call(rumination->debugger = rumination->factory->create(opts), error) )
 		goto error_factory_create;
 
 	atexit(rumination_destroy_atexit);
@@ -174,11 +168,11 @@ error_fork_child:
 	return false;
 }
 
-bool rumination_destroy( GError **error ) noexcept {
+bool rumination_destroy( GError **error ) RUMINATE_NOEXCEPT {
 	if( rumination == NULL ) return true;
 	// TODO: Error check these
-	gxx_call([](){ rumination->factory->shutdown(); }, error);
-	gxx_call([](){ rumination->communicator->destroy(); }, error);
+	gxx_call(rumination->factory->shutdown(), error);
+	gxx_call(rumination->communicator->destroy(), error);
 	// TODO: Check child return code
 	waitpid(rumination->child_pid, NULL, 0);
 	g_spawn_close_pid(rumination->child_pid);
@@ -189,15 +183,15 @@ bool rumination_destroy( GError **error ) noexcept {
 }
 
 
-bool rumination_begin_get_type_by_variable_name( const char *varname, GError **error ) noexcept {
+bool rumination_begin_get_type_by_variable_name( const char *varname, GError **error ) RUMINATE_NOEXCEPT {
 	g_assert(rumination->arp == 0);
-	return gxx_call<Ice::AsyncResultPtr>([varname](){ return rumination->debugger->begin_getTypeByVariableName(varname, gettid()); }, &rumination->arp, error);
+	return gxx_call(rumination->arp = rumination->debugger->begin_getTypeByVariableName(varname, gettid()), error);
 }
 
-RType *rumination_end_get_type_by_variable_name( GError **error ) noexcept {
+RType *rumination_end_get_type_by_variable_name( GError **error ) RUMINATE_NOEXCEPT {
 	g_assert(rumination->arp != 0);
 	Ruminate::TypePrx t;
-	if( !gxx_call<Ruminate::TypePrx>([](){ return rumination->debugger->end_getTypeByVariableName(rumination->arp); }, &t, error) ) {
+	if( !gxx_call(t = rumination->debugger->end_getTypeByVariableName(rumination->arp), error) ) {
 		// TODO: Cleanup
 		return NULL;
 	}
@@ -205,12 +199,13 @@ RType *rumination_end_get_type_by_variable_name( GError **error ) noexcept {
 	return r_type_new(t, error);
 }
 
-RFrameList *rumination_backtrace( GError **error ) noexcept {
+RFrameList *rumination_backtrace( GError **error ) RUMINATE_NOEXCEPT {
 	Ice::AsyncResultPtr arp;
-	if( !gxx_call<Ice::AsyncResultPtr>([](){ return rumination->debugger->begin_getBacktrace(gettid()); }, &arp, error) )
+	if( !gxx_call(arp = rumination->debugger->begin_getBacktrace(gettid()), error) )
 		return NULL;
 	rumination_hit_breakpoint();
-	return r_frame_list_new(rumination->debugger->end_getBacktrace(arp), error);
+	Ruminate::FrameList fl = rumination->debugger->end_getBacktrace(arp);
+	return r_frame_list_new(fl, error);
 }
 
 G_END_DECLS

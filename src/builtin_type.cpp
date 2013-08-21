@@ -1,6 +1,5 @@
-#include <functional>
-#include <memory>
-#include <string>
+#include <exception>
+#include <sstream>
 #include <cstddef>
 
 #include <Ice/Ice.h>
@@ -20,7 +19,7 @@
 #include "private/type.h"
 #include "private/builtin_type.h"
 
-bool r_builtin_type_init( RBuiltinType *rbt, GError ** ) noexcept {
+bool r_builtin_type_init( RBuiltinType *rbt, GError ** ) RUMINATE_NOEXCEPT {
 	switch( ((RType *) rbt)->type_id ) {
 		case Ruminate::TypeIdInt:
 			rbt->id = R_BUILTIN_TYPE_INT;
@@ -47,31 +46,31 @@ bool r_builtin_type_init( RBuiltinType *rbt, GError ** ) noexcept {
 	return true;
 }
 
-void r_builtin_type_destroy( RBuiltinType * ) noexcept {}
+void r_builtin_type_destroy( RBuiltinType * ) RUMINATE_NOEXCEPT {}
 
-RBuiltinType *r_builtin_type_alloc( Ruminate::TypeId, GError ** ) noexcept {
+RBuiltinType *r_builtin_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
 	return g_slice_new(RBuiltinType);
 }
 
-void r_builtin_type_free( RBuiltinType *rbt ) noexcept {
+void r_builtin_type_free( RBuiltinType *rbt ) RUMINATE_NOEXCEPT {
 	g_slice_free(RBuiltinType, rbt);
 }
 
 G_BEGIN_DECLS
 
-RBuiltinTypeId r_builtin_type_id( RBuiltinType *rbt, GError ** ) noexcept {
+RBuiltinTypeId r_builtin_type_id( RBuiltinType *rbt, GError ** ) RUMINATE_NOEXCEPT {
 	return rbt->id;
 }
 
-bool r_builtin_type_is_signed( RBuiltinType *rbt, GError **error ) noexcept {
+bool r_builtin_type_is_signed( RBuiltinType *rbt, GError **error ) RUMINATE_NOEXCEPT {
 	bool ret = false;
-	gxx_call([rbt, &ret](){ ret = ((RType *) rbt)->type->isSigned(); }, error);
+	gxx_call(ret = ((RType *) rbt)->type->isSigned(), error);
 	return ret;
 }
 
-bool r_builtin_type_is_unsigned( RBuiltinType *rbt, GError **error ) noexcept {
+bool r_builtin_type_is_unsigned( RBuiltinType *rbt, GError **error ) RUMINATE_NOEXCEPT {
 	bool ret = false;
-	gxx_call([rbt, &ret](){ ret = ((RType *) rbt)->type->isUnsigned(); }, error);
+	gxx_call(ret = ((RType *) rbt)->type->isUnsigned(), error);
 	return ret;
 }
 

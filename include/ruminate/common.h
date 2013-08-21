@@ -1,7 +1,8 @@
 #define RUMINATE_EXPORT __attribute__((visibility("default")))
 
 #ifdef __cplusplus
-#define RUMINATE_NOEXCEPT noexcept(true)
+//#define RUMINATE_NOEXCEPT noexcept(true) // C++11
+#define RUMINATE_NOEXCEPT throw()
 #else
 #define RUMINATE_NOEXCEPT
 #endif

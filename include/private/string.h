@@ -3,5 +3,5 @@ struct RString {
 	gint refcnt;
 };
 
-RString *r_string_new( const char *, gsize ) noexcept;
-RString *r_string_new( const char * ) noexcept;
+RString *r_string_new( const char *, gsize ) RUMINATE_NOEXCEPT;
+RString *r_string_new( const char * ) RUMINATE_NOEXCEPT;

@@ -6,16 +6,18 @@ struct RType {
 	Ruminate::TypeId type_id;
 };
 
-bool r_type_init( RType *, GError ** ) noexcept;
-void r_type_destroy( RType * ) noexcept;
+bool r_type_init( RType *, GError ** ) RUMINATE_NOEXCEPT;
+void r_type_destroy( RType * ) RUMINATE_NOEXCEPT;
 
-RType *r_type_alloc( Ruminate::TypeId, GError ** ) noexcept;
-void r_type_free( RType * ) noexcept;
+RType *r_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT;
+void r_type_free( RType * ) RUMINATE_NOEXCEPT;
 
-RType *r_type_new( Ruminate::TypePrx &, GError ** ) noexcept;
-void r_type_delete( RType * ) noexcept;
+RType *r_type_new( Ruminate::TypePrx &, GError ** ) RUMINATE_NOEXCEPT;
+void r_type_delete( RType * ) RUMINATE_NOEXCEPT;
 
+#if 0
 #ifndef _TYPE_CPP_
 extern template gxx_call_proto(Ruminate::TypeId);
 extern template gxx_call_proto(Ruminate::TypePrx);
+#endif
 #endif

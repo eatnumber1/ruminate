@@ -16,16 +16,21 @@ ICEDIR := $(TOPDIR)/ice
 
 FLAGS_ALL := $(FLAGS_ALL) -ferror-limit=3
 FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) -Wall -Wextra -Wnonnull
-FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER_CXX) -std=gnu++11 -stdlib=libc++
-FLAGS_COMPILER := $(FLAGS_COMPILER) -g -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls -fPIC
+FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER_CXX) -std=c++98
+FLAGS_PREPROC_AND_COMPILER_C := $(FLAGS_PREPROC_AND_COMPILER_C) -std=c99
+FLAGS_COMPILER := $(FLAGS_COMPILER) -g -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls -fPIC -fvisibility=hidden
 
 FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) $(shell $(PKG_CONFIG) --cflags gthread-2.0) $(shell $(PKG_CONFIG) --cflags glib-2.0)
 FLAGS_LINKER := $(FLAGS_LINKER) $(shell $(PKG_CONFIG) --libs gthread-2.0) $(shell $(PKG_CONFIG) --libs glib-2.0)
 
 ifeq ($(shell uname),Darwin)
 SO_SUFFIX := dylib
+#SO_LINK_FLAGS := $(FLAGS_LINKER) -dynamiclib -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup,-compatibility_version,1.0,-current_version,1.0,-install_name,/usr/local/lib/libfoo.1.dylib
+#SO_LINK_FLAGS := $(FLAGS_LINKER) -dynamiclib -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup,-compatibility_version,1.0,-current_version,1.0
+SO_LINK_FLAGS := $(FLAGS_LINKER) -dynamiclib
 else
 SO_SUFFIX := so
+SO_LINK_FLAGS := $(FLAGS_LINKER) -shared
 endif
 
 -include config.mk
@@ -122,6 +127,6 @@ CURDIR := $(TOPDIR)
 	$(SLICE2PY) $(FLAGS_SLICE2PY) $<
 
 %.$(SO_SUFFIX):
-	$(CXX) -shared -o $@ $(SO_OBJECTS) $(FLAGS_LINKER)
+	$(CXX) $(SO_LINK_FLAGS) -o $@ $(SO_OBJECTS) $(FLAGS_LINKER)
 
 # vim:tw=80

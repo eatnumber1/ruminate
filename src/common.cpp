@@ -1,6 +1,4 @@
-#include <functional>
-#include <memory>
-#include <string>
+#include <exception>
 #include <sstream>
 #include <cstddef>
 
@@ -15,11 +13,13 @@
 
 #include "private/common.h"
 
+#if 0
 template gxx_call_proto(std::string);
 template gxx_call_proto(bool);
 template gxx_call_proto(size_t);
+#endif
 
-void unimplemented( GError **error ) noexcept {
+void unimplemented( GError **error ) RUMINATE_NOEXCEPT {
 	g_set_error_literal(
 		error,
 		RUMINATE_ERROR,
@@ -28,7 +28,8 @@ void unimplemented( GError **error ) noexcept {
 	);
 }
 
-bool gxx_call( const std::function<void()> &func, GError **error ) noexcept {
+#if 0
+bool gxx_call( const std::function<void()> &func, GError **error ) RUMINATE_NOEXCEPT {
 	try {
 		func();
 		return true;
@@ -62,3 +63,4 @@ bool gxx_call( const std::function<void()> &func, GError **error ) noexcept {
 
 	return false;
 }
+#endif

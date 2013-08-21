@@ -10,5 +10,5 @@ struct RFrame {
 	gint refcnt;
 };
 
-RFrameList *r_frame_list_new( Ruminate::FrameList &&, GError ** ) noexcept;
-RFrame *r_frame_new( Ruminate::Frame &&, GError ** ) noexcept;
+RFrameList *r_frame_list_new( Ruminate::FrameList &, GError ** ) RUMINATE_NOEXCEPT;
+RFrame *r_frame_new( Ruminate::Frame &, GError ** ) RUMINATE_NOEXCEPT;

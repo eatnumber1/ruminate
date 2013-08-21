@@ -1,6 +1,5 @@
-#include <functional>
-#include <memory>
-#include <string>
+#include <exception>
+#include <sstream>
 #include <cstddef>
 
 #include <Ice/Ice.h>
@@ -23,7 +22,7 @@
 #include "private/tag_type.h"
 #include "private/record_type.h"
 
-bool r_tag_type_init( RTagType *rtt, GError **error ) noexcept {
+bool r_tag_type_init( RTagType *rtt, GError **error ) RUMINATE_NOEXCEPT {
 	switch( ((RType *) rtt)->type_id ) {
 		case Ruminate::TypeIdStructure:
 			rtt->id = R_TAG_TYPE_RECORD;
@@ -35,7 +34,7 @@ bool r_tag_type_init( RTagType *rtt, GError **error ) noexcept {
 	g_assert_not_reached();
 }
 
-void r_tag_type_destroy( RTagType *rtt ) noexcept {
+void r_tag_type_destroy( RTagType *rtt ) RUMINATE_NOEXCEPT {
 	switch( rtt->id ) {
 		case R_TAG_TYPE_RECORD:
 			r_record_type_destroy((RRecordType *) rtt);
@@ -45,7 +44,7 @@ void r_tag_type_destroy( RTagType *rtt ) noexcept {
 	}
 }
 
-RTagType *r_tag_type_alloc( Ruminate::TypeId id, GError **error ) noexcept {
+RTagType *r_tag_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 	switch( id ) {
 		case Ruminate::TypeIdStructure:
 			return (RTagType *) r_record_type_alloc(id, error);
@@ -56,7 +55,7 @@ RTagType *r_tag_type_alloc( Ruminate::TypeId id, GError **error ) noexcept {
 	g_assert_not_reached();
 }
 
-void r_tag_type_free( RTagType *rtt ) noexcept {
+void r_tag_type_free( RTagType *rtt ) RUMINATE_NOEXCEPT {
 	switch( rtt->id ) {
 		case R_TAG_TYPE_RECORD:
 			r_record_type_free((RRecordType *) rtt);
@@ -68,12 +67,12 @@ void r_tag_type_free( RTagType *rtt ) noexcept {
 
 G_BEGIN_DECLS
 
-RTagTypeId r_tag_type_id( RTagType *rtt, GError **error ) noexcept {
+RTagTypeId r_tag_type_id( RTagType *rtt, GError **error ) RUMINATE_NOEXCEPT {
 	(void) error;
 	return rtt->id;
 }
 
-const RString *r_tag_type_name( RTagType *, GError **error ) noexcept {
+const RString *r_tag_type_name( RTagType *, GError **error ) RUMINATE_NOEXCEPT {
 	unimplemented(error);
 	return NULL;
 }

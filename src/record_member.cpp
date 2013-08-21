@@ -1,6 +1,5 @@
-#include <functional>
-#include <memory>
-#include <string>
+#include <exception>
+#include <sstream>
 #include <cstddef>
 
 #include <Ice/Ice.h>
@@ -22,10 +21,10 @@
 #include "private/type.h"
 #include "private/record_member.h"
 
-bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, GError **error ) noexcept {
+bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, GError **error ) RUMINATE_NOEXCEPT {
 	bool bitfield;
 
-	if( !gxx_call<bool>([&member](){ return member->isBitfield(); }, &bitfield, error) )
+	if( !gxx_call(bitfield = member->isBitfield(), error) )
 		return false;
 
 	rm->id = bitfield ? R_RECORD_MEMBER_BITFIELD : R_RECORD_MEMBER_OTHER;
@@ -36,20 +35,20 @@ bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, G
 	return true;
 }
 
-void r_record_member_destroy( RRecordMember *rm ) noexcept {
+void r_record_member_destroy( RRecordMember *rm ) RUMINATE_NOEXCEPT {
 	if( rm->name != NULL ) r_string_unref(rm->name);
 	rm->member = 0;
 }
 
-RRecordMember *r_record_member_alloc( Ruminate::TypeMemberPrx &, GError ** ) noexcept {
+RRecordMember *r_record_member_alloc( Ruminate::TypeMemberPrx &, GError ** ) RUMINATE_NOEXCEPT {
 	return g_slice_new(RRecordMember);
 }
 
-void r_record_member_free( RRecordMember *rm ) noexcept {
+void r_record_member_free( RRecordMember *rm ) RUMINATE_NOEXCEPT {
 	g_slice_free(RRecordMember, rm);
 }
 
-RRecordMember *r_record_member_new( Ruminate::TypeMemberPrx &member, GError **error ) noexcept {
+RRecordMember *r_record_member_new( Ruminate::TypeMemberPrx &member, GError **error ) RUMINATE_NOEXCEPT {
 	RRecordMember *rm = r_record_member_alloc(member, error);
 	if( rm == NULL ) goto error_r_record_member_alloc;
 
@@ -64,14 +63,14 @@ error_r_record_member_alloc:
 
 G_BEGIN_DECLS
 
-RRecordMemberId r_record_member_id( RRecordMember *rm, GError ** ) noexcept {
+RRecordMemberId r_record_member_id( RRecordMember *rm, GError ** ) RUMINATE_NOEXCEPT {
 	return rm->id;
 }
 
-RString *r_record_member_name( RRecordMember *rm, GError **error ) noexcept {
+RString *r_record_member_name( RRecordMember *rm, GError **error ) RUMINATE_NOEXCEPT {
 	if( rm->name == NULL ) {
 		std::string name;
-		if( !gxx_call([rm, &name](){ name = rm->member->getName(); }, error) )
+		if( !gxx_call(name = rm->member->getName(), error) )
 			return NULL;
 
 		rm->name = r_string_new(name.c_str());
@@ -80,27 +79,27 @@ RString *r_record_member_name( RRecordMember *rm, GError **error ) noexcept {
 	return r_string_ref(rm->name);
 }
 
-RType *r_record_member_type( RRecordMember *rm, GError **error ) noexcept {
+RType *r_record_member_type( RRecordMember *rm, GError **error ) RUMINATE_NOEXCEPT {
 	Ruminate::TypePrx t;
-	if( !gxx_call([rm, &t](){ t = rm->member->getType(); }, error) )
+	if( !gxx_call(t = rm->member->getType(), error) )
 		return NULL;
 
 	return r_type_new(t, error);
 }
 
-off_t r_record_member_offset( RRecordMember *rm, GError **error ) noexcept {
-	G_STATIC_ASSERT(sizeof(off_t) >= sizeof(decltype(rm->member->getOffsetInBytes())));
+off_t r_record_member_offset( RRecordMember *rm, GError **error ) RUMINATE_NOEXCEPT {
+	G_STATIC_ASSERT(sizeof(off_t) >= sizeof(__typeof__(rm->member->getOffsetInBytes())));
 	off_t off = 0;
-	gxx_call([rm, &off](){ off = rm->member->getOffsetInBytes(); }, error);
+	gxx_call(off = rm->member->getOffsetInBytes(), error);
 	return off;
 }
 
-RRecordMember *r_record_member_ref( RRecordMember *rm ) noexcept {
+RRecordMember *r_record_member_ref( RRecordMember *rm ) RUMINATE_NOEXCEPT {
 	g_atomic_int_inc(&rm->refcnt);
 	return rm;
 }
 
-void r_record_member_unref( RRecordMember *rm ) noexcept {
+void r_record_member_unref( RRecordMember *rm ) RUMINATE_NOEXCEPT {
 	if( g_atomic_int_dec_and_test(&rm->refcnt) )
 		r_record_member_destroy(rm);
 }

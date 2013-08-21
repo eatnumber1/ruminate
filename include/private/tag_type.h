@@ -4,8 +4,8 @@ struct RTagType {
 	RString *name;
 };
 
-bool r_tag_type_init( RTagType *, GError ** ) noexcept;
-void r_tag_type_destroy( RTagType * ) noexcept;
+bool r_tag_type_init( RTagType *, GError ** ) RUMINATE_NOEXCEPT;
+void r_tag_type_destroy( RTagType * ) RUMINATE_NOEXCEPT;
 
-RTagType *r_tag_type_alloc( Ruminate::TypeId, GError ** ) noexcept;
-void r_tag_type_free( RTagType * ) noexcept;
+RTagType *r_tag_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT;
+void r_tag_type_free( RTagType * ) RUMINATE_NOEXCEPT;
