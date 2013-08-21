@@ -22,8 +22,12 @@ SRC_DEPS := $(SRC_OBJECTS:.o=.d)
 
 SRC_FLAGS_LINKER := $(SRC_LIBRARIES) -lIce -lIceUtil
 
-LIBRUMINATE_FLAGS_LINKER := -L$(CURDIR) -lruminate
 LIBRUMINATE := $(CURDIR)/libruminate.$(SO_SUFFIX)
+LIBRUMINATE_FLAGS_LINKER := -L$(CURDIR) -lruminate
+
+ifneq ($(shell uname),Darwin)
+FLAGS_LINKER := $(FLAGS_LINKER) -Wl,-rpath,$(CURDIR)
+endif
 
 SRC_PYTHON := \
 	src/dbgsvr.py \
