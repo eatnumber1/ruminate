@@ -64,6 +64,9 @@ class TypeImpl(Type):
 				lldb.eTypeClassOther: TypeId.TypeIdUnknown
 			}[sbtype.type]
 
+	def getId(self, current = None):
+		return self.id
+
 	def getName(self, current = None):
 		return self.sbtype.GetName()
 
