@@ -52,10 +52,13 @@ bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 			break;
 		case Ruminate::TypeIdTypedef:
 			rt->id = R_TYPE_TYPEDEF;
+			break;
 		case Ruminate::TypeIdPointer:
 			rt->id = R_TYPE_POINTER;
+			break;
 		case Ruminate::TypeIdUnknown:
 			rt->id = R_TYPE_UNKNOWN;
+			break;
 		default:
 			g_assert_not_reached();
 	}
