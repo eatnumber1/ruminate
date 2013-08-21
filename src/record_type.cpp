@@ -26,7 +26,15 @@
 #include "private/function_type.h"
 
 bool r_record_type_init( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
-	new (rrt) RRecordType();
+	switch( ((RType *) rrt)->type_id ) {
+		case Ruminate::TypeIdStructure:
+			new (rrt) RRecordType();
+			break;
+		case Ruminate::TypeIdFunction:
+			break;
+		default:
+			g_assert_not_reached();
+	}
 
 	rrt->members_init = false;
 
@@ -58,7 +66,15 @@ void r_record_type_destroy( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 	rrt->members.clear();
 	rrt->members_init = false;
 
-	rrt->~RRecordType();
+	switch( rrt->id ) {
+		case R_RECORD_TYPE_STRUCTURE:
+			rrt->~RRecordType();
+			break;
+		case R_RECORD_TYPE_FUNCTION:
+			break;
+		default:
+			g_assert_not_reached();
+	}
 }
 
 RRecordType *r_record_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {

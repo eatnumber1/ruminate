@@ -255,7 +255,7 @@ int main( int argc, char *argv[] ) {
 		.an_array = "hello"
 	};
 
-	print_json_for_type(f, &err);
+	(void) print_json_for_type(f, &err);
 	die_if_error(err);
 
 	printf("\n");

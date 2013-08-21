@@ -34,8 +34,6 @@ template gxx_call_proto(Ruminate::TypePrx);
 #endif
 
 bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
-	new (rt) RType();
-
 	rt->refcnt = 1;
 	rt->name = NULL;
 
@@ -47,6 +45,8 @@ bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdLong:
 		case Ruminate::TypeIdDouble:
 		case Ruminate::TypeIdVoid:
+		case Ruminate::TypeIdShort:
+		case Ruminate::TypeIdChar:
 			rt->id = R_TYPE_BUILTIN;
 			break;
 		case Ruminate::TypeIdTypedef:
@@ -104,8 +104,6 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 
 	if( rt->name != NULL ) r_string_unref(rt->name);
 	rt->type = 0;
-
-	rt->~RType();
 }
 
 
@@ -117,6 +115,8 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdLong:
 		case Ruminate::TypeIdDouble:
 		case Ruminate::TypeIdVoid:
+		case Ruminate::TypeIdShort:
+		case Ruminate::TypeIdChar:
 			return (RType *) r_builtin_type_alloc(id, error);
 		case Ruminate::TypeIdTypedef:
 			return (RType *) r_typedef_type_alloc(id, error);
@@ -138,6 +138,8 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdLong:
 		case Ruminate::TypeIdDouble:
 		case Ruminate::TypeIdVoid:
+		case Ruminate::TypeIdShort:
+		case Ruminate::TypeIdChar:
 			r_builtin_type_free((RBuiltinType *) rt);
 			break;
 		case Ruminate::TypeIdTypedef:
