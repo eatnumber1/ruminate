@@ -203,6 +203,10 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 		type = r_typedef_type_canonical((RTypedefType *) type, error);
 		die_if_error(*error);
 		// TODO: Error checking
+
+		id = r_type_id(type, error);
+		die_if_error(*error);
+		// TODO: Error checking
 	} else {
 		r_type_ref(type);
 	}
