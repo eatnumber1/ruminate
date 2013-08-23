@@ -78,7 +78,7 @@ class TypeImpl(Type):
 		return self.sbtype.GetByteSize()
 
 	def getPointeeType(self, current = None):
-		return self.proxyFor(self.sbtype.GetPointeeType(), current)
+		return self.proxyFor(self.sbtype.GetDereferencedType(), current)
 
 	def getPointerType(self, current = None):
 		return self.proxyFor(self.sbtype.GetPointerType(), current)
