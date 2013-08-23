@@ -6,7 +6,7 @@ import lldb
 class TypeImpl(Type):
 	def __init__(self, sbtype, sbvalue):
 		self.sbvalue = sbvalue
-		self.sbtype = sbvalue
+		self.sbtype = sbtype
 		if sbtype.type == lldb.eTypeClassBuiltin:
 			self.id = {
 				#lldb.eBasicTypeBool: TypeId.TypeId,
@@ -72,16 +72,16 @@ class TypeImpl(Type):
 		return self.sbtype.GetName()
 
 	def getBuiltinType(self, current = None):
-		return self.proxyFor(self.sbtype.GetBasicType(self.sbtype.GetBasicType()), current)
+		return self.proxyFor(current, self.sbtype.GetBasicType(self.sbtype.GetBasicType()))
 
 	def getSize(self, current = None):
 		return self.sbtype.GetByteSize()
 
 	def getPointeeType(self, current = None):
-		return self.proxyFor(self.sbtype.GetDereferencedType(), current)
+		return self.proxyFor(current, self.sbtype.GetDereferencedType())
 
 	def getPointerType(self, current = None):
-		return self.proxyFor(self.sbtype.GetPointerType(), current)
+		return self.proxyFor(currnet, self.sbtype.GetPointerType())
 
 	def isComplete(self, current = None):
 		return self.sbtype.IsTypeComplete()
@@ -90,7 +90,7 @@ class TypeImpl(Type):
 		canon = self.sbtype.GetCanonicalType()
 		if canon == self.sbtype:
 			return None
-		return self.proxyFor(canon, current)
+		return self.proxyFor(current, canon)
 
 	def getMembers(self, current = None):
 		ret = []
@@ -108,14 +108,14 @@ class TypeImpl(Type):
 		atl = self.sbtype.GetFunctionArgumentTypes()
 		ret = []
 		for idx in range(atl.GetSize()):
-			ret.append(TypeImpl.proxyFor(atl.GetTypeAtIndex(idx), current))
+			ret.append(self.proxyFor(current, atl.GetTypeAtIndex(idx), None))
 		return ret
 
 	def getReturnType(self, current = None):
 		return self.proxyFor(
+			current,
 			self.sbtype.GetFunctionReturnType(),
 			None,
-			current
 		)
 
 	def isSigned(self, current = None):
@@ -192,7 +192,7 @@ class TypeImpl(Type):
 			#lldb.eBasicTypeWChar: ,
 		}[self.sbtype.GetBasicType()]
 
-	def proxyFor(self, sbtype = None, sbvalue = None, current = None):
+	def proxyFor(self, current, sbtype = None, sbvalue = None):
 		return TypeImpl.proxyFor(
 			sbtype if sbtype != None else self.sbtype,
 			sbvalue if sbvalue != None else self.sbvalue,
