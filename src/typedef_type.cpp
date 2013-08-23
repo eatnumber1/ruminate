@@ -43,7 +43,7 @@ RType *r_typedef_type_canonical( RTypedefType *rtt, GError **error ) RUMINATE_NO
 	if( !gxx_call(t = ((RType *) rtt)->type->getCanonicalType(), error) )
 		return NULL;
 
-	return r_type_new(t, error);
+	return r_type_new(t, ((RType *) rtt)->mem, error);
 }
 
 G_END_DECLS

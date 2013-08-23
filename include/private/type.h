@@ -2,17 +2,20 @@ struct RType {
 	RTypeId id;
 	gint refcnt;
 	RString *name;
+	void *mem;
 	Ruminate::TypePrx type;
 	Ruminate::TypeId type_id;
 };
 
-bool r_type_init( RType *, GError ** ) RUMINATE_NOEXCEPT;
+typedef void (*MemFreeFunction)( void * );
+
+bool r_type_init( RType *, void *, GError ** ) RUMINATE_NOEXCEPT;
 void r_type_destroy( RType * ) RUMINATE_NOEXCEPT;
 
 RType *r_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT;
 void r_type_free( RType * ) RUMINATE_NOEXCEPT;
 
-RType *r_type_new( Ruminate::TypePrx &, GError ** ) RUMINATE_NOEXCEPT;
+RType *r_type_new( Ruminate::TypePrx &, void *, GError ** ) RUMINATE_NOEXCEPT;
 void r_type_delete( RType * ) RUMINATE_NOEXCEPT;
 
 #if 0

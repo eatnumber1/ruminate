@@ -43,7 +43,7 @@ RType *r_pointer_type_pointee( RPointerType *rpt, GError **error ) RUMINATE_NOEX
 	if( !gxx_call(t = ((RType *) rpt)->type->getPointeeType(), error) )
 		return NULL;
 
-	return r_type_new(t, error);
+	return r_type_new(t, ((RType *) rpt)->mem, error);
 }
 
 G_END_DECLS

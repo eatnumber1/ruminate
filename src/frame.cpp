@@ -101,7 +101,7 @@ const char *r_frame_compile_unit_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT
 
 RType *r_frame_function_type( RFrame *rf, GError **err ) RUMINATE_NOEXCEPT {
 	if( rf->functionType != NULL ) return r_type_ref(rf->functionType);
-	rf->functionType = r_type_new(rf->frame.functionType, err);
+	rf->functionType = r_type_new(rf->frame.functionType, NULL, err);
 	return rf->functionType;
 }
 

@@ -11,7 +11,7 @@
 #define print_json_for_type(expr, err) ({ \
 	GError **_err = (err); \
 	__typeof__(expr) __expr = (expr); \
-	RType *_type = rumination_get_type(__typeof__(expr), _err); \
+	RType *_type = rumination_get_type(__expr, _err); \
 	bool ret = _type == NULL ? false : _print_json_for_type(_type, &__expr, _err); \
 	r_type_unref(_type); \
 	ret; \
@@ -264,7 +264,7 @@ int main( int argc, char *argv[] ) {
 
 	printf("\n");
 
-	RType *type = rumination_get_type(__typeof__(print_function_type), &err);
+	RType *type = rumination_get_type(&print_function_type, &err);
 	die_if_error(err);
 
 	print_function_type((RFunctionType *) type, &err);

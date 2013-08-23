@@ -2,17 +2,18 @@ from Ruminate import *
 
 class TypeMemberImpl(TypeMember):
 	@staticmethod
-	def proxyFor(sbtypemember, current):
+	def proxyFor(sbtypemember, sbvalue, current):
 		return TypeMemberPrx.uncheckedCast(
-			current.adapter.addWithUUID(TypeMemberImpl(sbtypemember))
+			current.adapter.addWithUUID(TypeMemberImpl(sbtypemember, sbvalue))
 		)
 
-	def __init__(self, sbtypemember):
+	def __init__(self, sbtypemember, sbvalue):
 		self.sbtypemember = sbtypemember
+		self.sbvalue = sbvalue
 
 	def getType(self, current = None):
 		from type_impl import TypeImpl
-		return TypeImpl.proxyFor(self.sbtypemember.type, current)
+		return TypeImpl.proxyFor(self.sbtypemember.type, self.sbvalue, current)
 
 	def getName(self, current = None):
 		return self.sbtypemember.name

@@ -108,10 +108,7 @@ class DebuggerImpl(Debugger):
 				value = validate(frame.FindVariable(variable))
 				print(value)
 
-				typ = validate(value.GetType())
-				print(typ)
-
-				return TypeImpl.proxyFor(typ, current)
+				return TypeImpl.proxyFor(value.type, value, current)
 		finally:
 			print("getTypeByVariableName: exit")
 

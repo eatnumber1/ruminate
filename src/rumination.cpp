@@ -23,6 +23,7 @@
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
 #include "ruminate/type.h"
+#include "ruminate/pointer_type.h"
 #include "ruminate/frame.h"
 #include "ruminate/rumination.h"
 
@@ -188,7 +189,7 @@ bool rumination_begin_get_type_by_variable_name( const char *varname, GError **e
 	return gxx_call(rumination->arp = rumination->debugger->begin_getTypeByVariableName(varname, gettid()), error);
 }
 
-RType *rumination_end_get_type_by_variable_name( GError **error ) RUMINATE_NOEXCEPT {
+RType *rumination_end_get_type_by_variable_name( void *mem, GError **error ) RUMINATE_NOEXCEPT {
 	g_assert(rumination->arp != 0);
 	Ruminate::TypePrx t;
 	if( !gxx_call(t = rumination->debugger->end_getTypeByVariableName(rumination->arp), error) ) {
@@ -196,7 +197,10 @@ RType *rumination_end_get_type_by_variable_name( GError **error ) RUMINATE_NOEXC
 		return NULL;
 	}
 	rumination->arp = 0;
-	return r_type_new(t, error);
+	// TODO: Type check
+	RPointerType *pt = (RPointerType *) r_type_new(t, mem, error);
+	if( pt == NULL ) return NULL;
+	return r_pointer_type_pointee(pt, error);
 }
 
 RFrameList *rumination_backtrace( GError **error ) RUMINATE_NOEXCEPT {

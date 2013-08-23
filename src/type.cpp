@@ -12,11 +12,13 @@
 #include "ruminate/common.h"
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
+#include "ruminate/refptr.h"
 #include "ruminate/type.h"
 #include "ruminate/tag_type.h"
 #include "ruminate/builtin_type.h"
 #include "ruminate/pointer_type.h"
 #include "ruminate/typedef_type.h"
+#include "ruminate/array_type.h"
 
 #define _TYPE_CPP_
 
@@ -26,6 +28,7 @@
 #include "private/builtin_type.h"
 #include "private/pointer_type.h"
 #include "private/typedef_type.h"
+#include "private/array_type.h"
 #include "private/string.h"
 
 #if 0
@@ -33,11 +36,15 @@ template gxx_call_proto(Ruminate::TypeId);
 template gxx_call_proto(Ruminate::TypePrx);
 #endif
 
-bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
+bool r_type_init( RType *rt, void *mem, GError **error ) RUMINATE_NOEXCEPT {
 	rt->refcnt = 1;
 	rt->name = NULL;
+	rt->mem = r_ptr_ref(mem);
 
 	switch( rt->type_id ) {
+		case Ruminate::TypeIdArray:
+			rt->id = R_TYPE_ARRAY;
+			break;
 		case Ruminate::TypeIdStructure:
 		case Ruminate::TypeIdFunction:
 			rt->id = R_TYPE_TAG;
@@ -77,6 +84,9 @@ bool r_type_init( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 		case R_TYPE_POINTER:
 			ret = r_pointer_type_init((RPointerType *) rt, error);
 			break;
+		case R_TYPE_ARRAY:
+			ret = r_array_type_init((RArrayType *) rt, error);
+			break;
 		case R_TYPE_UNKNOWN:
 			break;
 		default:
@@ -100,6 +110,9 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 		case R_TYPE_POINTER:
 			r_pointer_type_destroy((RPointerType *) rt);
 			break;
+		case R_TYPE_ARRAY:
+			r_array_type_destroy((RArrayType *) rt);
+			break;
 		case R_TYPE_UNKNOWN:
 			break;
 		default:
@@ -108,11 +121,17 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 
 	if( rt->name != NULL ) r_string_unref(rt->name);
 	rt->type = 0;
+	if( rt->mem != NULL ) {
+		g_free(rt->mem);
+		rt->mem = NULL;
+	}
 }
 
 
 RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 	switch( id ) {
+		case Ruminate::TypeIdArray:
+			return (RType *) r_array_type_alloc(id, error);
 		case Ruminate::TypeIdStructure:
 		case Ruminate::TypeIdFunction:
 			return (RType *) r_tag_type_alloc(id, error);
@@ -138,6 +157,9 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 
 void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 	switch( rt->type_id ) {
+		case Ruminate::TypeIdArray:
+			r_array_type_free((RArrayType *) rt);
+			break;
 		case Ruminate::TypeIdStructure:
 		case Ruminate::TypeIdFunction:
 			r_tag_type_free((RTagType *) rt);
@@ -165,7 +187,7 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 	}
 }
 
-RType *r_type_new( Ruminate::TypePrx &type, GError **error ) RUMINATE_NOEXCEPT {
+RType *r_type_new( Ruminate::TypePrx &type, void *mem, GError **error ) RUMINATE_NOEXCEPT {
 	RType *rt;
 	Ruminate::TypeId id;
 
@@ -177,7 +199,7 @@ RType *r_type_new( Ruminate::TypePrx &type, GError **error ) RUMINATE_NOEXCEPT {
 	rt->type = type;
 	rt->type_id = id;
 
-	if( !r_type_init(rt, error) ) goto error_r_type_init;
+	if( !r_type_init(rt, mem, error) ) goto error_r_type_init;
 
 	return rt;
 
@@ -226,7 +248,7 @@ RType *r_type_pointer( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	Ruminate::TypePrx t;
 	if( !gxx_call(t = rt->type->getPointerType(), error) )
 		return NULL;
-	return r_type_new(t, error);
+	return r_type_new(t, rt->mem, error);
 }
 
 G_END_DECLS

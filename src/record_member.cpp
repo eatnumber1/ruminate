@@ -87,7 +87,7 @@ RType *r_record_member_type( RRecordMember *rm, GError **error ) RUMINATE_NOEXCE
 	if( !gxx_call(t = rm->member->getType(), error) )
 		return NULL;
 
-	return r_type_new(t, error);
+	return r_type_new(t, ((RType *) rm)->mem, error);
 }
 
 off_t r_record_member_offset( RRecordMember *rm, GError **error ) RUMINATE_NOEXCEPT {

@@ -49,7 +49,7 @@ RType *r_function_type_return_type( RFunctionType *rft, GError **error ) RUMINAT
 	if( !gxx_call(t = ((RType *) rft)->type->getReturnType(), error) )
 		return NULL;
 
-	return r_type_new(t, error);
+	return r_type_new(t, ((RType *) rft)->mem, error);
 }
 
 G_END_DECLS

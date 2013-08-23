@@ -9,6 +9,7 @@ module Ruminate {
 		TypeIdFunction,
 		TypeIdTypedef,
 		TypeIdPointer,
+		TypeIdArray,
 
 		TypeIdInt,
 		TypeIdLong,
@@ -26,17 +27,19 @@ module Ruminate {
 	interface Type {
 		TypeId getId();
 
-		Type *getPrimitiveType();
+		Type *getBuiltinType();
 		Type *getPointeeType();
 		Type *getPointerType();
 		Type *getCanonicalType();
 		Type *getReturnType();
+		Type *getArrayMemberType();
 
 		TypeMemberList getMembers();
 		TypeList getArguments();
 
 		string getName(); // This is cached in the C++ API layer
 		idempotent long getSize();
+		idempotent long getArraySize();
 
 		idempotent bool isComplete();
 		idempotent bool isSigned();

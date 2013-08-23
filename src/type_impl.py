@@ -4,8 +4,9 @@ from type_member_impl import *
 import lldb
 
 class TypeImpl(Type):
-	def __init__(self, sbtype):
-		self.sbtype = sbtype
+	def __init__(self, sbtype, sbvalue):
+		self.sbvalue = sbvalue
+		self.sbtype = sbvalue
 		if sbtype.type == lldb.eTypeClassBuiltin:
 			self.id = {
 				#lldb.eBasicTypeBool: TypeId.TypeId,
@@ -70,17 +71,17 @@ class TypeImpl(Type):
 	def getName(self, current = None):
 		return self.sbtype.GetName()
 
-	def getPrimitiveType(self, current = None):
-		return TypeImpl.proxyFor(self.sbtype.GetBasicType(self.sbtype.GetBasicType()), current)
+	def getBuiltinType(self, current = None):
+		return self.proxyFor(self.sbtype.GetBasicType(self.sbtype.GetBasicType()), current)
 
 	def getSize(self, current = None):
 		return self.sbtype.GetByteSize()
 
 	def getPointeeType(self, current = None):
-		return TypeImpl.proxyFor(self.sbtype.GetPointeeType(), current)
+		return self.proxyFor(self.sbtype.GetPointeeType(), current)
 
 	def getPointerType(self, current = None):
-		return TypeImpl.proxyFor(self.sbtype.GetPointerType(), current)
+		return self.proxyFor(self.sbtype.GetPointerType(), current)
 
 	def isComplete(self, current = None):
 		return self.sbtype.IsTypeComplete()
@@ -89,10 +90,19 @@ class TypeImpl(Type):
 		canon = self.sbtype.GetCanonicalType()
 		if canon == self.sbtype:
 			return None
-		return TypeImpl.proxyFor(canon, current)
+		return self.proxyFor(canon, current)
 
 	def getMembers(self, current = None):
-		return map(lambda f: TypeMemberImpl.proxyFor(f, current), self.sbtype.fields)
+		ret = []
+		for field in self.sbtype.fields:
+			ret.append(
+				TypeMemberImpl.proxyFor(
+					field,
+					self.sbvalue.GetChildMemberWithName(field.name),
+					current
+				)
+			)
+		return ret
 
 	def getArguments(self, current = None):
 		atl = self.sbtype.GetFunctionArgumentTypes()
@@ -102,8 +112,9 @@ class TypeImpl(Type):
 		return ret
 
 	def getReturnType(self, current = None):
-		return TypeImpl.proxyFor(
+		return self.proxyFor(
 			self.sbtype.GetFunctionReturnType(),
+			None,
 			current
 		)
 
@@ -181,8 +192,15 @@ class TypeImpl(Type):
 			#lldb.eBasicTypeWChar: ,
 		}[self.sbtype.GetBasicType()]
 
+	def proxyFor(self, sbtype = None, sbvalue = None, current = None):
+		return TypeImpl.proxyFor(
+			sbtype if sbtype != None else self.sbtype,
+			sbvalue if sbvalue != None else self.sbvalue,
+			current
+		)
+
 	@staticmethod
-	def proxyFor(sbtype, current):
+	def proxyFor(sbtype, sbvalue, current):
 		return TypePrx.uncheckedCast(
-			current.adapter.addWithUUID(TypeImpl(sbtype))
+			current.adapter.addWithUUID(TypeImpl(sbtype, sbvalue))
 		)
