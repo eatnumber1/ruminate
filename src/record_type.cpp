@@ -110,7 +110,7 @@ size_t r_record_type_nmembers( RRecordType *rrt, GError **error ) RUMINATE_NOEXC
 RRecordMember *r_record_type_member_at( RRecordType *rrt, size_t i, GError **error ) RUMINATE_NOEXCEPT {
 	if( !init_members(rrt, error) ) return 0;
 	// TODO: Memoize RRecordMembers
-	return r_record_member_new(rrt->members[i], error);
+	return r_record_member_new(rrt->members[i], ((RType *) rrt)->mem, error);
 }
 
 G_END_DECLS

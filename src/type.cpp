@@ -121,10 +121,8 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 
 	if( rt->name != NULL ) r_string_unref(rt->name);
 	rt->type = 0;
-	if( rt->mem != NULL ) {
-		g_free(rt->mem);
-		rt->mem = NULL;
-	}
+	r_ptr_unref(rt->mem);
+	rt->mem = NULL;
 }
 
 

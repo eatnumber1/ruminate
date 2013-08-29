@@ -7,8 +7,6 @@ struct RType {
 	Ruminate::TypeId type_id;
 };
 
-typedef void (*MemFreeFunction)( void * );
-
 bool r_type_init( RType *, void *, GError ** ) RUMINATE_NOEXCEPT;
 void r_type_destroy( RType * ) RUMINATE_NOEXCEPT;
 

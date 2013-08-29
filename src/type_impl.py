@@ -2,6 +2,7 @@ from Ruminate import *
 from type_member_impl import *
 
 import lldb
+import lldb_utils
 
 class TypeImpl(Type):
 	def __init__(self, sbtype, sbvalue):
@@ -72,16 +73,16 @@ class TypeImpl(Type):
 		return self.sbtype.GetName()
 
 	def getBuiltinType(self, current = None):
-		return self.proxyFor(current, self.sbtype.GetBasicType(self.sbtype.GetBasicType()))
+		return TypeImpl.proxyFor(current, self.sbtype.GetBasicType(self.sbtype.GetBasicType()), self.sbvalue)
 
 	def getSize(self, current = None):
 		return self.sbtype.GetByteSize()
 
 	def getPointeeType(self, current = None):
-		return self.proxyFor(current, self.sbtype.GetDereferencedType())
+		return TypeImpl.proxyFor(self.sbtype.GetPointeeType(), self.sbvalue.Dereference(), current)
 
 	def getPointerType(self, current = None):
-		return self.proxyFor(currnet, self.sbtype.GetPointerType())
+		return TypeImpl.proxyFor(self.sbtype.GetPointerType(), self.sbvalue.AddressOf(), current)
 
 	def isComplete(self, current = None):
 		return self.sbtype.IsTypeComplete()
@@ -90,29 +91,33 @@ class TypeImpl(Type):
 		canon = self.sbtype.GetCanonicalType()
 		if canon == self.sbtype:
 			return None
-		return self.proxyFor(current, canon)
+		return TypeImpl.proxyFor(current, canon, self.sbvalue)
 
 	def getMembers(self, current = None):
 		ret = []
 		for field in self.sbtype.fields:
-			ret.append(
-				TypeMemberImpl.proxyFor(
-					field,
-					self.sbvalue.GetChildMemberWithName(field.name),
-					current
-				)
-			)
+			lldb_utils.getDescription(field)
+			child_val = self.sbvalue.GetChildMemberWithName(field.name)
+			lldb_utils.getDescription(child_val)
+			ret.append(field, child_val, current)
+			#ret.append(
+			#	TypeMemberImpl.proxyFor(
+			#		field,
+			#		self.sbvalue.GetChildMemberWithName(field.name),
+			#		current
+			#	)
+			#)
 		return ret
 
 	def getArguments(self, current = None):
 		atl = self.sbtype.GetFunctionArgumentTypes()
 		ret = []
 		for idx in range(atl.GetSize()):
-			ret.append(self.proxyFor(current, atl.GetTypeAtIndex(idx), None))
+			ret.append(TypeImpl.proxyFor(current, atl.GetTypeAtIndex(idx), None))
 		return ret
 
 	def getReturnType(self, current = None):
-		return self.proxyFor(
+		return TypeImpl.proxyFor(
 			current,
 			self.sbtype.GetFunctionReturnType(),
 			None,
@@ -191,13 +196,6 @@ class TypeImpl(Type):
 			lldb.eBasicTypeVoid: False,
 			#lldb.eBasicTypeWChar: ,
 		}[self.sbtype.GetBasicType()]
-
-	def proxyFor(self, current, sbtype = None, sbvalue = None):
-		return TypeImpl.proxyFor(
-			sbtype if sbtype != None else self.sbtype,
-			sbvalue if sbvalue != None else self.sbvalue,
-			current
-		)
 
 	@staticmethod
 	def proxyFor(sbtype, sbvalue, current):

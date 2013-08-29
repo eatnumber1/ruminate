@@ -11,6 +11,7 @@
 #include "ruminate/common.h"
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
+#include "ruminate/refptr.h"
 #include "ruminate/type.h"
 #include "ruminate/record_member.h"
 
@@ -21,7 +22,7 @@
 #include "private/type.h"
 #include "private/record_member.h"
 
-bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, GError **error ) RUMINATE_NOEXCEPT {
+bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, void *mem, GError **error ) RUMINATE_NOEXCEPT {
 	bool bitfield;
 
 	if( !gxx_call(bitfield = member->isBitfield(), error) )
@@ -31,6 +32,7 @@ bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, G
 	rm->refcnt = 1;
 	rm->member = member;
 	rm->name = NULL;
+	rm->mem = r_ptr_ref(mem);
 
 	return true;
 }
@@ -38,6 +40,8 @@ bool r_record_member_init( RRecordMember *rm, Ruminate::TypeMemberPrx &member, G
 void r_record_member_destroy( RRecordMember *rm ) RUMINATE_NOEXCEPT {
 	if( rm->name != NULL ) r_string_unref(rm->name);
 	rm->member = 0;
+	r_ptr_unref(rm->mem);
+	rm->mem = NULL;
 }
 
 RRecordMember *r_record_member_alloc( Ruminate::TypeMemberPrx &, GError ** ) RUMINATE_NOEXCEPT {
@@ -51,17 +55,22 @@ void r_record_member_free( RRecordMember *rm ) RUMINATE_NOEXCEPT {
 	g_slice_free(RRecordMember, rm);
 }
 
-RRecordMember *r_record_member_new( Ruminate::TypeMemberPrx &member, GError **error ) RUMINATE_NOEXCEPT {
+RRecordMember *r_record_member_new( Ruminate::TypeMemberPrx &member, void *mem, GError **error ) RUMINATE_NOEXCEPT {
 	RRecordMember *rm = r_record_member_alloc(member, error);
 	if( rm == NULL ) goto error_r_record_member_alloc;
 
-	if( !r_record_member_init(rm, member, error) ) goto error_r_record_member_init;
+	if( !r_record_member_init(rm, member, mem, error) ) goto error_r_record_member_init;
 	return rm;
 
 error_r_record_member_init:
 	r_record_member_free(rm);
 error_r_record_member_alloc:
 	return NULL;
+}
+
+void r_record_member_delete( RRecordMember *rm ) RUMINATE_NOEXCEPT {
+	r_record_member_destroy(rm);
+	r_record_member_free(rm);
 }
 
 G_BEGIN_DECLS
@@ -87,7 +96,7 @@ RType *r_record_member_type( RRecordMember *rm, GError **error ) RUMINATE_NOEXCE
 	if( !gxx_call(t = rm->member->getType(), error) )
 		return NULL;
 
-	return r_type_new(t, ((RType *) rm)->mem, error);
+	return r_type_new(t, rm->mem, error);
 }
 
 off_t r_record_member_offset( RRecordMember *rm, GError **error ) RUMINATE_NOEXCEPT {
@@ -104,7 +113,7 @@ RRecordMember *r_record_member_ref( RRecordMember *rm ) RUMINATE_NOEXCEPT {
 
 void r_record_member_unref( RRecordMember *rm ) RUMINATE_NOEXCEPT {
 	if( g_atomic_int_dec_and_test(&rm->refcnt) )
-		r_record_member_destroy(rm);
+		r_record_member_delete(rm);
 }
 
 G_END_DECLS
