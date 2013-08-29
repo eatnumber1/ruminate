@@ -39,7 +39,7 @@ module Ruminate {
 
 		string getName(); // This is cached in the C++ API layer
 		idempotent long getSize();
-		idempotent long getArraySize();
+		idempotent long getArraySize( long tid );
 
 		idempotent bool isComplete();
 		idempotent bool isSigned();

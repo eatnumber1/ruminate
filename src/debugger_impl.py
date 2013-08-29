@@ -6,6 +6,7 @@ from Ruminate import *
 from lldb_utils import *
 from type_impl import *
 from lldb_em import *
+from stopped_thread import *
 
 import threading
 
@@ -76,46 +77,28 @@ class DebuggerImpl(Debugger):
 	def shutdown(self):
 		self.em.shutdown()
 
-	class StoppedThread(object):
-		def __init__(self, em, process, tid):
-			self.tid = tid
-			self.em = em
-			self.process = process
-
-		def __enter__(self):
-			thread = validate(self.process.GetThreadByID(self.tid))
-			stoppedAtBreakpoint = threading.Event()
-			def onStopped(event):
-				if thread.stop_reason == eStopReasonBreakpoint:
-					stoppedAtBreakpoint.set()
-					self.em.removeCallback(lldb.eStateStopped, onStopped)
-			self.em.addCallback(lldb.eStateStopped, onStopped)
-			stoppedAtBreakpoint.wait()
-			return thread
-
-		def __exit__(self, *args):
-			self.process.Continue()
-			return False
-
 	def getTypeByVariableName(self, variable, tid, current):
 		print("getTypeByVariableName: begin")
 
 		try:
-			with self.StoppedThread(self.em, self.process, tid) as thread:
+			with StoppedThread(self.em, self.process, tid) as thread:
 				frame = validate(thread.frame[1])
 				print(frame)
 
 				value = validate(frame.FindVariable(variable))
 				print(value)
 
-				return TypeImpl.proxyFor(value.type, value, current)
+				t = validate(value.type)
+				print(t)
+
+				return TypeImpl.proxyFor(t, value, StoppedThreadFactory(self.em, self.process), current)
 		finally:
 			print("getTypeByVariableName: exit")
 
 	def getBacktrace(self, tid, current):
 		print("getBacktrace: begin")
 		try:
-			with self.StoppedThread(self.em, self.process, tid) as thread:
+			with StoppedThread(self.em, self.process, tid) as thread:
 				frame_list = []
 
 				for sbframe in thread.frames:

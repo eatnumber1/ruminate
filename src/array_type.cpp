@@ -17,6 +17,7 @@
 
 #define _ARRAY_TYPE_CPP_
 
+#include "private/gettid.h"
 #include "private/common.h"
 #include "private/type.h"
 #include "private/array_type.h"
@@ -44,7 +45,7 @@ G_STATIC_ASSERT(sizeof(size_t) >= sizeof(uint64_t));
 
 size_t r_array_type_size( RArrayType *rat, GError **error ) RUMINATE_NOEXCEPT {
 	size_t size = 0;
-	(void) gxx_call(size = ((RType *) rat)->type->getArraySize(), error);
+	(void) gxx_call(size = ((RType *) rat)->type->getArraySize(gettid()), error);
 	return size;
 }
 
