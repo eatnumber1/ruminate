@@ -184,6 +184,23 @@ static bool print_function_type( RFunctionType *rft, GError **error ) {
 	return true;
 }
 
+static bool _print_json_for_array( RArrayType *type, void *data, GError **error ) {
+	size_t size = r_array_type_size(type, error);
+	die_if_error(*error);
+	// TODO: Error checking
+
+	RType *member_type = r_array_type_member_type(type, error);
+	die_if_error(*error);
+	// TODO: Error checking
+
+	printf("[");
+	for( size_t i = 0; i < size; i++ )
+		_print_json_for_type(member_type, &data[i], error);
+	printf("]");
+
+	return true;
+}
+
 static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 	RTypeId id = r_type_id(type, error);
 	// TODO: Error checking
@@ -224,7 +241,6 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 			// TODO: Error checking
 			break;
 		case R_TYPE_POINTER: {
-			// TODO: It might be an array
 			RType *pointee = r_pointer_type_pointee((RPointerType *) type, error);
 			die_if_error(*error);
 			// TODO: Error checking
@@ -235,6 +251,11 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 			// TODO: Error checking
 			break;
 		}
+		case R_TYPE_ARRAY:
+			_print_json_for_array((RArrayType *) type, data, error);
+			die_if_error(*error);
+			// TODO: Error checking
+			break;
 		default:
 			fprintf(stderr, "Unknown type with id %d\n", id);
 			abort();

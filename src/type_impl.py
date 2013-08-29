@@ -45,7 +45,7 @@ class TypeImpl(Type):
 			}[sbtype.GetBasicType()]
 		else:
 			self.id = {
-				#lldb.eTypeClassArray: TypeId.,
+				lldb.eTypeClassArray: TypeId.TypeIdArray,
 				#lldb.eTypeClassBlockPointer: TypeId.,
 				#lldb.eTypeClassClass: TypeId.,
 				#lldb.eTypeClassComplexFloat: TypeId.,
@@ -91,22 +91,18 @@ class TypeImpl(Type):
 		canon = self.sbtype.GetCanonicalType()
 		if canon == self.sbtype:
 			return None
-		return TypeImpl.proxyFor(current, canon, self.sbvalue)
+		return TypeImpl.proxyFor(canon, self.sbvalue, current)
 
 	def getMembers(self, current = None):
 		ret = []
 		for field in self.sbtype.fields:
-			lldb_utils.getDescription(field)
-			child_val = self.sbvalue.GetChildMemberWithName(field.name)
-			lldb_utils.getDescription(child_val)
-			ret.append(field, child_val, current)
-			#ret.append(
-			#	TypeMemberImpl.proxyFor(
-			#		field,
-			#		self.sbvalue.GetChildMemberWithName(field.name),
-			#		current
-			#	)
-			#)
+			ret.append(
+				TypeMemberImpl.proxyFor(
+					field,
+					self.sbvalue.GetChildMemberWithName(field.name),
+					current
+				)
+			)
 		return ret
 
 	def getArguments(self, current = None):
