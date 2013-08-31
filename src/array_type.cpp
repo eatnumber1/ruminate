@@ -12,6 +12,7 @@
 #include "ruminate/common.h"
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
+#include "ruminate/rumination.h"
 #include "ruminate/type.h"
 #include "ruminate/array_type.h"
 
@@ -44,8 +45,13 @@ G_BEGIN_DECLS
 G_STATIC_ASSERT(sizeof(size_t) >= sizeof(uint64_t));
 
 size_t r_array_type_size( RArrayType *rat, GError **error ) RUMINATE_NOEXCEPT {
-	size_t size = 0;
-	(void) gxx_call(size = ((RType *) rat)->type->getArraySize(gettid()), error);
+	Ice::AsyncResultPtr arp;
+	if( !gxx_call(arp = ((RType *) rat)->type->begin_getArraySize(gettid()), error) )
+		return 0;
+	rumination_hit_breakpoint();
+	size_t size;
+	if( !gxx_call(size = ((RType *) rat)->type->end_getArraySize(arp), error) )
+		return 0;
 	return size;
 }
 

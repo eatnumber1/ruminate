@@ -102,7 +102,7 @@ class TypeImpl(Type):
 				TypeMemberImpl.proxyFor(
 					field,
 					self.sbvalue.GetChildMemberWithName(field.name),
-					thread_stop,
+					self.thread_stop,
 					current
 				)
 			)
@@ -197,12 +197,13 @@ class TypeImpl(Type):
 		}[self.sbtype.GetBasicType()]
 
 	def getArraySize(self, tid, current = None):
+		print("getArraySize: begin")
 		with self.thread_stop.stop(tid):
-			print(self.sbvalue)
+			print("getArraySize: " + lldb_utils.getDescription(self.sbvalue))
 			return self.sbvalue.GetNumChildren()
 
 	def _proxyFor(self, current, sbtype, sbvalue = None, thread_stop = None):
-		TypeImpl.proxyFor(
+		return TypeImpl.proxyFor(
 			sbtype,
 			sbvalue if sbvalue != None else self.sbvalue,
 			thread_stop if thread_stop != None else self.thread_stop,

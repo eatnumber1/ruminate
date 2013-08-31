@@ -5,14 +5,10 @@ import threading
 
 class StoppedThreadFactory(object):
 	def __init__(self, em, process):
-		self.em
-		self.process
+		self.em = em
+		self.process = process
 
-	def produce(tid):
-		return StoppedThread(self.em, self.process, tid)
-
-	def stop(tid):
-		validate(self.process.Stop())
+	def produce(self, tid):
 		return StoppedThread(self.em, self.process, tid)
 
 class StoppedThread(object):
