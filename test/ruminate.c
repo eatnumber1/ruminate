@@ -175,7 +175,7 @@ static bool print_function_type( RFunctionType *rft, GError **error ) {
 		if( i != narguments - 1 ) printf(",");
 
 		r_string_unref(name);
-		r_record_member_unref(arg);
+		r_type_member_unref((RTypeMember *) arg);
 	}
 
 	printf(" ))");
@@ -190,13 +190,21 @@ static bool _print_json_for_array( RArrayType *type, void *data, GError **error 
 	die_if_error(*error);
 	// TODO: Error checking
 
-	RType *member_type = r_array_type_member_type(type, error);
-	die_if_error(*error);
-	// TODO: Error checking
-
 	printf("[");
-	for( size_t i = 0; i < size; i++ )
+	for( size_t i = 0; i < size; i++ ) {
+		RTypeMember *member = r_array_type_member_at(type, i, error);
+		die_if_error(*error);
+		// TODO: Error checking
+
+		RType *member_type = r_type_member_type(member, error);
+		die_if_error(*error);
+		// TODO: Error checking
+
 		_print_json_for_type(member_type, &data[i], error);
+
+		r_type_unref(member_type);
+		r_type_member_unref(member);
+	}
 	printf("]");
 
 	return true;
