@@ -2,6 +2,8 @@
 #include <sstream>
 #include <cstddef>
 
+#include <stdint.h>
+
 #include <Ice/Ice.h>
 #include "ice/type.h"
 

@@ -101,6 +101,7 @@ static bool _print_json_for_record( RRecordType *rt, void *data, GError **error 
 	printf("{");
 	for( size_t i = 0; i < nmembers; i++ ) {
 		RRecordMember *member = r_record_type_member_at(rt, i, error);
+		RTypeMember *tmember = (RTypeMember *) member;
 		// TODO: Error checking
 
 		RString *name = r_record_member_name(member, error);
@@ -111,11 +112,11 @@ static bool _print_json_for_record( RRecordType *rt, void *data, GError **error 
 
 		r_string_unref(name);
 
-		RType *member_type = r_record_member_type(member, error);
+		RType *member_type = r_type_member_type(tmember, error);
 		die_if_error(*error);
 		// TODO: Error checking
 
-		off_t offset = r_record_member_offset(member, error);
+		off_t offset = r_type_member_offset(tmember, error);
 		die_if_error(*error);
 		// TODO: Error checking
 
@@ -125,7 +126,7 @@ static bool _print_json_for_record( RRecordType *rt, void *data, GError **error 
 			error
 		);
 
-		r_record_member_unref(member);
+		r_type_member_unref(tmember);
 		if( i != nmembers - 1 ) printf(",");
 	}
 	printf("}");

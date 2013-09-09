@@ -16,12 +16,13 @@ G_BEGIN_DECLS
 #include <ruminate/refptr.h>
 
 #include <ruminate/type.h>
+#include <ruminate/type_member.h>
+#include <ruminate/record_member.h>
 #include <ruminate/builtin_type.h>
 #include <ruminate/array_type.h>
 #include <ruminate/typedef_type.h>
 #include <ruminate/pointer_type.h>
 #include <ruminate/tag_type.h>
-#include <ruminate/record_member.h>
 #include <ruminate/record_type.h>
 #include <ruminate/function_type.h>
 
