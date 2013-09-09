@@ -16,6 +16,7 @@
 #define _BUILTIN_TYPE_CPP_
 
 #include "private/common.h"
+#include "private/value.h"
 #include "private/type.h"
 #include "private/builtin_type.h"
 

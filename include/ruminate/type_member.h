@@ -1,19 +1,22 @@
 #ifndef _RUMINATE_TYPE_MEMBER_H_
 #define _RUMINATE_TYPE_MEMBER_H_
 
-typedef enum RTypeMemberIdentifier {
-	R_TYPE_MEMBER_INVALID = 0,
-	R_TYPE_MEMBER_UNSPEC,
-	R_TYPE_MEMBER_BIT_FIELD
-} RTypeMemberIdentifier;
+typedef enum RTypeMemberId {
+	R_TYPE_MEMBER_RECORD,
+	R_TYPE_MEMBER_ARRAY
+} RTypeMemberId;
 
 typedef struct RTypeMember RTypeMember;
-typedef struct RBitFieldMember RBitFieldMember;
 
-void r_type_member_ref( RTypeMember * );
-void r_type_member_unref( RTypeMember * );
+G_BEGIN_DECLS
 
-RTypeMemberIdentifier r_type_member_id( RTypeMember *, GError ** );
-RBitFieldMember *r_type_member_as_bit_field_member( RTypeMember *, GError ** );
+RTypeMemberId RUMINATE_EXPORT r_type_member_id( RTypeMember *, GError ** ) RUMINATE_NOEXCEPT;
+RType * RUMINATE_EXPORT r_type_member_type( RTypeMember *, GError ** ) RUMINATE_NOEXCEPT;
+off_t RUMINATE_EXPORT r_type_member_offset( RTypeMember *, GError ** ) RUMINATE_NOEXCEPT;
+
+RTypeMember * RUMINATE_EXPORT r_type_member_ref( RTypeMember * ) RUMINATE_NOEXCEPT;
+void RUMINATE_EXPORT r_type_member_unref( RTypeMember * ) RUMINATE_NOEXCEPT;
+
+G_END_DECLS
 
 #endif

@@ -12,11 +12,6 @@ G_BEGIN_DECLS
 
 RRecordMemberId RUMINATE_EXPORT r_record_member_id( RRecordMember *, GError ** ) RUMINATE_NOEXCEPT;
 RString * RUMINATE_EXPORT r_record_member_name( RRecordMember *, GError ** ) RUMINATE_NOEXCEPT;
-RType * RUMINATE_EXPORT r_record_member_type( RRecordMember *, GError ** ) RUMINATE_NOEXCEPT;
-off_t RUMINATE_EXPORT r_record_member_offset( RRecordMember *, GError ** ) RUMINATE_NOEXCEPT;
-
-RRecordMember * RUMINATE_EXPORT r_record_member_ref( RRecordMember * ) RUMINATE_NOEXCEPT;
-void RUMINATE_EXPORT r_record_member_unref( RRecordMember * ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS
 

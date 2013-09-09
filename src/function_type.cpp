@@ -12,6 +12,7 @@
 #include "ruminate/string.h"
 #include "ruminate/type.h"
 #include "ruminate/tag_type.h"
+#include "ruminate/type_member.h"
 #include "ruminate/record_member.h"
 #include "ruminate/record_type.h"
 #include "ruminate/function_type.h"
@@ -19,6 +20,8 @@
 #define _FUNCTION_TYPE_CPP_
 
 #include "private/common.h"
+#include "private/value.h"
+#include "private/type_member.h"
 #include "private/record_member.h"
 #include "private/type.h"
 #include "private/tag_type.h"

@@ -13,6 +13,7 @@ SRC_SOURCES := \
 	function_type.cpp \
 	record_type.cpp \
 	record_member.cpp \
+	type_member.cpp \
 	frame.cpp \
 	rumination.cpp
 SRC_SOURCES := $(SRC_SOURCES:%=$(CURDIR)/%)

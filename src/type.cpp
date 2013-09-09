@@ -18,11 +18,13 @@
 #include "ruminate/builtin_type.h"
 #include "ruminate/pointer_type.h"
 #include "ruminate/typedef_type.h"
+#include "ruminate/type_member.h"
 #include "ruminate/array_type.h"
 
 #define _TYPE_CPP_
 
 #include "private/common.h"
+#include "private/value.h"
 #include "private/type.h"
 #include "private/tag_type.h"
 #include "private/builtin_type.h"
@@ -36,10 +38,11 @@ template gxx_call_proto(Ruminate::TypeId);
 template gxx_call_proto(Ruminate::TypePrx);
 #endif
 
-bool r_type_init( RType *rt, void *mem, GError **error ) RUMINATE_NOEXCEPT {
+bool r_type_init( RType *rt, RValue rv, GError **error ) RUMINATE_NOEXCEPT {
 	rt->refcnt = 1;
 	rt->name = NULL;
-	rt->mem = r_ptr_ref(mem);
+	r_ptr_ref(rv.top);
+	rt->mem = rv;
 
 	switch( rt->type_id ) {
 		case Ruminate::TypeIdArray:
@@ -93,6 +96,7 @@ bool r_type_init( RType *rt, void *mem, GError **error ) RUMINATE_NOEXCEPT {
 			g_assert_not_reached();
 	}
 
+	if( !ret ) r_ptr_unref(rv.top);
 	return ret;
 }
 
@@ -121,8 +125,9 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 
 	if( rt->name != NULL ) r_string_unref(rt->name);
 	rt->type = 0;
-	r_ptr_unref(rt->mem);
-	rt->mem = NULL;
+	r_ptr_unref(rt->mem.top);
+	rt->mem.top = NULL;
+	rt->mem.cur = NULL;
 }
 
 
@@ -147,6 +152,7 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdUnknown: {
 			RType *ret = g_slice_new(RType);
 			new (ret) RType();
+			return ret;
 		}
 		default:
 			g_assert_not_reached();
@@ -185,7 +191,7 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 	}
 }
 
-RType *r_type_new( Ruminate::TypePrx &type, void *mem, GError **error ) RUMINATE_NOEXCEPT {
+RType *r_type_new( Ruminate::TypePrx &type, RValue rv, GError **error ) RUMINATE_NOEXCEPT {
 	RType *rt;
 	Ruminate::TypeId id;
 
@@ -197,7 +203,7 @@ RType *r_type_new( Ruminate::TypePrx &type, void *mem, GError **error ) RUMINATE
 	rt->type = type;
 	rt->type_id = id;
 
-	if( !r_type_init(rt, mem, error) ) goto error_r_type_init;
+	if( !r_type_init(rt, rv, error) ) goto error_r_type_init;
 
 	return rt;
 
@@ -246,7 +252,7 @@ RType *r_type_pointer( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	Ruminate::TypePrx t;
 	if( !gxx_call(t = rt->type->getPointerType(), error) )
 		return NULL;
-	return r_type_new(t, rt->mem, error);
+	return r_type_new(t, (RValue) { rt->mem.top, &rt->mem.cur }, error);
 }
 
 G_END_DECLS

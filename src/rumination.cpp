@@ -31,6 +31,7 @@
 
 #include "private/common.h"
 #include "private/gettid.h"
+#include "private/value.h"
 #include "private/type.h"
 #include "private/frame.h"
 #include "private/rumination.h"
@@ -198,9 +199,11 @@ RType *rumination_end_get_type_by_variable_name( void *mem, GError **error ) RUM
 	}
 	rumination->arp = 0;
 	// TODO: Type check
-	RPointerType *pt = (RPointerType *) r_type_new(t, mem, error);
+	RPointerType *pt = (RPointerType *) r_type_new(t, (RValue) { mem, mem }, error);
 	if( pt == NULL ) return NULL;
-	return r_pointer_type_pointee(pt, error);
+	RType *ret = r_pointer_type_pointee(pt, error);
+	r_type_unref((RType *) pt);
+	return ret;
 }
 
 RFrameList *rumination_backtrace( GError **error ) RUMINATE_NOEXCEPT {

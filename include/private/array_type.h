@@ -1,5 +1,9 @@
 struct RArrayType {
 	RType parent;
+	struct {
+		Ruminate::TypeMemberList value;
+		bool valid;
+	} members;
 };
 
 bool r_array_type_init( RArrayType *, GError ** ) RUMINATE_NOEXCEPT;

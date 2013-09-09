@@ -11,6 +11,7 @@
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
 #include "ruminate/type.h"
+#include "ruminate/type_member.h"
 #include "ruminate/record_member.h"
 #include "ruminate/tag_type.h"
 #include "ruminate/record_type.h"
@@ -19,7 +20,9 @@
 #define _RECORD_TYPE_CPP_
 
 #include "private/common.h"
+#include "private/value.h"
 #include "private/type.h"
+#include "private/type_member.h"
 #include "private/record_member.h"
 #include "private/tag_type.h"
 #include "private/record_type.h"
@@ -109,8 +112,13 @@ size_t r_record_type_nmembers( RRecordType *rrt, GError **error ) RUMINATE_NOEXC
 
 RRecordMember *r_record_type_member_at( RRecordType *rrt, size_t i, GError **error ) RUMINATE_NOEXCEPT {
 	if( !init_members(rrt, error) ) return 0;
+	// TODO: vector access could throw
+	Ruminate::TypeMemberPrx tmp = rrt->members[i];
+	off_t offset;
+	if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
 	// TODO: Memoize RRecordMembers
-	return r_record_member_new(rrt->members[i], ((RType *) rrt)->mem, error);
+	RType *rt = (RType *) rrt;
+	return (RRecordMember *) r_type_member_new(tmp, R_TYPE_MEMBER_RECORD, (RValue) { rt->mem.top, ((uint8_t *) rt->mem.cur) + offset }, error);
 }
 
 G_END_DECLS

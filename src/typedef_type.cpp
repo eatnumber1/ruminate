@@ -16,6 +16,7 @@
 #define _TYPEDEF_TYPE_CPP_
 
 #include "private/common.h"
+#include "private/value.h"
 #include "private/type.h"
 #include "private/typedef_type.h"
 
@@ -43,7 +44,8 @@ RType *r_typedef_type_canonical( RTypedefType *rtt, GError **error ) RUMINATE_NO
 	if( !gxx_call(t = ((RType *) rtt)->type->getCanonicalType(), error) )
 		return NULL;
 
-	return r_type_new(t, ((RType *) rtt)->mem, error);
+	RType *rt = (RType *) rtt;
+	return r_type_new(t, rt->mem, error);
 }
 
 G_END_DECLS
