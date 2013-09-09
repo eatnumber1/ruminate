@@ -1,6 +1,7 @@
 #include <exception>
 #include <sstream>
 #include <cstddef>
+#include <new>
 
 #include <Ice/Ice.h>
 #include "ice/type.h"
@@ -13,10 +14,8 @@
 #include "ruminate/type.h"
 #include "ruminate/builtin_type.h"
 
-#define _BUILTIN_TYPE_CPP_
-
 #include "private/common.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type.h"
 #include "private/builtin_type.h"
 

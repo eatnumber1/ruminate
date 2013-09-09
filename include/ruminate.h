@@ -13,7 +13,6 @@ G_BEGIN_DECLS
 #include <ruminate/common.h>
 #include <ruminate/string.h>
 #include <ruminate/errors.h>
-#include <ruminate/refptr.h>
 
 #include <ruminate/type.h>
 #include <ruminate/type_member.h>

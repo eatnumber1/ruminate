@@ -18,11 +18,9 @@
 #include "ruminate/frame.h"
 #include "ruminate/rumination.h"
 
-#define _ARRAY_TYPE_CPP_
-
 #include "private/gettid.h"
 #include "private/common.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/array_type.h"
@@ -78,7 +76,7 @@ RTypeMember *r_array_type_member_at( RArrayType *rat, size_t idx, GError **error
 	if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
 	// TODO: Memoize RTypeMembers
 	RType *rt = (RType *) rat;
-	return r_type_member_new(tmp, R_TYPE_MEMBER_ARRAY, (RValue) { rt->mem.top, ((uint8_t *) rt->mem.cur) + offset }, error);
+	return r_type_member_new(tmp, R_TYPE_MEMBER_ARRAY, rt->ptr, ((uint8_t *) rt->cur) + offset, error);
 }
 
 G_END_DECLS

@@ -1,9 +1,9 @@
 SRC_SOURCES := \
 	gettid.c \
 	errors.c \
-	refptr.c \
 	common.cpp \
 	string.cpp \
+	memory.cpp \
 	type.cpp \
 	builtin_type.cpp \
 	array_type.cpp \

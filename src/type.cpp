@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <cstddef>
+#include <new>
 
 #include <Ice/Ice.h>
 #include "ice/type.h"
@@ -12,7 +13,6 @@
 #include "ruminate/common.h"
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
-#include "ruminate/refptr.h"
 #include "ruminate/type.h"
 #include "ruminate/tag_type.h"
 #include "ruminate/builtin_type.h"
@@ -21,10 +21,8 @@
 #include "ruminate/type_member.h"
 #include "ruminate/array_type.h"
 
-#define _TYPE_CPP_
-
 #include "private/common.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type.h"
 #include "private/tag_type.h"
 #include "private/builtin_type.h"
@@ -33,16 +31,11 @@
 #include "private/array_type.h"
 #include "private/string.h"
 
-#if 0
-template gxx_call_proto(Ruminate::TypeId);
-template gxx_call_proto(Ruminate::TypePrx);
-#endif
-
-bool r_type_init( RType *rt, RValue rv, GError **error ) RUMINATE_NOEXCEPT {
+bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
 	rt->refcnt = 1;
 	rt->name = NULL;
-	r_ptr_ref(rv.top);
-	rt->mem = rv;
+	rt->ptr = r_memory_ref(rv);
+	rt->cur = cur;
 
 	switch( rt->type_id ) {
 		case Ruminate::TypeIdArray:
@@ -96,7 +89,7 @@ bool r_type_init( RType *rt, RValue rv, GError **error ) RUMINATE_NOEXCEPT {
 			g_assert_not_reached();
 	}
 
-	if( !ret ) r_ptr_unref(rv.top);
+	if( !ret ) r_memory_unref(rv);
 	return ret;
 }
 
@@ -125,9 +118,7 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 
 	if( rt->name != NULL ) r_string_unref(rt->name);
 	rt->type = 0;
-	r_ptr_unref(rt->mem.top);
-	rt->mem.top = NULL;
-	rt->mem.cur = NULL;
+	r_memory_unref(rt->ptr);
 }
 
 
@@ -191,7 +182,7 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 	}
 }
 
-RType *r_type_new( Ruminate::TypePrx &type, RValue rv, GError **error ) RUMINATE_NOEXCEPT {
+RType *r_type_new( Ruminate::TypePrx &type, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
 	RType *rt;
 	Ruminate::TypeId id;
 
@@ -203,7 +194,7 @@ RType *r_type_new( Ruminate::TypePrx &type, RValue rv, GError **error ) RUMINATE
 	rt->type = type;
 	rt->type_id = id;
 
-	if( !r_type_init(rt, rv, error) ) goto error_r_type_init;
+	if( !r_type_init(rt, rv, cur, error) ) goto error_r_type_init;
 
 	return rt;
 
@@ -249,10 +240,26 @@ void r_type_unref( RType *rt ) RUMINATE_NOEXCEPT {
 }
 
 RType *r_type_pointer( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
+	// TODO: Runtime error if rt is not value-backed.
+	RMemory *rm;
 	Ruminate::TypePrx t;
-	if( !gxx_call(t = rt->type->getPointerType(), error) )
-		return NULL;
-	return r_type_new(t, (RValue) { rt->mem.top, &rt->mem.cur }, error);
+	void **ptrptr;
+	
+	ptrptr = g_new(void *, 1);
+	*ptrptr = rt->cur;
+	rm = r_memory_new(ptrptr, rt->ptr, error);
+	if( rm == NULL ) goto err_r_memory_new;
+
+	G_STATIC_ASSERT(sizeof(void **) <= sizeof(::Ice::Long));
+	if( !gxx_call(t = rt->type->getPointerType((::Ice::Long) ptrptr), error) )
+		goto err_getPointerType;
+	return r_type_new(t, rm, ptrptr, error);
+
+err_getPointerType:
+	r_memory_unref(rm);
+err_r_memory_new:
+	g_free(ptrptr);
+	return NULL;
 }
 
 G_END_DECLS

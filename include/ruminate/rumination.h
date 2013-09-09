@@ -15,7 +15,6 @@ G_END_DECLS
 
 #define rumination_get_type(expr, err) ({ \
 	__typeof__(expr) *_expr = g_malloc(sizeof(__typeof__(expr))); \
-	r_ptr_set_deleter(_expr, g_free); \
 	*_expr = (expr); \
 	RType *ret; \
 	if( !rumination_begin_get_type_by_variable_name("_expr", err) ) { \

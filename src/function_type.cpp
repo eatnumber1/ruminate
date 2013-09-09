@@ -1,6 +1,7 @@
 #include <exception>
 #include <sstream>
 #include <cstddef>
+#include <new>
 
 #include <Ice/Ice.h>
 #include "ice/type.h"
@@ -17,10 +18,8 @@
 #include "ruminate/record_type.h"
 #include "ruminate/function_type.h"
 
-#define _FUNCTION_TYPE_CPP_
-
 #include "private/common.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type_member.h"
 #include "private/record_member.h"
 #include "private/type.h"
@@ -48,11 +47,12 @@ void r_function_type_free( RFunctionType *rft ) RUMINATE_NOEXCEPT {
 G_BEGIN_DECLS
 
 RType *r_function_type_return_type( RFunctionType *rft, GError **error ) RUMINATE_NOEXCEPT {
+	RType *rt = (RType *) rft;
 	Ruminate::TypePrx t;
-	if( !gxx_call(t = ((RType *) rft)->type->getReturnType(), error) )
+	if( !gxx_call(t = rt->type->getReturnType(), error) )
 		return NULL;
 
-	return r_type_new(t, ((RType *) rft)->mem, error);
+	return r_type_new(t, NULL, NULL, error);
 }
 
 G_END_DECLS

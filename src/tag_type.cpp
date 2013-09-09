@@ -15,10 +15,8 @@
 #include "ruminate/record_member.h"
 #include "ruminate/record_type.h"
 
-#define _TAG_TYPE_CPP_
-
 #include "private/common.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type.h"
 #include "private/tag_type.h"
 #include "private/record_type.h"

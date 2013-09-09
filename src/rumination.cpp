@@ -27,11 +27,9 @@
 #include "ruminate/frame.h"
 #include "ruminate/rumination.h"
 
-#define _RUMINATE_CPP_
-
 #include "private/common.h"
 #include "private/gettid.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type.h"
 #include "private/frame.h"
 #include "private/rumination.h"
@@ -198,8 +196,13 @@ RType *rumination_end_get_type_by_variable_name( void *mem, GError **error ) RUM
 		return NULL;
 	}
 	rumination->arp = 0;
+	RMemory *rmem = r_memory_new(mem, error);
+	if( rmem == NULL ) {
+		// TODO: Cleanup
+		return NULL;
+	}
 	// TODO: Type check
-	RPointerType *pt = (RPointerType *) r_type_new(t, (RValue) { mem, mem }, error);
+	RPointerType *pt = (RPointerType *) r_type_new(t, rmem, &mem, error);
 	if( pt == NULL ) return NULL;
 	RType *ret = r_pointer_type_pointee(pt, error);
 	r_type_unref((RType *) pt);

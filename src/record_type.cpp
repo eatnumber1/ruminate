@@ -1,6 +1,7 @@
 #include <exception>
 #include <sstream>
 #include <cstddef>
+#include <new>
 
 #include <stdint.h>
 
@@ -19,10 +20,8 @@
 #include "ruminate/record_type.h"
 #include "ruminate/function_type.h"
 
-#define _RECORD_TYPE_CPP_
-
 #include "private/common.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/record_member.h"
@@ -120,7 +119,7 @@ RRecordMember *r_record_type_member_at( RRecordType *rrt, size_t i, GError **err
 	if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
 	// TODO: Memoize RRecordMembers
 	RType *rt = (RType *) rrt;
-	return (RRecordMember *) r_type_member_new(tmp, R_TYPE_MEMBER_RECORD, (RValue) { rt->mem.top, ((uint8_t *) rt->mem.cur) + offset }, error);
+	return (RRecordMember *) r_type_member_new(tmp, R_TYPE_MEMBER_RECORD, rt->ptr, ((uint8_t *) rt->cur) + offset, error);
 }
 
 G_END_DECLS

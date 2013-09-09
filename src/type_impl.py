@@ -6,8 +6,8 @@ import lldb
 import lldb_utils
 
 class TypeImpl(Type):
-	def __init__(self, sbtype, sbvalue, thread_stop):
-		self.sbvalue = sbvalue
+	def __init__(self, sbtype, address, thread_stop):
+		self.address = address
 		self.sbtype = sbtype
 		self.thread_stop = thread_stop
 		if sbtype.type == lldb.eTypeClassBuiltin:
@@ -80,11 +80,11 @@ class TypeImpl(Type):
 	def getSize(self, current = None):
 		return self.sbtype.GetByteSize()
 
-	def getPointeeType(self, current = None):
-		return self._proxyFor(current, self.sbtype.GetPointeeType(), self.sbvalue.Dereference())
+	def getPointeeType(self, address, current = None):
+		return self._proxyFor(current, self.sbtype.GetPointeeType(), address)
 
-	def getPointerType(self, current = None):
-		return self._proxyFor(current, self.sbtype.GetPointerType(), self.sbvalue.AddressOf())
+	def getPointerType(self, address, current = None):
+		return self._proxyFor(current, self.sbtype.GetPointerType(), address)
 
 	def isComplete(self, current = None):
 		return self.sbtype.IsTypeComplete()
@@ -95,13 +95,14 @@ class TypeImpl(Type):
 			return None
 		return self._proxyFor(current, canon)
 
-	def getMembers(self, current = None):
+	def getMembers(self, address, current = None):
+		# TODO: Properly handle arrays.
 		ret = []
 		for field in self.sbtype.fields:
 			ret.append(
 				TypeMemberImpl.proxyFor(
 					field,
-					self.sbvalue.GetChildMemberWithName(field.name),
+					address,
 					self.thread_stop,
 					current
 				)
@@ -202,16 +203,16 @@ class TypeImpl(Type):
 			print("getArraySize: " + lldb_utils.getDescription(self.sbvalue))
 			return self.sbvalue.GetNumChildren()
 
-	def _proxyFor(self, current, sbtype, sbvalue = None, thread_stop = None):
+	def _proxyFor(self, current, sbtype, address = None, thread_stop = None):
 		return TypeImpl.proxyFor(
 			sbtype,
-			sbvalue if sbvalue != None else self.sbvalue,
+			address if address != None else self.address,
 			thread_stop if thread_stop != None else self.thread_stop,
 			current
 		)
 
 	@staticmethod
-	def proxyFor(sbtype, sbvalue, thread_stop, current):
+	def proxyFor(sbtype, address, thread_stop, current):
 		return TypePrx.uncheckedCast(
-			current.adapter.addWithUUID(TypeImpl(sbtype, sbvalue, thread_stop))
+			current.adapter.addWithUUID(TypeImpl(sbtype, address, thread_stop))
 		)

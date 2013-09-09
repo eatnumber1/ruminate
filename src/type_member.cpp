@@ -1,6 +1,7 @@
 #include <exception>
 #include <sstream>
 #include <cstddef>
+#include <new>
 
 #include <Ice/Ice.h>
 #include "ice/type.h"
@@ -11,24 +12,21 @@
 #include "ruminate/common.h"
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
-#include "ruminate/refptr.h"
 #include "ruminate/type.h"
 #include "ruminate/type_member.h"
 #include "ruminate/record_member.h"
 
-#define _TYPE_MEMBER_CPP_
-
 #include "private/common.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/string.h"
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/record_member.h"
 
-bool r_type_member_init( RTypeMember *tm, RValue rv, GError **error ) RUMINATE_NOEXCEPT {
+bool r_type_member_init( RTypeMember *tm, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
 	tm->refcnt = 1;
-	r_ptr_ref(rv.top);
-	tm->mem = rv;
+	tm->ptr = r_memory_ref(rv);
+	tm->cur = cur;
 
 	switch( tm->id ) {
 		case R_TYPE_MEMBER_ARRAY:
@@ -44,7 +42,7 @@ bool r_type_member_init( RTypeMember *tm, RValue rv, GError **error ) RUMINATE_N
 	return true;
 
 err_child_init:
-	r_ptr_unref(rv.top);
+	r_memory_unref(rv);
 	return false;
 }
 
@@ -57,9 +55,9 @@ void r_type_member_destroy( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 		default:
 			g_assert_not_reached();
 	}
-	r_ptr_unref(tm->mem.top);
-	tm->mem.top = NULL;
-	tm->mem.cur = NULL;
+	r_memory_unref(tm->ptr);
+	tm->ptr = NULL;
+	tm->cur = NULL;
 }
 
 RTypeMember *r_type_member_alloc( RTypeMemberId id, GError **error ) RUMINATE_NOEXCEPT {
@@ -90,14 +88,14 @@ void r_type_member_free( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 	}
 }
 
-RTypeMember *r_type_member_new( Ruminate::TypeMemberPrx &member, RTypeMemberId id, RValue rv, GError **error ) RUMINATE_NOEXCEPT {
+RTypeMember *r_type_member_new( Ruminate::TypeMemberPrx &member, RTypeMemberId id, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
 	RTypeMember *tm = r_type_member_alloc(id, error);
 	if( tm == NULL ) goto error_r_type_member_alloc;
 
 	tm->member = member;
 	tm->id = id;
 
-	if( !r_type_member_init(tm, rv, error) ) goto error_r_type_member_init;
+	if( !r_type_member_init(tm, rv, cur, error) ) goto error_r_type_member_init;
 	return tm;
 
 error_r_type_member_init:
@@ -132,7 +130,7 @@ RType *r_type_member_type( RTypeMember *tm, GError **error ) RUMINATE_NOEXCEPT {
 	if( !gxx_call(t = tm->member->getType(), error) )
 		return NULL;
 
-	return r_type_new(t, tm->mem, error);
+	return r_type_new(t, tm->ptr, tm->cur, error);
 }
 
 off_t r_type_member_offset( RTypeMember *tm, GError **error ) RUMINATE_NOEXCEPT {

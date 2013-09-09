@@ -28,8 +28,8 @@ module Ruminate {
 		TypeId getId();
 
 		Type *getBuiltinType();
-		Type *getPointeeType();
-		Type *getPointerType();
+		Type *getPointeeType( long address );
+		Type *getPointerType( long address );
 		Type *getCanonicalType();
 		Type *getReturnType();
 

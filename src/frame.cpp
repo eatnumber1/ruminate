@@ -1,6 +1,7 @@
 #include <exception>
 #include <sstream>
 #include <cstddef>
+#include <new>
 #include <utility>
 
 #include <stdint.h>
@@ -16,10 +17,8 @@
 #include "ruminate/type.h"
 #include "ruminate/frame.h"
 
-#define _FRAME_CPP_
-
 #include "private/common.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type.h"
 #include "private/frame.h"
 
@@ -103,7 +102,7 @@ const char *r_frame_compile_unit_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT
 RType *r_frame_function_type( RFrame *rf, GError **err ) RUMINATE_NOEXCEPT {
 	if( rf->functionType != NULL ) return r_type_ref(rf->functionType);
 	// TODO: Maybe retrieve the fp from the SBValue?
-	rf->functionType = r_type_new(rf->frame.functionType, (RValue) { NULL, NULL }, err);
+	rf->functionType = r_type_new(rf->frame.functionType, NULL, NULL, err);
 	return rf->functionType;
 }
 

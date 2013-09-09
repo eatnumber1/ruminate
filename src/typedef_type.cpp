@@ -1,6 +1,7 @@
 #include <exception>
 #include <sstream>
 #include <cstddef>
+#include <new>
 
 #include <Ice/Ice.h>
 #include "ice/type.h"
@@ -13,10 +14,8 @@
 #include "ruminate/type.h"
 #include "ruminate/typedef_type.h"
 
-#define _TYPEDEF_TYPE_CPP_
-
 #include "private/common.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type.h"
 #include "private/typedef_type.h"
 
@@ -45,7 +44,7 @@ RType *r_typedef_type_canonical( RTypedefType *rtt, GError **error ) RUMINATE_NO
 		return NULL;
 
 	RType *rt = (RType *) rtt;
-	return r_type_new(t, rt->mem, error);
+	return r_type_new(t, rt->ptr, rt->cur, error);
 }
 
 G_END_DECLS

@@ -1,6 +1,7 @@
 #include <exception>
 #include <sstream>
 #include <cstddef>
+#include <new>
 
 #include <Ice/Ice.h>
 #include "ice/type.h"
@@ -11,16 +12,13 @@
 #include "ruminate/common.h"
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
-#include "ruminate/refptr.h"
 #include "ruminate/type.h"
 #include "ruminate/type_member.h"
 #include "ruminate/record_member.h"
 
-#define _RECORD_MEMBER_CPP_
-
 #include "private/common.h"
 #include "private/string.h"
-#include "private/value.h"
+#include "private/memory.h"
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/record_member.h"
