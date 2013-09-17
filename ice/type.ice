@@ -33,7 +33,7 @@ module Ruminate {
 		Type *getCanonicalType();
 		Type *getReturnType();
 
-		TypeMemberList getMembers();
+		TypeMemberList getMembers( long tid );
 		TypeList getArguments();
 
 		string getName(); // This is cached in the C++ API layer

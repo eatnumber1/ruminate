@@ -93,7 +93,7 @@ void r_record_type_free( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 
 static bool init_members( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
 	if( !rrt->members_init ) {
-		if( !gxx_call(rrt->members = ((RType *) rrt)->type->getMembers(), error) )
+		if( !gxx_call(rrt->members = ((RType *) rrt)->type->getMembers(0), error) )
 			return false;
 		rrt->members_init = true;
 	}

@@ -51,8 +51,11 @@ void r_array_type_free( RArrayType *rat ) RUMINATE_NOEXCEPT {
 // TODO: Dedup this with RRecordType?
 static bool init_members( RArrayType *rat, GError **error ) RUMINATE_NOEXCEPT {
 	if( !rat->members.valid ) {
-		if( !gxx_call(rat->members.value = ((RType *) rat)->type->getMembers(), error) )
-			return false;
+		RType *rt = (RType *) rat;
+		// TODO: Handle exceptions
+		Ice::AsyncResultPtr arp = rt->type->begin_getMembers(gettid());
+		rumination_hit_breakpoint();
+		rat->members.value = rt->type->end_getMembers(arp);
 		rat->members.valid = true;
 	}
 	return true;

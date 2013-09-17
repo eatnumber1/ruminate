@@ -95,10 +95,13 @@ class TypeImpl(Type):
 			return None
 		return self._proxyFor(current, canon)
 
-	def getMembers(self, current = None):
+	def getMembers(self, tid, current = None):
 		# TODO: Properly handle arrays.
 		if self.id == TypeId.TypeIdArray:
-			return []
+			with self.thread_stop.produce(tid):
+				print("getArraySize: " + lldb_utils.getDescription(self.sbvalue))
+				# TODO: Do something here
+				return []
 		else:
 			ret = []
 			for field in self.sbtype.fields:
@@ -199,12 +202,6 @@ class TypeImpl(Type):
 			lldb.eBasicTypeVoid: False,
 			#lldb.eBasicTypeWChar: ,
 		}[self.sbtype.GetBasicType()]
-
-	def getArraySize(self, tid, current = None):
-		print("getArraySize: begin")
-		with self.thread_stop.stop(tid):
-			print("getArraySize: " + lldb_utils.getDescription(self.sbvalue))
-			return self.sbvalue.GetNumChildren()
 
 	def _proxyFor(self, current, sbtype, address = None, thread_stop = None):
 		return TypeImpl.proxyFor(
