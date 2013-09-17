@@ -1,4 +1,11 @@
-ICE_SOURCES := debugger.ice type.ice debugger_factory.ice exceptions.ice type_member.ice frame.ice
+ICE_SOURCES := \
+	debugger.ice \
+	type.ice \
+	debugger_factory.ice \
+	exceptions.ice \
+	type_member.ice \
+	frame.ice \
+	debugee.ice
 ICE_SOURCES := $(ICE_SOURCES:%=$(CURDIR)/%)
 
 ICE_DEPS := $(ICE_DEPS:.ice=.cpp.d) $(ICE_DEPS:.ice=.py.d)

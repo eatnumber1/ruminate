@@ -1,6 +1,7 @@
 #ifndef _DEBUGGER_FACTORY_ICE_
 #define _DEBUGGER_FACTORY_ICE_
 
+#include <Ice/Identity.ice>
 #include <debugger.ice>
 
 module Ruminate {
@@ -11,7 +12,7 @@ module Ruminate {
 	};
 
 	interface DebuggerFactory {
-		Debugger *create( DebuggerFactoryOptions options );
+		Debugger *create( DebuggerFactoryOptions options, Ice::Identity cbid );
 		void shutdown() throws RuminateException;
 	};
 };

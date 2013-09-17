@@ -11,9 +11,11 @@
 #include <spawn.h>
 #include <sys/wait.h>
 
+#include <IceUtil/UUID.h>
 #include <Ice/Ice.h>
 #include "ice/debugger_factory.h"
 #include "ice/debugger.h"
+#include "ice/debugee.h"
 #include "ice/frame.h"
 #include "ice/type.h"
 
@@ -37,6 +39,8 @@
 #define RUMINATION_DEBUGGER_CONTROLLER_PATH "./src/dbgsvr.py"
 
 static Rumination *rumination;
+
+static Ice::Identity init_callbacks( Ice::CommunicatorPtr &, Ruminate::DebuggerFactoryPrx & );
 
 G_BEGIN_DECLS
 
@@ -115,6 +119,9 @@ bool rumination_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEP
 	Ice::ObjectPrx factory_proxy;
 	gint child_stdout;
 	int port;
+	Ice::Identity cbid;
+	Ice::PropertiesPtr props;
+	Ice::InitializationData id;
 
 	// TODO Thread safety
 	if( rumination != NULL ) return true;
@@ -132,7 +139,13 @@ bool rumination_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEP
 		goto error_read_child_port;
 	}
 
-	if( !gxx_call(rumination->communicator = Ice::initialize(*argc, argv), error) )
+	// TODO: Handle exceptions
+	// TODO: Remove ice arguments from argc.
+	props = Ice::createProperties(*argc, argv);
+	props->setProperty("Ice.ACM.Client", "0");
+	id.properties = props;
+
+	if( !gxx_call(rumination->communicator = Ice::initialize(id), error) )
 		goto error_ice_initialize;
 
 	proxy_str = g_strdup_printf("DebuggerFactory:default -h 127.0.0.1 -p %d", port);
@@ -144,11 +157,14 @@ bool rumination_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEP
 	if( !gxx_call(rumination->factory = Ruminate::DebuggerFactoryPrx::checkedCast(factory_proxy), error) )
 		goto error_checkedCast;
 
+	// TODO: Handle exceptions
+	cbid = init_callbacks(rumination->communicator, rumination->factory);
+
 	opts.exename = argv[0];
 	opts.pid = getpid();
 	opts.breakpointAddress = (::Ice::Long) &rumination_hit_breakpoint;
 
-	if( !gxx_call(rumination->debugger = rumination->factory->create(opts), error) )
+	if( !gxx_call(rumination->debugger = rumination->factory->create(opts, cbid), error) )
 		goto error_factory_create;
 
 	atexit(rumination_destroy_atexit);
@@ -219,3 +235,23 @@ RFrameList *rumination_backtrace( GError **error ) RUMINATE_NOEXCEPT {
 }
 
 G_END_DECLS
+
+class DebugeeImpl : public Ruminate::Debugee {
+public:
+	void stop( const Ice::Current & = Ice::Current() ) {
+		fprintf(stderr, "Hello World!\n");
+		rumination_hit_breakpoint();
+	}
+};
+
+static Ice::Identity init_callbacks( Ice::CommunicatorPtr &communicator, Ruminate::DebuggerFactoryPrx &proxy ) {
+	Ice::ObjectAdapterPtr adapter = communicator->createObjectAdapter("");
+	Ice::Identity ident;
+	ident.name = IceUtil::generateUUID();
+	ident.category = "";
+	Ruminate::DebugeePtr cb = new DebugeeImpl();
+	adapter->add(cb, ident);
+	adapter->activate();
+	proxy->ice_getConnection()->setAdapter(adapter);
+	return ident;
+}

@@ -95,19 +95,22 @@ class TypeImpl(Type):
 			return None
 		return self._proxyFor(current, canon)
 
-	def getMembers(self, address, current = None):
+	def getMembers(self, current = None):
 		# TODO: Properly handle arrays.
-		ret = []
-		for field in self.sbtype.fields:
-			ret.append(
-				TypeMemberImpl.proxyFor(
-					field,
-					address,
-					self.thread_stop,
-					current
+		if self.id == TypeId.TypeIdArray:
+			return []
+		else:
+			ret = []
+			for field in self.sbtype.fields:
+				ret.append(
+					TypeMemberImpl.proxyFor(
+						field,
+						self.address,
+						self.thread_stop,
+						current
+					)
 				)
-			)
-		return ret
+			return ret
 
 	def getArguments(self, current = None):
 		atl = self.sbtype.GetFunctionArgumentTypes()

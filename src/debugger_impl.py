@@ -13,9 +13,10 @@ import threading
 import sys # For debugging only
 
 class DebuggerImpl(Debugger):
-	def __init__(self, options, shutdown):
+	def __init__(self, options, shutdown, debugee):
 		self.debugger = validate(SBDebugger.Create())
 		self.debugger.SetAsync(True)
+		self.debugee = debugee
 
 		#self.debugger.SetLoggingCallback(lambda msg: sys.stdout.write(msg))
 		#self.debugger.EnableLog("lldb", ["all"])

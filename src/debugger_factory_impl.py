@@ -16,8 +16,9 @@ class DebuggerFactoryImpl(DebuggerFactory):
 			self.adapter.remove(uuid)
 		self.adapter.getCommunicator().shutdown()
 
-	def create(self, options, current):
-		debugger = DebuggerImpl(options, self.shutdown)
+	def create(self, options, cbid, current):
+		debugee = DebugeePrx.uncheckedCast(current.con.createProxy(cbid))
+		debugger = DebuggerImpl(options, self.shutdown, debugee)
 		proxy = DebuggerPrx.uncheckedCast(
 			current.adapter.addWithUUID(
 				debugger
