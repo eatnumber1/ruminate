@@ -73,6 +73,11 @@ class DebuggerImpl(Debugger):
 
 		self.em.begin()
 		running.wait()
+
+		self.type_factory = TypeImplFactory()
+		self.type_factory.debugger = self
+		self.type_factory.thred_stop = StoppedThreadFactory(self.em, self.process)
+
 		print("__init__: end")
 
 	def shutdown(self):
@@ -92,7 +97,7 @@ class DebuggerImpl(Debugger):
 				t = validate(value.type)
 				print(t)
 
-				return TypeImpl.proxyFor(t, value, StoppedThreadFactory(self.em, self.process), current)
+				return self.type_factory.proxy(t, current)
 		finally:
 			print("getTypeByVariableName: exit")
 
@@ -107,10 +112,13 @@ class DebuggerImpl(Debugger):
 					frame.functionName = sbframe.name
 					frame.moduleName = sbframe.module.file.basename
 					frame.compileUnitName = sbframe.compile_unit.file.basename
-					frame.functionType = TypeImpl.proxyFor(sbframe.function.type, current)
+					frame.functionType = self.type_factory.proxy(sbframe.function.type, current)
 					frame.line = sbframe.line_entry.line
 					frame_list.append(frame)
 
 				return frame_list
 		finally:
 			print("getBacktrace: end")
+
+	def createSBValueFor(self, sbtype, address):
+		self.target.EvaluateExpression("(" + sbtype.name + ") " + str(address))

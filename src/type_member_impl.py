@@ -2,19 +2,18 @@ from Ruminate import *
 
 class TypeMemberImpl(TypeMember):
 	@staticmethod
-	def proxyFor(sbtypemember, base_address, thread_stop, current):
+	def proxyFor(sbtypemember, base_address, type_factory):
 		return TypeMemberPrx.uncheckedCast(
-			current.adapter.addWithUUID(TypeMemberImpl(sbtypemember, base_address, thread_stop))
+			current.adapter.addWithUUID(TypeMemberImpl(sbtypemember, base_address, type_factory))
 		)
 
-	def __init__(self, sbtypemember, base_address, thread_stop):
+	def __init__(self, sbtypemember, base_address, type_factory):
 		self.sbtypemember = sbtypemember
-		self.thread_stop = thread_stop
+		self.type_factory = type_factory
 		self.address = base_address + self.getOffsetInBytes()
 
 	def getType(self, current = None):
-		from type_impl import TypeImpl
-		return TypeImpl.proxyFor(self.sbtypemember.type, self.address, self.thread_stop, current)
+		self.type_factory.proxy(sbtype = self.sbtypemember.type, address = self.address, current = current)
 
 	def getName(self, current = None):
 		return self.sbtypemember.name

@@ -6,7 +6,14 @@ import lldb
 import lldb_utils
 
 class TypeImpl(Type):
-	def __init__(self, sbtype, address, thread_stop):
+	def __init__(self, sbtype, address, thread_stop, debugger):
+		self.factory = TypeImplFactory()
+		self.factory.sbtype = sbtype
+		self.factory.address = address
+		self.factory.thread_stop = thread_stop
+		self.factory.debugger = debugger
+
+		self.debugger = debugger
 		self.address = address
 		self.sbtype = sbtype
 		self.thread_stop = thread_stop
@@ -75,16 +82,16 @@ class TypeImpl(Type):
 		return self.sbtype.GetName()
 
 	def getBuiltinType(self, current = None):
-		return self._proxyFor(current, self.sbtype.GetBasicType(self.sbtype.GetBasicType()))
+		return self.factory.proxy(sbtype = self.sbtype.GetBasicType(self.sbtype.GetBasicType()), current = current)
 
 	def getSize(self, current = None):
 		return self.sbtype.GetByteSize()
 
 	def getPointeeType(self, address, current = None):
-		return self._proxyFor(current, self.sbtype.GetPointeeType(), address)
+		return self.factory.proxy(sbtype = self.sbtype.GetPointeeType(), current = current)
 
 	def getPointerType(self, address, current = None):
-		return self._proxyFor(current, self.sbtype.GetPointerType(), address)
+		return self.factory.proxy(sbtype = self.sbtype.GetPointerType(), current = current)
 
 	def isComplete(self, current = None):
 		return self.sbtype.IsTypeComplete()
@@ -93,15 +100,24 @@ class TypeImpl(Type):
 		canon = self.sbtype.GetCanonicalType()
 		if canon == self.sbtype:
 			return None
-		return self._proxyFor(current, canon)
+		return self.factory.proxy(sbtype = canon, current = current)
 
 	def getMembers(self, tid, current = None):
 		# TODO: Properly handle arrays.
 		if self.id == TypeId.TypeIdArray:
 			with self.thread_stop.produce(tid):
-				print("getArraySize: " + lldb_utils.getDescription(self.sbvalue))
-				# TODO: Do something here
-				return []
+				ret = []
+				array = self.deubgger.createSBValueFor(self.sbtype, self.address)
+				for index in range(0, array.num_children):
+					child = array.GetChildAtIndex(index),
+					ret.append(
+						self.factory.proxy(
+							sbtype = child,
+							address = child.address_of.unsigned,
+							current = current
+						)
+					)
+				return ret
 		else:
 			ret = []
 			for field in self.sbtype.fields:
@@ -109,7 +125,7 @@ class TypeImpl(Type):
 					TypeMemberImpl.proxyFor(
 						field,
 						self.address,
-						self.thread_stop,
+						self.factory,
 						current
 					)
 				)
@@ -119,14 +135,20 @@ class TypeImpl(Type):
 		atl = self.sbtype.GetFunctionArgumentTypes()
 		ret = []
 		for idx in range(atl.GetSize()):
-			ret.append(self._proxyFor(current, atl.GetTypeAtIndex(idx), None))
+			ret.append(
+				self.factory.proxy(
+					sbtype = atl.GetTypeAtIndex(idx),
+					current = current,
+					address = None
+				)
+			)
 		return ret
 
 	def getReturnType(self, current = None):
-		return self._proxyFor(
-			current,
-			self.sbtype.GetFunctionReturnType(),
-			None,
+		return self.factory.proxy(
+			current = current,
+			sbtype = self.sbtype.GetFunctionReturnType(),
+			address = None,
 		)
 
 	def isSigned(self, current = None):
@@ -202,17 +224,3 @@ class TypeImpl(Type):
 			lldb.eBasicTypeVoid: False,
 			#lldb.eBasicTypeWChar: ,
 		}[self.sbtype.GetBasicType()]
-
-	def _proxyFor(self, current, sbtype, address = None, thread_stop = None):
-		return TypeImpl.proxyFor(
-			sbtype,
-			address if address != None else self.address,
-			thread_stop if thread_stop != None else self.thread_stop,
-			current
-		)
-
-	@staticmethod
-	def proxyFor(sbtype, address, thread_stop, current):
-		return TypePrx.uncheckedCast(
-			current.adapter.addWithUUID(TypeImpl(sbtype, address, thread_stop))
-		)
