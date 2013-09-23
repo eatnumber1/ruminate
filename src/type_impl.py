@@ -113,7 +113,7 @@ class TypeImpl(Type):
 				for index in range(0, array.num_children):
 					child = array.GetChildAtIndex(index)
 					ret.append(
-						ArrayMemberImpl(child.type, self.address, child.address_of.unsigned, self.factory)
+						ArrayMemberImpl.proxyFor(child.type, self.address, child.address_of.unsigned, self.factory, current)
 					)
 				return ret
 		else:
