@@ -4,7 +4,7 @@ from lldb import *
 
 from Ruminate import *
 from lldb_utils import *
-from type_impl import *
+from type_impl_factory import *
 from lldb_em import *
 from stopped_thread import *
 
@@ -32,6 +32,12 @@ class DebuggerImpl(Debugger):
 				err
 			))
 			validate(err)
+
+			# TODO: This might be racy. Revisit later
+			self.type_factory = TypeImplFactory()
+			self.type_factory.debugger = self
+			self.type_factory.thread_stop = StoppedThreadFactory(self.em, self.process)
+
 			return self.process
 
 		self.em = LLDBEventMachine(procgen)
@@ -74,10 +80,6 @@ class DebuggerImpl(Debugger):
 		self.em.begin()
 		running.wait()
 
-		self.type_factory = TypeImplFactory()
-		self.type_factory.debugger = self
-		self.type_factory.thred_stop = StoppedThreadFactory(self.em, self.process)
-
 		print("__init__: end")
 
 	def shutdown(self):
@@ -97,7 +99,11 @@ class DebuggerImpl(Debugger):
 				t = validate(value.type)
 				print(t)
 
-				return self.type_factory.proxy(t, current)
+				return self.type_factory.proxy(
+					sbtype = t,
+					current = current,
+					address = value.address_of.unsigned
+				)
 		finally:
 			print("getTypeByVariableName: exit")
 
@@ -121,4 +127,5 @@ class DebuggerImpl(Debugger):
 			print("getBacktrace: end")
 
 	def createSBValueFor(self, sbtype, address):
-		self.target.EvaluateExpression("(" + sbtype.name + ") " + str(address))
+		# TODO: Check for errors here
+		return self.target.EvaluateExpression("(%s) 0x%x" % (sbtype.name, address), SBExpressionOptions())

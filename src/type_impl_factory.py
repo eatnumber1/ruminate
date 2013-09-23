@@ -1,10 +1,15 @@
 from type_impl import *
 
 class TypeImplFactory(object):
-	def instance(self, sbtype = self.sbtype, address = self.address, debugger = self.debugger, thread_stop = self.thread_stop):
-		TypeImpl(self.sbtype, self.address, self.thread_stop, self.debugger)
+	def instance(self, **kwargs):
+		return TypeImpl(
+			kwargs["sbtype"] if "sbtype" in kwargs else self.sbtype,
+			kwargs["address"] if "address" in kwargs else self.address,
+			kwargs["thread_stop"] if "thread_stop" in kwargs else self.thread_stop,
+			kwargs["debugger"] if "debugger" in kwargs else self.debugger
+		)
 
-	def proxy(self, sbtype = self.sbtype, address = self.address, debugger = self.debugger, thread_stop = self.thread_stop, current = self.current):
+	def proxy(self, **kwargs):
 		return TypePrx.uncheckedCast(
-			current.adapter.addWithUUID(self.instance(sbtype, address, debugger, thread_stop))
+			kwargs["current"].adapter.addWithUUID(self.instance(**kwargs))
 		)

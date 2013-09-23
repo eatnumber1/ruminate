@@ -4,6 +4,7 @@
 module Ruminate {
 	interface Type;
 
+	// TODO: Subclass TypeMember from some shared superclass for arrays
 	interface TypeMember {
 		idempotent Type *getType();
 

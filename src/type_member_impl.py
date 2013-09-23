@@ -2,7 +2,7 @@ from Ruminate import *
 
 class TypeMemberImpl(TypeMember):
 	@staticmethod
-	def proxyFor(sbtypemember, base_address, type_factory):
+	def proxyFor(sbtypemember, base_address, type_factory, current):
 		return TypeMemberPrx.uncheckedCast(
 			current.adapter.addWithUUID(TypeMemberImpl(sbtypemember, base_address, type_factory))
 		)
@@ -13,7 +13,11 @@ class TypeMemberImpl(TypeMember):
 		self.address = base_address + self.getOffsetInBytes()
 
 	def getType(self, current = None):
-		self.type_factory.proxy(sbtype = self.sbtypemember.type, address = self.address, current = current)
+		return self.type_factory.proxy(
+			sbtype = self.sbtypemember.type,
+			address = self.address,
+			current = current
+		)
 
 	def getName(self, current = None):
 		return self.sbtypemember.name

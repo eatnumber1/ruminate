@@ -1,5 +1,6 @@
 from Ruminate import *
 from type_member_impl import *
+from array_member_impl import *
 from stopped_thread import *
 
 import lldb
@@ -7,6 +8,7 @@ import lldb_utils
 
 class TypeImpl(Type):
 	def __init__(self, sbtype, address, thread_stop, debugger):
+		from type_impl_factory import TypeImplFactory
 		self.factory = TypeImplFactory()
 		self.factory.sbtype = sbtype
 		self.factory.address = address
@@ -88,10 +90,10 @@ class TypeImpl(Type):
 		return self.sbtype.GetByteSize()
 
 	def getPointeeType(self, address, current = None):
-		return self.factory.proxy(sbtype = self.sbtype.GetPointeeType(), current = current)
+		return self.factory.proxy(sbtype = self.sbtype.GetPointeeType(), address = address, current = current)
 
 	def getPointerType(self, address, current = None):
-		return self.factory.proxy(sbtype = self.sbtype.GetPointerType(), current = current)
+		return self.factory.proxy(sbtype = self.sbtype.GetPointerType(), address = address, current = current)
 
 	def isComplete(self, current = None):
 		return self.sbtype.IsTypeComplete()
@@ -107,15 +109,11 @@ class TypeImpl(Type):
 		if self.id == TypeId.TypeIdArray:
 			with self.thread_stop.produce(tid):
 				ret = []
-				array = self.deubgger.createSBValueFor(self.sbtype, self.address)
+				array = self.debugger.createSBValueFor(self.sbtype, self.address)
 				for index in range(0, array.num_children):
-					child = array.GetChildAtIndex(index),
+					child = array.GetChildAtIndex(index)
 					ret.append(
-						self.factory.proxy(
-							sbtype = child,
-							address = child.address_of.unsigned,
-							current = current
-						)
+						ArrayMemberImpl(child.type, self.address, child.address_of.unsigned, self.factory)
 					)
 				return ret
 		else:
