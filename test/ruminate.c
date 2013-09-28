@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
+#include <locale.h>
 
 #define print_json_for_type(expr, err) ({ \
 	GError **_err = (err); \
@@ -69,7 +71,12 @@ static bool _print_json_for_builtin( RBuiltinType *type, void *data, GError **er
 			} else if( is_signed ) {
 				printf("%hhd", *((signed char *) data));
 			} else {
-				printf("'%c'", *((char *) data));
+				char c = *((char *) data);
+				if( isalnum(c) ) {
+					printf("'%c'", c);
+				} else {
+					printf("0x%x", c);
+				}
 			}
 			break;
 		case R_BUILTIN_TYPE_BOOL:
@@ -285,6 +292,8 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 }
 
 int main( int argc, char *argv[] ) {
+	setlocale(LC_ALL, "");
+
 	GError *err = NULL;
 	rumination_init(&argc, argv, &err);
 	die_if_error(err);
