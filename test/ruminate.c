@@ -29,6 +29,10 @@ typedef struct __attribute__((packed)) MyStruct {
 	} a_struct;
 	int *an_int_ptr;
 	char an_array[6];
+	union {
+		double a_double;
+		long a_long;
+	} a_union, another_union;
 } MyTypedef;
 
 void die_if_error( GError *err ) {
@@ -99,6 +103,7 @@ static bool _print_json_for_record( RRecordType *rt, void *data, GError **error 
 
 	switch( id ) {
 		case R_RECORD_TYPE_STRUCTURE:
+		case R_RECORD_TYPE_UNION:
 			break;
 		default:
 			g_assert_not_reached();
@@ -305,7 +310,13 @@ int main( int argc, char *argv[] ) {
 			.an_int = 100
 		},
 		.an_int_ptr = &argc,
-		.an_array = "hello"
+		.an_array = "hello",
+		.a_union = {
+			.a_double = 3.14
+		},
+		.another_union = {
+			.a_long = 1024L
+		}
 	};
 
 	{

@@ -6,6 +6,7 @@
 module Ruminate {
 	enum TypeId {
 		TypeIdStructure,
+		TypeIdUnion,
 		TypeIdFunction,
 		TypeIdTypedef,
 		TypeIdPointer,

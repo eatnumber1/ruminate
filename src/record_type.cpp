@@ -19,8 +19,11 @@
 #include "ruminate/tag_type.h"
 #include "ruminate/record_type.h"
 #include "ruminate/function_type.h"
+#include "ruminate/frame.h"
+#include "ruminate/rumination.h"
 
 #include "private/common.h"
+#include "private/gettid.h"
 #include "private/memory.h"
 #include "private/type.h"
 #include "private/type_member.h"
@@ -36,6 +39,9 @@ bool r_record_type_init( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdStructure:
 			rrt->id = R_RECORD_TYPE_STRUCTURE;
 			return true;
+		case Ruminate::TypeIdUnion:
+			rrt->id = R_RECORD_TYPE_UNION;
+			return true;
 		case Ruminate::TypeIdFunction:
 			rrt->id = R_RECORD_TYPE_FUNCTION;
 			return r_function_type_init((RFunctionType *) rrt, error);
@@ -49,6 +55,7 @@ bool r_record_type_init( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
 void r_record_type_destroy( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 	switch( rrt->id ) {
 		case R_RECORD_TYPE_STRUCTURE:
+		case R_RECORD_TYPE_UNION:
 			break;
 		case R_RECORD_TYPE_FUNCTION:
 			r_function_type_destroy((RFunctionType *) rrt);
@@ -65,6 +72,7 @@ RRecordType *r_record_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE
 	switch( id ) {
 		case Ruminate::TypeIdFunction:
 			return (RRecordType *) r_function_type_alloc(id, error);
+		case Ruminate::TypeIdUnion:
 		case Ruminate::TypeIdStructure: {
 			RRecordType *ret = g_slice_new(RRecordType);
 			new (ret) RRecordType();
@@ -80,6 +88,7 @@ RRecordType *r_record_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE
 void r_record_type_free( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 	switch( rrt->id ) {
 		case R_RECORD_TYPE_STRUCTURE:
+		case R_RECORD_TYPE_UNION:
 			rrt->~RRecordType();
 			g_slice_free(RRecordType, rrt);
 			break;
@@ -93,7 +102,8 @@ void r_record_type_free( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 
 static bool init_members( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
 	if( !rrt->members_init ) {
-		if( !gxx_call(rrt->members = ((RType *) rrt)->type->getMembers(0), error) )
+		RType *rt = (RType *) rrt;
+		if( !gxx_call(rrt->members = rt->type->getMembers(0), error) )
 			return false;
 		rrt->members_init = true;
 	}

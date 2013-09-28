@@ -42,6 +42,7 @@ bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_N
 			rt->id = R_TYPE_ARRAY;
 			break;
 		case Ruminate::TypeIdStructure:
+		case Ruminate::TypeIdUnion:
 		case Ruminate::TypeIdFunction:
 			rt->id = R_TYPE_TAG;
 			break;
@@ -128,6 +129,7 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdArray:
 			return (RType *) r_array_type_alloc(id, error);
 		case Ruminate::TypeIdStructure:
+		case Ruminate::TypeIdUnion:
 		case Ruminate::TypeIdFunction:
 			return (RType *) r_tag_type_alloc(id, error);
 		case Ruminate::TypeIdInt:
@@ -158,6 +160,7 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 			r_array_type_free((RArrayType *) rt);
 			break;
 		case Ruminate::TypeIdStructure:
+		case Ruminate::TypeIdUnion:
 		case Ruminate::TypeIdFunction:
 			r_tag_type_free((RTagType *) rt);
 			break;

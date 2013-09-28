@@ -1,11 +1,12 @@
 from Ruminate import *
 
-class TypeListMemberImpl(TypeMember):
+class SBTypeListAdapter(TypeMember):
 	@staticmethod
-	def proxyFor(sbtypelist, index, type_factory, current):
+	def proxyFor(**kwargs):
+		current = kwargs.pop("current")
 		return TypeMemberPrx.uncheckedCast(
 			current.adapter.addWithUUID(
-				TypeListMemberImpl(sbtypelist, index, type_factory)
+				SBTypeListAdapter(**kwargs)
 			)
 		)
 
@@ -20,11 +21,12 @@ class TypeListMemberImpl(TypeMember):
 			current = current
 		)
 
-class TypeMemberImpl(TypeMember):
+class SBTypeMemberAdapter(TypeMember):
 	@staticmethod
-	def proxyFor(sbtypemember, base_address, type_factory, current):
+	def proxyFor(**kwargs):
+		current = kwargs.pop("current")
 		return TypeMemberPrx.uncheckedCast(
-			current.adapter.addWithUUID(TypeMemberImpl(sbtypemember, base_address, type_factory))
+			current.adapter.addWithUUID(SBTypeMemberAdapter(**kwargs))
 		)
 
 	def __init__(self, sbtypemember, base_address, type_factory):
@@ -53,3 +55,27 @@ class TypeMemberImpl(TypeMember):
 
 	def isBitfield(self, current = None):
 		return self.sbtypemember.is_bitfield
+
+class SBTypeAdapter(TypeMember):
+	@staticmethod
+	def proxyFor(**kwargs):
+		current = kwargs.pop("current")
+		return TypeMemberPrx.uncheckedCast(
+			current.adapter.addWithUUID(SBTypeAdapter(**kwargs))
+		)
+
+	def __init__(self, sbtype, base_address, address, type_factory):
+		self.type_factory = type_factory
+		self.sbtype = sbtype
+		self.offset = address - base_address
+		self.address = address
+
+	def getType(self, current = None):
+		return self.type_factory.proxy(
+			sbtype = self.sbtype,
+			address = self.address,
+			current = current
+		)
+
+	def getOffsetInBytes(self, current = None):
+		return self.offset

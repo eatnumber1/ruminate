@@ -1,7 +1,7 @@
 from Ruminate import *
-from type_member_impl import *
 from array_member_impl import *
 from stopped_thread import *
+import type_member_impl
 
 import lldb
 import lldb_utils
@@ -67,7 +67,7 @@ class TypeImpl(Type):
 				#lldb.eTypeClassObjCObject: TypeId.,
 				#lldb.eTypeClassObjCObjectPointer: TypeId.,
 				#lldb.eTypeClassReference: TypeId.,
-				#lldb.eTypeClassUnion: TypeId.,
+				lldb.eTypeClassUnion: TypeId.TypeIdUnion,
 				#lldb.eTypeClassVector: TypeId.,
 				lldb.eTypeClassStruct: TypeId.TypeIdStructure,
 				lldb.eTypeClassFunction: TypeId.TypeIdFunction,
@@ -112,7 +112,13 @@ class TypeImpl(Type):
 				for index in range(0, array.num_children):
 					child = array.GetChildAtIndex(index)
 					ret.append(
-						ArrayMemberImpl.proxyFor(child.type, self.address, child.address_of.unsigned, self.factory, current)
+						type_member_impl.SBTypeAdapter.proxyFor(
+							sbtype = child.type,
+							base_address = self.address,
+							address = child.address_of.unsigned,
+							type_factory = self.factory,
+							current = current
+						)
 					)
 				return ret
 		elif self.id == TypeId.TypeIdFunction:
@@ -120,11 +126,11 @@ class TypeImpl(Type):
 			args = self.sbtype.GetFunctionArgumentTypes()
 			for index in range(0, args.GetSize()):
 				ret.append(
-					TypeListMemberImpl.proxyFor(
-						args,
-						index,
-						self.factory,
-						current
+					type_member_impl.SBTypeListAdapter.proxyFor(
+						sbtypelist = args,
+						index = index,
+						type_factory = self.factory,
+						current = current
 					)
 				)
 			return ret
@@ -132,11 +138,11 @@ class TypeImpl(Type):
 			ret = []
 			for field in self.sbtype.fields:
 				ret.append(
-					TypeMemberImpl.proxyFor(
-						field,
-						self.address,
-						self.factory,
-						current
+					type_member_impl.SBTypeMemberAdapter.proxyFor(
+						sbtypemember = field,
+						base_address = self.address,
+						type_factory = self.factory,
+						current = current
 					)
 				)
 			return ret
