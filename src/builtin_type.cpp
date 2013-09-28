@@ -39,6 +39,9 @@ bool r_builtin_type_init( RBuiltinType *rbt, GError ** ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdChar:
 			rbt->id = R_BUILTIN_TYPE_CHAR;
 			break;
+		case Ruminate::TypeIdBool:
+			rbt->id = R_BUILTIN_TYPE_BOOL;
+			break;
 		default:
 			g_assert_not_reached();
 	}

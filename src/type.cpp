@@ -51,6 +51,7 @@ bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_N
 		case Ruminate::TypeIdVoid:
 		case Ruminate::TypeIdShort:
 		case Ruminate::TypeIdChar:
+		case Ruminate::TypeIdBool:
 			rt->id = R_TYPE_BUILTIN;
 			break;
 		case Ruminate::TypeIdTypedef:
@@ -135,6 +136,7 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdVoid:
 		case Ruminate::TypeIdShort:
 		case Ruminate::TypeIdChar:
+		case Ruminate::TypeIdBool:
 			return (RType *) r_builtin_type_alloc(id, error);
 		case Ruminate::TypeIdTypedef:
 			return (RType *) r_typedef_type_alloc(id, error);
@@ -165,6 +167,7 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdVoid:
 		case Ruminate::TypeIdShort:
 		case Ruminate::TypeIdChar:
+		case Ruminate::TypeIdBool:
 			r_builtin_type_free((RBuiltinType *) rt);
 			break;
 		case Ruminate::TypeIdTypedef:

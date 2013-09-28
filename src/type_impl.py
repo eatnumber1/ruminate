@@ -21,7 +21,7 @@ class TypeImpl(Type):
 		self.thread_stop = thread_stop
 		if sbtype.type == lldb.eTypeClassBuiltin:
 			self.id = {
-				#lldb.eBasicTypeBool: TypeId.TypeId,
+				lldb.eBasicTypeBool: TypeId.TypeIdBool,
 				lldb.eBasicTypeChar: TypeId.TypeIdChar,
 				#lldb.eBasicTypeChar16: TypeId.TypeId,
 				#lldb.eBasicTypeChar32: TypeId.TypeId,
@@ -105,7 +105,6 @@ class TypeImpl(Type):
 		return self.factory.proxy(sbtype = canon, current = current)
 
 	def getMembers(self, tid, current = None):
-		# TODO: Properly handle arrays.
 		if self.id == TypeId.TypeIdArray:
 			with self.thread_stop.produce(tid):
 				ret = []
@@ -116,6 +115,19 @@ class TypeImpl(Type):
 						ArrayMemberImpl.proxyFor(child.type, self.address, child.address_of.unsigned, self.factory, current)
 					)
 				return ret
+		elif self.id == TypeId.TypeIdFunction:
+			ret = []
+			args = self.sbtype.GetFunctionArgumentTypes()
+			for index in range(0, args.GetSize()):
+				ret.append(
+					TypeListMemberImpl.proxyFor(
+						args,
+						index,
+						self.factory,
+						current
+					)
+				)
+			return ret
 		else:
 			ret = []
 			for field in self.sbtype.fields:

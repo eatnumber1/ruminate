@@ -128,4 +128,7 @@ class DebuggerImpl(Debugger):
 
 	def createSBValueFor(self, sbtype, address):
 		# TODO: Check for errors here
-		return self.target.EvaluateExpression("(%s) 0x%x" % (sbtype.name, address), SBExpressionOptions())
+		return self.target.EvaluateExpression(
+			"(%s) 0x%x" % (sbtype.GetPointerType().name, address),
+			SBExpressionOptions()
+		).Dereference()

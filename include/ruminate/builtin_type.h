@@ -4,7 +4,8 @@ typedef enum RBuiltinTypeId {
 	R_BUILTIN_TYPE_DOUBLE,
 	R_BUILTIN_TYPE_SHORT,
 	R_BUILTIN_TYPE_CHAR,
-	R_BUILTIN_TYPE_VOID
+	R_BUILTIN_TYPE_VOID,
+	R_BUILTIN_TYPE_BOOL
 } RBuiltinTypeId;
 
 typedef struct RBuiltinType RBuiltinType;

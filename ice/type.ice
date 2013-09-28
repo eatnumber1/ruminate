@@ -17,6 +17,7 @@ module Ruminate {
 		TypeIdShort,
 		TypeIdChar,
 		TypeIdVoid,
+		TypeIdBool,
 
 		TypeIdUnknown
 	};

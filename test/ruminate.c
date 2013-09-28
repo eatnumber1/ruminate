@@ -69,8 +69,11 @@ static bool _print_json_for_builtin( RBuiltinType *type, void *data, GError **er
 			} else if( is_signed ) {
 				printf("%hhd", *((signed char *) data));
 			} else {
-				printf("%c", *((char *) data));
+				printf("'%c'", *((char *) data));
 			}
+			break;
+		case R_BUILTIN_TYPE_BOOL:
+			printf("%s", *((_Bool *) data) ? "true" : "false");
 			break;
 		default:
 			printf("\"unknown primitive type\"");
@@ -167,9 +170,14 @@ static bool print_function_type( RFunctionType *rft, GError **error ) {
 		die_if_error(*error);
 		// TODO: Error checking
 
-		RString *name = r_record_member_name(arg, error);
+		RType *arg_type = r_type_member_type((RTypeMember *) arg, error);
+		die_if_error(*error);
+
+		RString *name = r_type_name(arg_type, error);
 		die_if_error(*error);
 		// TODO: Error checking
+
+		r_type_unref(arg_type);
 
 		printf(" %s", r_string_bytes(name));
 		if( i != narguments - 1 ) printf(",");
@@ -201,6 +209,8 @@ static bool _print_json_for_array( RArrayType *type, void *data, GError **error 
 		// TODO: Error checking
 
 		_print_json_for_type(member_type, &data[i], error);
+		if( i < size - 1 )
+			printf(", ");
 
 		r_type_unref(member_type);
 		r_type_member_unref(member);
@@ -289,18 +299,27 @@ int main( int argc, char *argv[] ) {
 		.an_array = "hello"
 	};
 
-	(void) print_json_for_type(f, &err);
-	die_if_error(err);
+	{
+		(void) print_json_for_type(f, &err);
+		die_if_error(err);
 
-	printf("\n");
+		printf("\n");
+	}
 
-	RType *type = rumination_get_type(&print_function_type, &err);
-	die_if_error(err);
+	{
+		// TODO: Type check
+		RPointerType *pt = (RPointerType *) rumination_get_type(&print_function_type, &err);
+		die_if_error(err);
 
-	print_function_type((RFunctionType *) type, &err);
-	die_if_error(err);
+		RType *type = r_pointer_type_pointee(pt, &err);
+		die_if_error(err);
+		r_type_unref((RType *) pt);
 
-	r_type_unref(type);
+		print_function_type((RFunctionType *) type, &err);
+		die_if_error(err);
 
-	printf("\n");
+		r_type_unref(type);
+
+		printf("\n");
+	}
 }

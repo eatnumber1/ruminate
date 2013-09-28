@@ -1,5 +1,25 @@
 from Ruminate import *
 
+class TypeListMemberImpl(TypeMember):
+	@staticmethod
+	def proxyFor(sbtypelist, index, type_factory, current):
+		return TypeMemberPrx.uncheckedCast(
+			current.adapter.addWithUUID(
+				TypeListMemberImpl(sbtypelist, index, type_factory)
+			)
+		)
+
+	def __init__(self, sbtypelist, index, type_factory):
+		self.sbtypelist = sbtypelist
+		self.index = index
+		self.type_factory = type_factory
+
+	def getType(self, current = None):
+		return self.type_factory.proxy(
+			sbtype = self.sbtypelist.GetTypeAtIndex(self.index),
+			current = current
+		)
+
 class TypeMemberImpl(TypeMember):
 	@staticmethod
 	def proxyFor(sbtypemember, base_address, type_factory, current):

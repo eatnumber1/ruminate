@@ -115,8 +115,10 @@ RRecordMember *r_record_type_member_at( RRecordType *rrt, size_t i, GError **err
 	if( !init_members(rrt, error) ) return 0;
 	// TODO: vector access could throw
 	Ruminate::TypeMemberPrx tmp = rrt->members[i];
-	off_t offset;
-	if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
+	off_t offset = 0;
+	if( rrt->id != R_RECORD_TYPE_FUNCTION ) {
+		if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
+	}
 	// TODO: Memoize RRecordMembers
 	RType *rt = (RType *) rrt;
 	return (RRecordMember *) r_type_member_new(tmp, R_TYPE_MEMBER_RECORD, rt->ptr, ((uint8_t *) rt->cur) + offset, error);

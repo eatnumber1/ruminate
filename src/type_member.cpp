@@ -112,6 +112,8 @@ void r_type_member_delete( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 bool _r_type_member_offset( Ruminate::TypeMemberPrx &tmp, off_t *out, GError **error ) RUMINATE_NOEXCEPT {
 	G_STATIC_ASSERT(sizeof(off_t) >= sizeof(__typeof__(tmp->getOffsetInBytes())));
 	g_assert(out != NULL);
+
+	// TODO: Error here if this type member has no offset (function arguments)
 	off_t off = 0;
 	if( !gxx_call(off = tmp->getOffsetInBytes(), error) )
 		return false;
