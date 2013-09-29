@@ -21,6 +21,17 @@
 
 typedef char *string;
 
+struct IdentifiedUnion {
+	enum {
+		A_LONG,
+		A_SHORT
+	} id;
+	union {
+		long a_long;
+		short a_short;
+	} value;
+};
+
 typedef struct __attribute__((packed)) MyStruct {
 	short a_short;
 	string a_string;
@@ -31,8 +42,8 @@ typedef struct __attribute__((packed)) MyStruct {
 	char an_array[6];
 	union {
 		double a_double;
-		long a_long;
-	} a_union, another_union;
+	} a_union;
+	struct IdentifiedUnion an_identified_union, another_identified_union;
 } MyTypedef;
 
 void die_if_error( GError *err ) {
@@ -314,8 +325,17 @@ int main( int argc, char *argv[] ) {
 		.a_union = {
 			.a_double = 3.14
 		},
-		.another_union = {
-			.a_long = 1024L
+		.an_identified_union = {
+			.id = A_LONG,
+			.value = {
+				.a_long = 1024L
+			}
+		},
+		.another_identified_union = {
+			.id = A_SHORT,
+			.value = {
+				.a_short = 255
+			}
 		}
 	};
 
