@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <new>
 
+#include <stdint.h>
+
 #include <Ice/Ice.h>
 #include "ice/type.h"
 
@@ -12,26 +14,33 @@
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
 #include "ruminate/type.h"
-#include "ruminate/tag_type.h"
-#include "ruminate/type_member.h"
 #include "ruminate/record_member.h"
 #include "ruminate/record_type.h"
+#include "ruminate/tag_type.h"
+#include "ruminate/type_member.h"
 #include "ruminate/function_type.h"
+#include "ruminate/frame.h"
+#include "ruminate/rumination.h"
 
 #include "private/common.h"
+#include "private/gettid.h"
 #include "private/memory.h"
+#include "private/string.h"
 #include "private/type_member.h"
 #include "private/record_member.h"
 #include "private/type.h"
-#include "private/tag_type.h"
 #include "private/record_type.h"
+#include "private/tag_type.h"
 #include "private/function_type.h"
 
-bool r_function_type_init( RFunctionType *, GError ** ) RUMINATE_NOEXCEPT {
+bool r_function_type_init( RFunctionType *rft, GError ** ) RUMINATE_NOEXCEPT {
+	rft->name = NULL;
 	return true;
 }
 
-void r_function_type_destroy( RFunctionType * ) RUMINATE_NOEXCEPT {}
+void r_function_type_destroy( RFunctionType *rft ) RUMINATE_NOEXCEPT {
+	if( rft->name != NULL ) r_string_unref(rft->name);
+}
 
 RFunctionType *r_function_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
 	RFunctionType *ret = g_slice_new(RFunctionType);
@@ -60,6 +69,21 @@ RType *r_function_type_return_type( RFunctionType *rft, GError **error ) RUMINAT
 	r_memory_unref(rm);
 
 	return ret;
+}
+
+RString *r_function_type_name( RFunctionType *rft, GError **error ) RUMINATE_NOEXCEPT {
+	if( rft->name == NULL ) {
+		std::string name;
+		RType *rt = (RType *) rft;
+		Ice::AsyncResultPtr arp;
+		if( !gxx_call(arp = rt->type->begin_getName(gettid()), error) )
+			return NULL;
+		rumination_hit_breakpoint();
+		if( !gxx_call(name = rt->type->end_getName(arp), error) )
+			return NULL;
+		rft->name = r_string_new(name.c_str());
+	}
+	return r_string_ref(rft->name);
 }
 
 G_END_DECLS

@@ -113,8 +113,8 @@ static bool _print_json_for_record( RRecordType *rt, void *data, GError **error 
 	// TODO: Error checking
 
 	switch( id ) {
-		case R_RECORD_TYPE_STRUCTURE:
-		case R_RECORD_TYPE_UNION:
+		case R_RECORD_TYPE_TAG:
+		case R_RECORD_TYPE_FUNCTION:
 			break;
 		default:
 			g_assert_not_reached();
@@ -178,11 +178,15 @@ static bool print_function_type( RFunctionType *rft, GError **error ) {
 	die_if_error(*error);
 	// TODO: Error checking
 
+	RString *rfname = r_function_type_name(rft, error);
+	die_if_error(*error);
+
 	r_type_unref(rtype);
 
-	printf("(%s (", r_string_bytes(rtname));
+	printf("%s %s(", r_string_bytes(rtname), r_string_bytes(rfname));
 
 	r_string_unref(rtname);
+	r_string_unref(rfname);
 
 	size_t narguments = r_record_type_nmembers(rrt, error);
 	die_if_error(*error);
@@ -209,7 +213,7 @@ static bool print_function_type( RFunctionType *rft, GError **error ) {
 		r_type_member_unref((RTypeMember *) arg);
 	}
 
-	printf(" ))");
+	printf(" )");
 
 	r_type_unref((RType *) rft);
 
@@ -276,7 +280,7 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 			die_if_error(*error);
 			// TODO: Error checking
 			break;
-		case R_TYPE_TAG:
+		case R_TYPE_RECORD:
 			// TODO: Support other tag types.
 			_print_json_for_record((RRecordType *) type, data, error);
 			die_if_error(*error);

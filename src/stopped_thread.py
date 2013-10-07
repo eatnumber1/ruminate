@@ -2,6 +2,7 @@ from lldb import *
 from lldb_utils import *
 
 import threading
+import Ice
 
 class StoppedThreadFactory(object):
 	def __init__(self, em, process):
@@ -9,7 +10,17 @@ class StoppedThreadFactory(object):
 		self.process = process
 
 	def produce(self, tid):
-		return StoppedThread(self.em, self.process, tid)
+		if tid == Ice.Unset:
+			return DummyStoppedThread()
+		else:
+			return StoppedThread(self.em, self.process, tid)
+
+class DummyStoppedThread(object):
+	def __enter__(self):
+		pass
+
+	def __exit__(self, *args):
+		pass
 
 class StoppedThread(object):
 	def __init__(self, em, process, tid):

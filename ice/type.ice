@@ -6,6 +6,7 @@
 module Ruminate {
 	enum TypeId {
 		TypeIdStructure,
+		TypeIdEnum,
 		TypeIdUnion,
 		TypeIdFunction,
 		TypeIdTypedef,
@@ -35,10 +36,10 @@ module Ruminate {
 		Type *getCanonicalType();
 		Type *getReturnType();
 
-		TypeMemberList getMembers( long tid );
+		TypeMemberList getMembers( optional(1) long tid );
 		TypeList getArguments();
 
-		string getName(); // This is cached in the C++ API layer
+		string getName( optional(1) long tid ); // This is cached in the C++ API layer
 		idempotent long getSize();
 
 		idempotent bool isComplete();

@@ -132,3 +132,6 @@ class DebuggerImpl(Debugger):
 			"(%s) 0x%x" % (sbtype.GetPointerType().name, address),
 			SBExpressionOptions()
 		).Dereference()
+
+	def createSBAddressFor(self, address):
+		return lldb.SBAddress(address, self.target)

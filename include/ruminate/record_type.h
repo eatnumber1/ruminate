@@ -1,6 +1,5 @@
 typedef enum RRecordTypeId {
-	R_RECORD_TYPE_STRUCTURE,
-	R_RECORD_TYPE_UNION,
+	R_RECORD_TYPE_TAG,
 	R_RECORD_TYPE_FUNCTION
 } RRecordTypeId;
 

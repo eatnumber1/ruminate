@@ -1,5 +1,5 @@
 struct RTagType {
-	RType parent;
+	RRecordType parent;
 	RTagTypeId id;
 	RString *name;
 };

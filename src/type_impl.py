@@ -1,3 +1,5 @@
+from __future__ import nested_scopes, with_statement
+
 from Ruminate import *
 from array_member_impl import *
 from stopped_thread import *
@@ -61,7 +63,7 @@ class TypeImpl(Type):
 				#lldb.eTypeClassClass: TypeId.,
 				#lldb.eTypeClassComplexFloat: TypeId.,
 				#lldb.eTypeClassComplexInteger: TypeId.,
-				#lldb.eTypeClassEnumeration: TypeId.,
+				lldb.eTypeClassEnumeration: TypeId.TypeIdEnum,
 				#lldb.eTypeClassMemberPointer: TypeId.,
 				#lldb.eTypeClassObjCInterface: TypeId.,
 				#lldb.eTypeClassObjCObject: TypeId.,
@@ -80,8 +82,12 @@ class TypeImpl(Type):
 	def getId(self, current = None):
 		return self.id
 
-	def getName(self, current = None):
-		return self.sbtype.GetName()
+	def getName(self, tid, current = None):
+		with self.thread_stop.produce(tid):
+			if self.id == TypeId.TypeIdFunction:
+				return self.debugger.createSBAddressFor(self.address).function.name
+			else:
+				return self.sbtype.name
 
 	def getBuiltinType(self, current = None):
 		return self.factory.proxy(sbtype = self.sbtype.GetBasicType(self.sbtype.GetBasicType()), current = current)
@@ -105,12 +111,12 @@ class TypeImpl(Type):
 		return self.factory.proxy(sbtype = canon, current = current)
 
 	def getMembers(self, tid, current = None):
-		if self.id == TypeId.TypeIdArray:
-			with self.thread_stop.produce(tid):
+		with self.thread_stop.produce(tid):
+			if self.id == TypeId.TypeIdArray:
 				ret = []
 				array = self.debugger.createSBValueFor(self.sbtype, self.address)
 				for index in range(0, array.num_children):
-					child = array.GetChildAtIndex(index)
+					child = array.GetChildAtIndex(index, lldb.eDynamicDontRunTarget, False)
 					ret.append(
 						type_member_impl.SBTypeAdapter.proxyFor(
 							sbtype = child.type,
@@ -121,31 +127,31 @@ class TypeImpl(Type):
 						)
 					)
 				return ret
-		elif self.id == TypeId.TypeIdFunction:
-			ret = []
-			args = self.sbtype.GetFunctionArgumentTypes()
-			for index in range(0, args.GetSize()):
-				ret.append(
-					type_member_impl.SBTypeListAdapter.proxyFor(
-						sbtypelist = args,
-						index = index,
-						type_factory = self.factory,
-						current = current
+			elif self.id == TypeId.TypeIdFunction:
+				ret = []
+				args = self.sbtype.GetFunctionArgumentTypes()
+				for index in range(0, args.GetSize()):
+					ret.append(
+						type_member_impl.SBTypeListAdapter.proxyFor(
+							sbtypelist = args,
+							index = index,
+							type_factory = self.factory,
+							current = current
+						)
 					)
-				)
-			return ret
-		else:
-			ret = []
-			for field in self.sbtype.fields:
-				ret.append(
-					type_member_impl.SBTypeMemberAdapter.proxyFor(
-						sbtypemember = field,
-						base_address = self.address,
-						type_factory = self.factory,
-						current = current
+				return ret
+			else:
+				ret = []
+				for field in self.sbtype.fields:
+					ret.append(
+						type_member_impl.SBTypeMemberAdapter.proxyFor(
+							sbtypemember = field,
+							base_address = self.address,
+							type_factory = self.factory,
+							current = current
+						)
 					)
-				)
-			return ret
+				return ret
 
 	def getArguments(self, current = None):
 		atl = self.sbtype.GetFunctionArgumentTypes()

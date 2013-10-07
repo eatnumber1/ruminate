@@ -14,7 +14,8 @@
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
 #include "ruminate/type.h"
-#include "ruminate/tag_type.h"
+#include "ruminate/record_member.h"
+#include "ruminate/record_type.h"
 #include "ruminate/builtin_type.h"
 #include "ruminate/pointer_type.h"
 #include "ruminate/typedef_type.h"
@@ -24,7 +25,7 @@
 #include "private/common.h"
 #include "private/memory.h"
 #include "private/type.h"
-#include "private/tag_type.h"
+#include "private/record_type.h"
 #include "private/builtin_type.h"
 #include "private/pointer_type.h"
 #include "private/typedef_type.h"
@@ -43,8 +44,9 @@ bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_N
 			break;
 		case Ruminate::TypeIdStructure:
 		case Ruminate::TypeIdUnion:
+		case Ruminate::TypeIdEnum:
 		case Ruminate::TypeIdFunction:
-			rt->id = R_TYPE_TAG;
+			rt->id = R_TYPE_RECORD;
 			break;
 		case Ruminate::TypeIdInt:
 		case Ruminate::TypeIdLong:
@@ -70,8 +72,8 @@ bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_N
 
 	bool ret = true;
 	switch( rt->id ) {
-		case R_TYPE_TAG:
-			ret = r_tag_type_init((RTagType *) rt, error);
+		case R_TYPE_RECORD:
+			ret = r_record_type_init((RRecordType *) rt, error);
 			break;
 		case R_TYPE_BUILTIN:
 			ret = r_builtin_type_init((RBuiltinType *) rt, error);
@@ -97,8 +99,8 @@ bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_N
 
 void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 	switch( rt->id ) {
-		case R_TYPE_TAG:
-			r_tag_type_destroy((RTagType *) rt);
+		case R_TYPE_RECORD:
+			r_record_type_destroy((RRecordType *) rt);
 			break;
 		case R_TYPE_BUILTIN:
 			r_builtin_type_destroy((RBuiltinType *) rt);
@@ -129,9 +131,10 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdArray:
 			return (RType *) r_array_type_alloc(id, error);
 		case Ruminate::TypeIdStructure:
+		case Ruminate::TypeIdEnum:
 		case Ruminate::TypeIdUnion:
 		case Ruminate::TypeIdFunction:
-			return (RType *) r_tag_type_alloc(id, error);
+			return (RType *) r_record_type_alloc(id, error);
 		case Ruminate::TypeIdInt:
 		case Ruminate::TypeIdLong:
 		case Ruminate::TypeIdDouble:
@@ -161,8 +164,9 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 			break;
 		case Ruminate::TypeIdStructure:
 		case Ruminate::TypeIdUnion:
+		case Ruminate::TypeIdEnum:
 		case Ruminate::TypeIdFunction:
-			r_tag_type_free((RTagType *) rt);
+			r_record_type_free((RRecordType *) rt);
 			break;
 		case Ruminate::TypeIdInt:
 		case Ruminate::TypeIdLong:
@@ -227,7 +231,7 @@ RTypeId r_type_id( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 RString *r_type_name( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	if( rt->name == NULL ) {
 		std::string name;
-		if( !gxx_call(name = rt->type->getName(),  error) )
+		if( !gxx_call(name = rt->type->getName(IceUtil::None), error) )
 			return NULL;
 		rt->name = r_string_new(name.c_str());
 	}

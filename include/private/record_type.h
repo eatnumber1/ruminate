@@ -1,5 +1,5 @@
 struct RRecordType {
-	RTagType parent;
+	RType parent;
 	RRecordTypeId id;
 	bool members_init;
 	Ruminate::TypeMemberList members;

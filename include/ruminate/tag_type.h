@@ -1,5 +1,6 @@
 typedef enum RTagTypeId {
-	R_TAG_TYPE_RECORD,
+	R_TAG_TYPE_STRUCTURE,
+	R_TAG_TYPE_UNION,
 	R_TAG_TYPE_ENUM
 } RTagTypeId;
 

@@ -1,5 +1,6 @@
 struct RFunctionType {
 	RRecordType parent;
+	RString *name;
 };
 
 bool r_function_type_init( RFunctionType *, GError ** ) RUMINATE_NOEXCEPT;

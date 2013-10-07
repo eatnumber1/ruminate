@@ -16,8 +16,8 @@
 #include "ruminate/type.h"
 #include "ruminate/type_member.h"
 #include "ruminate/record_member.h"
-#include "ruminate/tag_type.h"
 #include "ruminate/record_type.h"
+#include "ruminate/tag_type.h"
 #include "ruminate/function_type.h"
 #include "ruminate/frame.h"
 #include "ruminate/rumination.h"
@@ -28,8 +28,8 @@
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/record_member.h"
-#include "private/tag_type.h"
 #include "private/record_type.h"
+#include "private/tag_type.h"
 #include "private/function_type.h"
 
 bool r_record_type_init( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
@@ -37,11 +37,10 @@ bool r_record_type_init( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
 
 	switch( ((RType *) rrt)->type_id ) {
 		case Ruminate::TypeIdStructure:
-			rrt->id = R_RECORD_TYPE_STRUCTURE;
-			return true;
 		case Ruminate::TypeIdUnion:
-			rrt->id = R_RECORD_TYPE_UNION;
-			return true;
+		case Ruminate::TypeIdEnum:
+			rrt->id = R_RECORD_TYPE_TAG;
+			return r_tag_type_init((RTagType *) rrt, error);;
 		case Ruminate::TypeIdFunction:
 			rrt->id = R_RECORD_TYPE_FUNCTION;
 			return r_function_type_init((RFunctionType *) rrt, error);
@@ -54,8 +53,8 @@ bool r_record_type_init( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
 
 void r_record_type_destroy( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 	switch( rrt->id ) {
-		case R_RECORD_TYPE_STRUCTURE:
-		case R_RECORD_TYPE_UNION:
+		case R_RECORD_TYPE_TAG:
+			r_tag_type_destroy((RTagType *) rrt);
 			break;
 		case R_RECORD_TYPE_FUNCTION:
 			r_function_type_destroy((RFunctionType *) rrt);
@@ -64,8 +63,10 @@ void r_record_type_destroy( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 			g_assert_not_reached();
 	}
 
-	rrt->members.clear();
-	rrt->members_init = false;
+	if( rrt->members_init ) {
+		rrt->members.clear();
+		rrt->members_init = false;
+	}
 }
 
 RRecordType *r_record_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
@@ -73,11 +74,9 @@ RRecordType *r_record_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE
 		case Ruminate::TypeIdFunction:
 			return (RRecordType *) r_function_type_alloc(id, error);
 		case Ruminate::TypeIdUnion:
-		case Ruminate::TypeIdStructure: {
-			RRecordType *ret = g_slice_new(RRecordType);
-			new (ret) RRecordType();
-			return ret;
-		}
+		case Ruminate::TypeIdEnum:
+		case Ruminate::TypeIdStructure:
+			return (RRecordType *) r_tag_type_alloc(id, error);
 		default:
 			g_assert_not_reached();
 	}
@@ -87,10 +86,8 @@ RRecordType *r_record_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE
 
 void r_record_type_free( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 	switch( rrt->id ) {
-		case R_RECORD_TYPE_STRUCTURE:
-		case R_RECORD_TYPE_UNION:
-			rrt->~RRecordType();
-			g_slice_free(RRecordType, rrt);
+		case R_RECORD_TYPE_TAG:
+			r_tag_type_free((RTagType *) rrt);
 			break;
 		case R_RECORD_TYPE_FUNCTION:
 			r_function_type_free((RFunctionType *) rrt);
@@ -103,7 +100,7 @@ void r_record_type_free( RRecordType *rrt ) RUMINATE_NOEXCEPT {
 static bool init_members( RRecordType *rrt, GError **error ) RUMINATE_NOEXCEPT {
 	if( !rrt->members_init ) {
 		RType *rt = (RType *) rrt;
-		if( !gxx_call(rrt->members = rt->type->getMembers(0), error) )
+		if( !gxx_call(rrt->members = rt->type->getMembers(IceUtil::None), error) )
 			return false;
 		rrt->members_init = true;
 	}
