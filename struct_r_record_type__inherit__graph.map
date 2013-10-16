@@ -1,0 +1,5 @@
+<map id="RRecordType" name="RRecordType">
+<area shape="rect" id="node3" href="$struct_r_function_type.html" title="An opaque struct representing a function. " alt="" coords="4,161,115,189"/>
+<area shape="rect" id="node4" href="$struct_r_tag_type.html" title="An opaque struct representing a tagged type. " alt="" coords="139,161,220,189"/>
+<area shape="rect" id="node2" href="$struct_r_type.html" title="An opaque struct representing a type. " alt="" coords="90,6,149,34"/>
+</map>
