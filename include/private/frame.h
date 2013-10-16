@@ -8,6 +8,9 @@ struct RFrame {
 	RType *functionType;
 	Ruminate::Frame frame;
 	gint refcnt;
+	RString *function_name;
+	RString *module_name;
+	RString *compile_unit_name;
 };
 
 RFrameList *r_frame_list_new( Ruminate::FrameList &, GError ** ) RUMINATE_NOEXCEPT;

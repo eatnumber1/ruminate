@@ -1,6 +1,12 @@
+/** The only file you should need to include.
+ *
+ * @file ruminate.h
+ */
+
 #ifndef _RUMINATE_H_
 #define _RUMINATE_H_
 
+/// @private
 #include <glib.h>
 
 #include <sys/types.h>

@@ -7,5 +7,6 @@
 #define RUMINATE_NOEXCEPT
 #endif
 
+/// @private
 __attribute__((deprecated("unimplemented")))
 void unimplemented( GError ** ) RUMINATE_NOEXCEPT;

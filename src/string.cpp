@@ -24,6 +24,10 @@ RString *r_string_new( const char *init ) RUMINATE_NOEXCEPT {
 	return r_string_new(init, strlen(init));
 }
 
+RString *r_string_new( const std::string &init ) RUMINATE_NOEXCEPT {
+	return r_string_new(init.c_str(), init.size());
+}
+
 G_BEGIN_DECLS
 
 RString *r_string_ref( RString *rs ) RUMINATE_NOEXCEPT {
@@ -39,8 +43,12 @@ void r_string_unref( RString *rs ) RUMINATE_NOEXCEPT {
 	}
 }
 
-const char *r_string_bytes( const RString *rs ) RUMINATE_NOEXCEPT {
+const char *r_string_bytes( RString *rs ) RUMINATE_NOEXCEPT {
 	return rs->gstr->str;
+}
+
+size_t r_string_length( RString *rs ) RUMINATE_NOEXCEPT {
+	return rs->gstr->len;
 }
 
 G_END_DECLS

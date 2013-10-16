@@ -1,11 +1,27 @@
-#ifndef _RUMINATE_TYPE_MEMBER_H_
-#define _RUMINATE_TYPE_MEMBER_H_
+/** Type members
+ *
+ * A RTypeMember represents a member of an array (RArrayType) or record
+ * (RRecordType) type.
+ *
+ * @file type_member.h
+ * @see RTypeMember
+ */
 
+/** An identifier denoting the child type of this RTypeMember.
+ *
+ * This identifier can be retrieved using r_type_member_id().
+ *
+ * @enum RTypeMemberId
+ */
 typedef enum RTypeMemberId {
-	R_TYPE_MEMBER_RECORD,
-	R_TYPE_MEMBER_ARRAY
+	R_TYPE_MEMBER_RECORD /** a RRecordMember @see RRecordMember */,
+	R_TYPE_MEMBER_ARRAY /** an array member */
 } RTypeMemberId;
 
+/** An opaque struct representing a type member.
+ *
+ * @struct RTypeMember
+ */
 typedef struct RTypeMember RTypeMember;
 
 G_BEGIN_DECLS
@@ -18,5 +34,3 @@ RTypeMember * RUMINATE_EXPORT r_type_member_ref( RTypeMember * ) RUMINATE_NOEXCE
 void RUMINATE_EXPORT r_type_member_unref( RTypeMember * ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS
-
-#endif

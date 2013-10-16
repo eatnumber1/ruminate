@@ -1,0 +1,3 @@
+DOXYGEN ?= doxygen
+DOXYFILE := $(CURDIR)/Doxyfile
+DOXYDEPS := $(TOPDIR)/README.md

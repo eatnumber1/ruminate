@@ -18,6 +18,7 @@
 #include "ruminate/frame.h"
 
 #include "private/common.h"
+#include "private/string.h"
 #include "private/memory.h"
 #include "private/type.h"
 #include "private/frame.h"
@@ -27,6 +28,9 @@ RFrame *r_frame_new( Ruminate::Frame &frame, GError ** ) RUMINATE_NOEXCEPT {
 	new (ret) RFrame();
 	ret->refcnt = 1;
 	ret->frame = frame;
+	ret->function_name = NULL;
+	ret->module_name = NULL;
+	ret->compile_unit_name = NULL;
 	return ret;
 }
 
@@ -82,21 +86,33 @@ void r_frame_ref( RFrame *frame ) RUMINATE_NOEXCEPT {
 
 void r_frame_unref( RFrame *frame ) RUMINATE_NOEXCEPT {
 	if( g_atomic_int_dec_and_test(&frame->refcnt) ) {
+		if( frame->function_name != NULL ) r_string_unref(frame->function_name);
+		if( frame->module_name != NULL ) r_string_unref(frame->module_name);
+		if( frame->compile_unit_name != NULL ) r_string_unref(frame->compile_unit_name);
 		frame->~RFrame();
 		g_slice_free(RFrame, frame);
 	}
 }
 
-const char *r_frame_function_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
-	return rf->frame.functionName.c_str();
+RString *r_frame_function_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
+	if( rf->function_name == NULL )
+		rf->function_name = r_string_new(rf->frame.functionName);
+
+	return r_string_ref(rf->function_name);
 }
 
-const char *r_frame_module_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
-	return rf->frame.moduleName.c_str();
+RString *r_frame_module_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
+	if( rf->module_name == NULL )
+		rf->module_name = r_string_new(rf->frame.moduleName);
+
+	return r_string_ref(rf->module_name);
 }
 
-const char *r_frame_compile_unit_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
-	return rf->frame.compileUnitName.c_str();
+RString *r_frame_compile_unit_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
+	if( rf->compile_unit_name == NULL )
+		rf->compile_unit_name = r_string_new(rf->frame.compileUnitName);
+
+	return r_string_ref(rf->compile_unit_name);
 }
 
 RType *r_frame_function_type( RFrame *rf, GError **err ) RUMINATE_NOEXCEPT {

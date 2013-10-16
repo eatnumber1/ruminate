@@ -5,9 +5,12 @@ SLICE2PY := slice2py
 
 PKG_CONFIG ?= pkg-config
 
-SUBDIRS := ice include src test
+SUBDIRS := ice include src test doc include/ruminate
 
 CSCOPE_FILES := cscope.out cscope.po.out cscope.in.out
+
+NULL :=
+SPACE := $(NULL) $(NULL)
 
 TOPDIR := $(PWD)
 INCDIR := $(TOPDIR)/include
@@ -40,8 +43,9 @@ DEPCLEAN_TARGETS := $(SUBDIRS:=/depclean)
 ALL_TARGETS := $(SUBDIRS:=/all)
 INSTALL_TARGETS := $(SUBDIRS:=/install)
 TEST_TARGETS := $(SUBDIRS:=/test)
+DOC_TARGETS := $(SUBDIRS:=/doc)
 
-.PHONY: all clean depclean cscope pristine cscope-clean install test
+.PHONY: all clean depclean cscope pristine cscope-clean install test doc
 .DEFAULT_GOAL: all
 
 all: $(ALL_TARGETS)
@@ -50,6 +54,7 @@ depclean: clean $(DEPCLEAN_TARGETS)
 pristine: depclean cscope-clean
 install: $(INSTALL_TARGETS)
 test: $(TEST_TARGETS)
+doc: $(DOC_TARGETS)
 
 cscope-clean:
 	$(RM) $(CSCOPE_FILES)
@@ -63,6 +68,7 @@ $(DEPCLEAN_TARGETS):
 $(ALL_TARGETS):
 $(INSTALL_TARGETS):
 $(TEST_TARGETS):
+$(DOC_TARGETS):
 
 define variableRule
  CURDIR := $$(TOPDIR)/$$$(1)
@@ -73,7 +79,7 @@ $(foreach subdir, $(SUBDIRS), $(eval $(call variableRule, $(subdir))))
 FLAGS_PREPROC_AND_COMPILER_C := $(FLAGS_PREPROC_AND_COMPILER) $(FLAGS_PREPROC_AND_COMPILER_C)
 FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER) $(FLAGS_PREPROC_AND_COMPILER_CXX)
 
-FLAGS_PREPROCESSOR := $(FLAGS_ALL) $(FLAGS_PREPROCESSOR)
+FLAGS_PREPROCESSOR := $(FLAGS_ALL) $(FLAGS_PREPROCESSOR) $(FLAGS_PREPROC_AND_COMPILER)
 FLAGS_PREPROCESSOR_C := $(FLAGS_PREPROCESSOR) $(FLAGS_PREPROCESSOR_C)
 FLAGS_PREPROCESSOR_CXX := $(FLAGS_PREPROCESSOR) $(FLAGS_PREPROCESSOR_CXX)
 
@@ -92,6 +98,7 @@ define subdirRule
  $$$(1)/clean: CURDIR := $$(CURDIR)
  $$$(1)/depclean: CURDIR := $$(CURDIR)
  $$$(1)/install: CURDIR := $$(CURDIR)
+ $$$(1)/doc: CURDIR := $$(CURDIR)
  $$$(1)/test: CURDIR := $$(CURDIR)
  include $$(CURDIR)/Makefile
 endef

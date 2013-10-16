@@ -28,15 +28,25 @@ void abort_with_backtrace( const char *message ) {
 	for( size_t i = 0; i < frames_len; i++ ) {
 		RFrame *frame = r_frame_list_at(frames, i, &err);
 		abort_if_error(err);
-		const char *fname = r_frame_function_name(frame, &err);
+		RString *fname = r_frame_function_name(frame, &err);
 		abort_if_error(err);
-		const char *mname = r_frame_module_name(frame, &err);
+		RString *mname = r_frame_module_name(frame, &err);
 		abort_if_error(err);
-		const char *cuname = r_frame_compile_unit_name(frame, &err);
+		RString *cuname = r_frame_compile_unit_name(frame, &err);
 		abort_if_error(err);
 		uint32_t line = r_frame_line(frame, &err);
 		abort_if_error(err);
-		fprintf(stderr, "\tat %s(%s, %s:%d)\n", fname, mname, cuname, line);
+		fprintf(
+			stderr,
+			"\tat %s(%s, %s:%d)\n",
+			r_string_bytes(fname),
+			r_string_bytes(mname),
+			r_string_bytes(cuname),
+			line
+		);
+		r_string_unref(cuname);
+		r_string_unref(mname);
+		r_string_unref(fname);
 	}
 
 	r_frame_list_unref(frames);

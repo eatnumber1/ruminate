@@ -1,12 +1,37 @@
+/** Error handling facilities.
+ * 
+ * Every function which takes as an argument a `GError **` reports errors
+ * through this pointer.
+ *
+ * In brief, pass `NULL` as the `GError **` argument to functions or pass a
+ * pointer to a `NULL` `GError *` to recieve a `GError` when an error occurs.
+ *
+ * @see [GError](https://developer.gnome.org/glib/2.34/glib-Error-Reporting.html)
+ * @file errors.h
+ */
+
 #ifndef _RUMINATE_ERRORS_H_
 #define _RUMINATE_ERRORS_H_
 
 G_BEGIN_DECLS
 
+/// @private
 GQuark ruminate_error_quark();
 
-#define RUMINATE_ERROR ruminate_error_quark()
+/** The error quark representing errors produced by this library.
+ *
+ * This quark will be placed in the `domain` field of a `GError` produced when
+ * an error occurrs.
+ *
+ * @see [GQuark](https://developer.gnome.org/glib/2.34/glib-Quarks.html)
+ */
+#define RUMINATE_ERROR (ruminate_error_quark())
 
+/** The various errors produced by rumination.
+ *
+ * These will be placed in the `code` field of a `GError` produced when an error
+ * occurrs.
+ */
 typedef enum {
 	RUMINATE_ERROR_SB_INVALID,
 	RUMINATE_ERROR_LLDB_ERROR,

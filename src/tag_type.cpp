@@ -77,7 +77,7 @@ RTagTypeId r_tag_type_id( RTagType *rtt, GError **error ) RUMINATE_NOEXCEPT {
 	return rtt->id;
 }
 
-const RString *r_tag_type_name( RTagType *, GError **error ) RUMINATE_NOEXCEPT {
+RString *r_tag_type_name( RTagType *, GError **error ) RUMINATE_NOEXCEPT {
 	unimplemented(error);
 	return NULL;
 }
