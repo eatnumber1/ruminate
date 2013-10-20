@@ -26,7 +26,24 @@ typedef struct RRecordMember RRecordMember;
 
 G_BEGIN_DECLS
 
-RRecordMemberId RUMINATE_EXPORT r_record_member_id( RRecordMember *, GError ** ) RUMINATE_NOEXCEPT;
-RString * RUMINATE_EXPORT r_record_member_name( RRecordMember *, GError ** ) RUMINATE_NOEXCEPT;
+/** Get the real type identifier of this record member.
+ *
+ * @memberof RRecordMember
+ * @return the real type of this record member
+ */
+RRecordMemberId RUMINATE_EXPORT r_record_member_id(
+	RRecordMember *member /** [in] the record member to get the id of */,
+	GError **error /** [out] see errors.h */
+) RUMINATE_NOEXCEPT;
+
+/** Get the name of this record member
+ *
+ * @memberof RRecordMember
+ * @return a RString containing the name of this record member
+ */
+RString * RUMINATE_EXPORT r_record_member_name(
+	RRecordMember *member /** [in] the record member to get the name of */,
+	GError **error /** [in] see errors.h */
+) RUMINATE_NOEXCEPT;
 
 G_END_DECLS

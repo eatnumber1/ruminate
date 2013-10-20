@@ -9,12 +9,12 @@ G_BEGIN_DECLS
  *
  * This function frees all internal resources of the ruminate framework.
  * Undefined behavior results if any ruminate framework functions are called
- * after this function is called and returns true.
+ * after this function returns `true`.
  *
  * @return Whether or not an error occurred.
  */
 bool RUMINATE_EXPORT rumination_destroy(
-	GError **error /** [in,out] a pointer to see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /** Initialize the ruminate framework.
@@ -26,7 +26,7 @@ bool RUMINATE_EXPORT rumination_destroy(
 bool RUMINATE_EXPORT rumination_init(
 	int *arglen /** [in,out] a pointer to the number of arguments */,
 	char *args[] /** [in,out] an array of string arguments */,
-	GError **error /** [in,out] a pointer to see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /// @private
@@ -43,7 +43,7 @@ RType * RUMINATE_EXPORT rumination_end_get_type_by_variable_name( void *, GError
  *         r_frame_list_unref().
  */
 RFrameList * RUMINATE_EXPORT rumination_backtrace(
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /// @private
@@ -61,7 +61,7 @@ G_END_DECLS
  * rumination_init().
  *
  * @param[in] expr The expression to determine the type of.
- * @param[in,out] error a pointer to a pointer to a `GError`. see errors.h
+ * @param[out] error see errors.h
  * @return A pointer to an RType or `NULL` if an error occurred. This RType
  *         must be freed using r_type_unref().
  */

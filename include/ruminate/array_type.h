@@ -14,7 +14,7 @@ G_BEGIN_DECLS
  */
 size_t RUMINATE_EXPORT r_array_type_size(
 	RArrayType *type /** [in] the type to get the size of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /** Get the type of a member of this array.
@@ -25,7 +25,7 @@ size_t RUMINATE_EXPORT r_array_type_size(
 RTypeMember * RUMINATE_EXPORT r_array_type_member_at(
 	RArrayType *type /** [in] the type to get the member type of */,
 	size_t index /** [in] the index in the array to get the member type of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS

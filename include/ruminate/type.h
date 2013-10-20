@@ -40,7 +40,7 @@ G_BEGIN_DECLS
  */
 RTypeId RUMINATE_EXPORT r_type_id(
 	RType *type /** [in] the type to retrieve the type id of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /** Get the name of this type.
@@ -50,7 +50,7 @@ RTypeId RUMINATE_EXPORT r_type_id(
  */
 RString * RUMINATE_EXPORT r_type_name(
 	RType *type /** [in] the type to retrieve the name of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /** Increase the reference count of this type
@@ -79,7 +79,7 @@ void RUMINATE_EXPORT r_type_unref(
  */
 RType * RUMINATE_EXPORT r_type_pointer(
 	RType *type /** [in] the type to get a pointer to */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS

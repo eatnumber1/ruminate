@@ -26,11 +26,54 @@ typedef struct RTypeMember RTypeMember;
 
 G_BEGIN_DECLS
 
-RTypeMemberId RUMINATE_EXPORT r_type_member_id( RTypeMember *, GError ** ) RUMINATE_NOEXCEPT;
-RType * RUMINATE_EXPORT r_type_member_type( RTypeMember *, GError ** ) RUMINATE_NOEXCEPT;
-off_t RUMINATE_EXPORT r_type_member_offset( RTypeMember *, GError ** ) RUMINATE_NOEXCEPT;
+/** Get the type member id of this RTypeMember
+ *
+ * @memberof RTypeMember
+ */
+RTypeMemberId RUMINATE_EXPORT r_type_member_id(
+	RTypeMember *member /** [in] the type member to get the id of */,
+	GError **error /** [out] see errors.h */
+) RUMINATE_NOEXCEPT;
 
-RTypeMember * RUMINATE_EXPORT r_type_member_ref( RTypeMember * ) RUMINATE_NOEXCEPT;
-void RUMINATE_EXPORT r_type_member_unref( RTypeMember * ) RUMINATE_NOEXCEPT;
+/** Get the type of this type member.
+ *
+ * @memberof RTypeMember
+ */
+RType * RUMINATE_EXPORT r_type_member_type(
+	RTypeMember *member /** [in] the type member to get the type of */,
+	GError **error /** [out] see errors.h */
+) RUMINATE_NOEXCEPT;
+
+/** Get the offset of this type member into it's container.
+ *
+ * This is the number of bytes into this type member's container (either an
+ * RArrayType, or an RRecordType) that this member is located.
+ *
+ * @memberof RTypeMember
+ * @see RArrayType
+ * @see RRecordType
+ */
+off_t RUMINATE_EXPORT r_type_member_offset(
+	RTypeMember *member /** [in] the type member to get the offset of */,
+	GError **error /** [out] see errors.h */
+) RUMINATE_NOEXCEPT;
+
+/** Increment the reference count of this RTypeMember.
+ *
+ * @memberof RTypeMember
+ */
+RTypeMember * RUMINATE_EXPORT r_type_member_ref(
+	RTypeMember *member /** [in] the type member to increment the reference count of */
+) RUMINATE_NOEXCEPT;
+
+/** Decrement the reference count of this RTypeMember.
+ *
+ * If the reference count reaches zero, this RTypeMember will be freed.
+ *
+ * @memberof RTypeMember
+ */
+void RUMINATE_EXPORT r_type_member_unref(
+	RTypeMember *member /** [in] the type member to decrement the reference count of */
+) RUMINATE_NOEXCEPT;
 
 G_END_DECLS

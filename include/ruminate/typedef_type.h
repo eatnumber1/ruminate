@@ -25,7 +25,7 @@ G_BEGIN_DECLS
  */
 RType * RUMINATE_EXPORT r_typedef_type_canonical(
 	RTypedefType * /** [in] the type to canonicalize */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS

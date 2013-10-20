@@ -41,7 +41,7 @@ G_BEGIN_DECLS
  */
 RTagTypeId RUMINATE_EXPORT r_tag_type_id(
 	RTagType *type /** [in] the tagged type to retrieve the id of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /** Get the tag name of this tagged type.
@@ -52,7 +52,7 @@ RTagTypeId RUMINATE_EXPORT r_tag_type_id(
  */
 RString * RUMINATE_EXPORT r_tag_type_name(
 	RTagType *type /** [in] the type to get the tag name of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS

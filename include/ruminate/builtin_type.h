@@ -41,7 +41,7 @@ G_BEGIN_DECLS
  */
 RBuiltinTypeId RUMINATE_EXPORT r_builtin_type_id(
 	RBuiltinType *type /** [in] the builtin type to retrieve the id of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /** Determine if this type is signed.
@@ -53,7 +53,7 @@ RBuiltinTypeId RUMINATE_EXPORT r_builtin_type_id(
  */
 bool RUMINATE_EXPORT r_builtin_type_is_signed(
 	RBuiltinType *type /** [in] the type to determine the signedness of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /** Determine if this type is unsigned.
@@ -65,7 +65,7 @@ bool RUMINATE_EXPORT r_builtin_type_is_signed(
  */
 bool RUMINATE_EXPORT r_builtin_type_is_unsigned(
 	RBuiltinType *type /** [in] the type to determine the signedness of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS

@@ -14,7 +14,7 @@ G_BEGIN_DECLS
  */
 RType * RUMINATE_EXPORT r_pointer_type_pointee(
 	RPointerType *type /** [in] the type to dereference */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS

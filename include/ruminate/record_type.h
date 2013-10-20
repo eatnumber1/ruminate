@@ -39,7 +39,7 @@ G_BEGIN_DECLS
  */
 RRecordTypeId RUMINATE_EXPORT r_record_type_id(
 	RRecordType *type /** [in] the record type to retrieve the id of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /** Get the number of members in this record type.
@@ -49,7 +49,7 @@ RRecordTypeId RUMINATE_EXPORT r_record_type_id(
  */
 size_t RUMINATE_EXPORT r_record_type_nmembers(
 	RRecordType *type /** [in] the type to get the number of members of */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /** Get a record's member at a specified index.
@@ -61,7 +61,7 @@ size_t RUMINATE_EXPORT r_record_type_nmembers(
 RRecordMember * RUMINATE_EXPORT r_record_type_member_at(
 	RRecordType *type /** [in] the record type to retrieve a member of */,
 	size_t index /** [in] the index of the member */,
-	GError **error /** [in,out] see errors.h */
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 G_END_DECLS
