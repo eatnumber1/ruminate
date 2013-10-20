@@ -87,6 +87,9 @@ $(document).ready(function(){initNavTree('struct_r_frame_list.html','');});
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="struct_r_frame_list-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">RFrameList Struct Reference</div>  </div>
 </div><!--header-->
@@ -94,11 +97,157 @@ $(document).ready(function(){initNavTree('struct_r_frame_list.html','');});
 
 <p>An opaque struct representing a call stack.  
  <a href="struct_r_frame_list.html#details">More...</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a9058fdf39e9738a3adf2379e767b3d20"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame_list.html#a9058fdf39e9738a3adf2379e767b3d20">r_frame_list_size</a> (<a class="el" href="struct_r_frame_list.html">RFrameList</a> *list, GError **error)</td></tr>
+<tr class="memdesc:a9058fdf39e9738a3adf2379e767b3d20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of elements in this frame list.  <a href="#a9058fdf39e9738a3adf2379e767b3d20">More...</a><br/></td></tr>
+<tr class="separator:a9058fdf39e9738a3adf2379e767b3d20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad39dc50f681a5576da3fb1d7b08398bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_r_frame.html">RFrame</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame_list.html#ad39dc50f681a5576da3fb1d7b08398bd">r_frame_list_at</a> (<a class="el" href="struct_r_frame_list.html">RFrameList</a> *list, size_t index, GError **error)</td></tr>
+<tr class="memdesc:ad39dc50f681a5576da3fb1d7b08398bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a> from this <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a>.  <a href="#ad39dc50f681a5576da3fb1d7b08398bd">More...</a><br/></td></tr>
+<tr class="separator:ad39dc50f681a5576da3fb1d7b08398bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ed414a8b2cd92778f91e391bb9db882"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame_list.html#a7ed414a8b2cd92778f91e391bb9db882">r_frame_list_ref</a> (<a class="el" href="struct_r_frame_list.html">RFrameList</a> *list)</td></tr>
+<tr class="memdesc:a7ed414a8b2cd92778f91e391bb9db882"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increment the reference count on this <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a>.  <a href="#a7ed414a8b2cd92778f91e391bb9db882">More...</a><br/></td></tr>
+<tr class="separator:a7ed414a8b2cd92778f91e391bb9db882"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2f57f2088ab983a15cfae4dd59fa80d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame_list.html#ab2f57f2088ab983a15cfae4dd59fa80d">r_frame_list_unref</a> (<a class="el" href="struct_r_frame_list.html">RFrameList</a> *list)</td></tr>
+<tr class="memdesc:ab2f57f2088ab983a15cfae4dd59fa80d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrement the reference count of this <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a>.  <a href="#ab2f57f2088ab983a15cfae4dd59fa80d">More...</a><br/></td></tr>
+<tr class="separator:ab2f57f2088ab983a15cfae4dd59fa80d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An opaque struct representing a call stack. </p>
+<p>A call stack is a list of one or more <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a> instances.</p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a> </dd></dl>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>ruminate/<a class="el" href="frame_8h.html">frame.h</a></li>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ad39dc50f681a5576da3fb1d7b08398bd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_r_frame.html">RFrame</a> * r_frame_list_at </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame_list.html">RFrameList</a> *&#160;</td>
+          <td class="paramname"><em>list</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get an <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a> from this <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>the <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a> at index <em>index</em> </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">list</td><td>the frame list to get an element from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">index</td><td>the index of the <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a> to get </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a7ed414a8b2cd92778f91e391bb9db882"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void r_frame_list_ref </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame_list.html">RFrameList</a> *&#160;</td>
+          <td class="paramname"><em>list</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Increment the reference count on this <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">list</td><td>the frame list to increment the reference count of </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a9058fdf39e9738a3adf2379e767b3d20"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t r_frame_list_size </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame_list.html">RFrameList</a> *&#160;</td>
+          <td class="paramname"><em>list</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the number of elements in this frame list. </p>
+<dl class="section return"><dt>Returns</dt><dd>the number of elements in this frame list. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">list</td><td>the frame list to get the size of </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab2f57f2088ab983a15cfae4dd59fa80d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void r_frame_list_unref </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame_list.html">RFrameList</a> *&#160;</td>
+          <td class="paramname"><em>list</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Decrement the reference count of this <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a>. </p>
+<p>The <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a> will be freed if it's reference count drops to zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">list</td><td>the frame list to decrement the reference count of </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>ruminate/frame.h</li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -106,7 +255,7 @@ $(document).ready(function(){initNavTree('struct_r_frame_list.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="struct_r_frame_list.html">RFrameList</a></li>
-    <li class="footer">Generated on Mon Oct 14 2013 22:31:13 for Ruminate by
+    <li class="footer">Generated on Sun Oct 20 2013 11:48:40 for Ruminate by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

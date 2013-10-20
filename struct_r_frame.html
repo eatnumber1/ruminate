@@ -87,6 +87,9 @@ $(document).ready(function(){initNavTree('struct_r_frame.html','');});
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="struct_r_frame-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">RFrame Struct Reference</div>  </div>
 </div><!--header-->
@@ -94,10 +97,267 @@ $(document).ready(function(){initNavTree('struct_r_frame.html','');});
 
 <p>An opaque struct representing a call stack frame.  
  <a href="struct_r_frame.html#details">More...</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:afe2c073f2e782ec284f7a5a390ab9725"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame.html#afe2c073f2e782ec284f7a5a390ab9725">r_frame_ref</a> (<a class="el" href="struct_r_frame.html">RFrame</a> *frame)</td></tr>
+<tr class="memdesc:afe2c073f2e782ec284f7a5a390ab9725"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increment the reference count of this <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a>.  <a href="#afe2c073f2e782ec284f7a5a390ab9725">More...</a><br/></td></tr>
+<tr class="separator:afe2c073f2e782ec284f7a5a390ab9725"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1326ea97655ac6fb1ad27b663dd6bba4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame.html#a1326ea97655ac6fb1ad27b663dd6bba4">r_frame_unref</a> (<a class="el" href="struct_r_frame.html">RFrame</a> *frame)</td></tr>
+<tr class="memdesc:a1326ea97655ac6fb1ad27b663dd6bba4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrement the reference count of this <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a>.  <a href="#a1326ea97655ac6fb1ad27b663dd6bba4">More...</a><br/></td></tr>
+<tr class="separator:a1326ea97655ac6fb1ad27b663dd6bba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a8357f0188f0700229479fd10a5215e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_r_string.html">RString</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame.html#a1a8357f0188f0700229479fd10a5215e">r_frame_function_name</a> (<a class="el" href="struct_r_frame.html">RFrame</a> *frame, GError **error)</td></tr>
+<tr class="memdesc:a1a8357f0188f0700229479fd10a5215e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the function this <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a> represents.  <a href="#a1a8357f0188f0700229479fd10a5215e">More...</a><br/></td></tr>
+<tr class="separator:a1a8357f0188f0700229479fd10a5215e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15348a02f579ddd131d970875f91c521"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_r_string.html">RString</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame.html#a15348a02f579ddd131d970875f91c521">r_frame_module_name</a> (<a class="el" href="struct_r_frame.html">RFrame</a> *frame, GError **error)</td></tr>
+<tr class="memdesc:a15348a02f579ddd131d970875f91c521"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the module which contains this frame.  <a href="#a15348a02f579ddd131d970875f91c521">More...</a><br/></td></tr>
+<tr class="separator:a15348a02f579ddd131d970875f91c521"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc61d8ba92f3b69d72057332c01395e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_r_string.html">RString</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame.html#adc61d8ba92f3b69d72057332c01395e3">r_frame_compile_unit_name</a> (<a class="el" href="struct_r_frame.html">RFrame</a> *frame, GError **error)</td></tr>
+<tr class="memdesc:adc61d8ba92f3b69d72057332c01395e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the compile unit which contains this frame.  <a href="#adc61d8ba92f3b69d72057332c01395e3">More...</a><br/></td></tr>
+<tr class="separator:adc61d8ba92f3b69d72057332c01395e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad19bde1c7cf7daa99e3b31d6bf51ec03"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_r_type.html">RType</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame.html#ad19bde1c7cf7daa99e3b31d6bf51ec03">r_frame_function_type</a> (<a class="el" href="struct_r_frame.html">RFrame</a> *frame, GError **error)</td></tr>
+<tr class="memdesc:ad19bde1c7cf7daa99e3b31d6bf51ec03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the type of this function.  <a href="#ad19bde1c7cf7daa99e3b31d6bf51ec03">More...</a><br/></td></tr>
+<tr class="separator:ad19bde1c7cf7daa99e3b31d6bf51ec03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a998c79641f63fe8e968676170cd563e1"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_frame.html#a998c79641f63fe8e968676170cd563e1">r_frame_line</a> (<a class="el" href="struct_r_frame.html">RFrame</a> *frame, GError **error)</td></tr>
+<tr class="memdesc:a998c79641f63fe8e968676170cd563e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the line number that this frame is at.  <a href="#a998c79641f63fe8e968676170cd563e1">More...</a><br/></td></tr>
+<tr class="separator:a998c79641f63fe8e968676170cd563e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An opaque struct representing a call stack frame. </p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>ruminate/<a class="el" href="frame_8h.html">frame.h</a></li>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="adc61d8ba92f3b69d72057332c01395e3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_r_string.html">RString</a> * r_frame_compile_unit_name </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame.html">RFrame</a> *&#160;</td>
+          <td class="paramname"><em>frame</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the name of the compile unit which contains this frame. </p>
+<p>This is usually the name of the file which defined this function.</p>
+<dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="struct_r_string.html" title="An opaque struct representing a string. ">RString</a> containing the name of this compile unit. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">frame</td><td>the frame to get the compile unit name of </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a1a8357f0188f0700229479fd10a5215e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_r_string.html">RString</a> * r_frame_function_name </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame.html">RFrame</a> *&#160;</td>
+          <td class="paramname"><em>frame</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the name of the function this <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a> represents. </p>
+<dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="struct_r_string.html" title="An opaque struct representing a string. ">RString</a> containing the name of this function. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">frame</td><td>the frame to get the name of </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ad19bde1c7cf7daa99e3b31d6bf51ec03"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_r_type.html">RType</a> * r_frame_function_type </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame.html">RFrame</a> *&#160;</td>
+          <td class="paramname"><em>frame</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the type of this function. </p>
+<dl class="section return"><dt>Returns</dt><dd>an <a class="el" href="struct_r_type.html" title="An opaque struct representing a type. ">RType</a> representing the type of this function. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">frame</td><td>the frame to get the type of </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a998c79641f63fe8e968676170cd563e1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t r_frame_line </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame.html">RFrame</a> *&#160;</td>
+          <td class="paramname"><em>frame</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the line number that this frame is at. </p>
+<dl class="section return"><dt>Returns</dt><dd>the line number that this frame is at </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">frame</td><td>the frame to get the line number of </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a15348a02f579ddd131d970875f91c521"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_r_string.html">RString</a> * r_frame_module_name </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame.html">RFrame</a> *&#160;</td>
+          <td class="paramname"><em>frame</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the name of the module which contains this frame. </p>
+<p>This is usually the name of the executable or library.</p>
+<dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="struct_r_string.html" title="An opaque struct representing a string. ">RString</a> containing the name of this module. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">frame</td><td>the frame to get the module name of </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="afe2c073f2e782ec284f7a5a390ab9725"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void r_frame_ref </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame.html">RFrame</a> *&#160;</td>
+          <td class="paramname"><em>frame</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Increment the reference count of this <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">frame</td><td>the frame to increment the reference count of </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a1326ea97655ac6fb1ad27b663dd6bba4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void r_frame_unref </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_frame.html">RFrame</a> *&#160;</td>
+          <td class="paramname"><em>frame</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Decrement the reference count of this <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a>. </p>
+<p>The <a class="el" href="struct_r_frame.html" title="An opaque struct representing a call stack frame. ">RFrame</a> will be freed if it's reference count drops to zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">frame</td><td>the frame to decrement the reference count of </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>ruminate/frame.h</li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -105,7 +365,7 @@ $(document).ready(function(){initNavTree('struct_r_frame.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="struct_r_frame.html">RFrame</a></li>
-    <li class="footer">Generated on Mon Oct 14 2013 22:31:13 for Ruminate by
+    <li class="footer">Generated on Sun Oct 20 2013 11:48:40 for Ruminate by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

@@ -149,7 +149,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">expr</td><td>The expression to determine the type of. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">error</td><td>a pointer to a pointer to a <code>GError</code>. see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -174,10 +174,10 @@ Functions</h2></td></tr>
 
 <p>Generate a backtrace. </p>
 <p>This function generates a backtrace of the caller's call stack.</p>
-<dl class="section return"><dt>Returns</dt><dd>A pointer to an <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a> representing the frames found in the caller's call stack. This <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a> must be freed using r_frame_list_unref(). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to an <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a> representing the frames found in the caller's call stack. This <a class="el" href="struct_r_frame_list.html" title="An opaque struct representing a call stack. ">RFrameList</a> must be freed using <a class="el" href="struct_r_frame_list.html#ab2f57f2088ab983a15cfae4dd59fa80d" title="Decrement the reference count of this RFrameList. ">r_frame_list_unref()</a>. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -199,11 +199,11 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>De-initialize the ruminate framework. </p>
-<p>This function frees all internal resources of the ruminate framework. Undefined behavior results if any ruminate framework functions are called after this function is called and returns true.</p>
+<p>This function frees all internal resources of the ruminate framework. Undefined behavior results if any ruminate framework functions are called after this function returns <code>true</code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>Whether or not an error occurred. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">error</td><td>a pointer to see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -247,7 +247,7 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">arglen</td><td>a pointer to the number of arguments </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">args</td><td>an array of string arguments </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">error</td><td>a pointer to see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -260,7 +260,7 @@ Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_1229bae49d98528e082d5169ebe9d673.html">ruminate</a></li><li class="navelem"><a class="el" href="rumination_8h.html">rumination.h</a></li>
-    <li class="footer">Generated on Mon Oct 14 2013 22:31:13 for Ruminate by
+    <li class="footer">Generated on Sun Oct 20 2013 11:48:40 for Ruminate by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>
