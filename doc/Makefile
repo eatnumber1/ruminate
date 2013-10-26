@@ -1,9 +1,6 @@
-.PHONY: doc/doc doc/clean doc/doc
+.PHONY: doc/doc doc/doc
 
 doc/all: doc/doc
-
-doc/clean:
-	$(RM) -r doc/html
 
 doc/doc: doc/html
 

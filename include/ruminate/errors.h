@@ -10,23 +10,6 @@
  * @file errors.h
  */
 
-#ifndef _RUMINATE_ERRORS_H_
-#define _RUMINATE_ERRORS_H_
-
-G_BEGIN_DECLS
-
-/// @private
-GQuark ruminate_error_quark();
-
-/** The error quark representing errors produced by this library.
- *
- * This quark will be placed in the `domain` field of a `GError` produced when
- * an error occurrs.
- *
- * @see [GQuark](https://developer.gnome.org/glib/2.34/glib-Quarks.html)
- */
-#define RUMINATE_ERROR (ruminate_error_quark())
-
 /** The various errors produced by rumination.
  *
  * These will be placed in the `code` field of a `GError` produced when an error
@@ -41,11 +24,35 @@ typedef enum {
 	RUMINATE_ERROR_INCOMPLETE_TYPE,
 	RUMINATE_ERROR_ICE,
 	RUMINATE_ERROR_STDLIB,
-	RUMINATE_ERROR_ERRNO,
+	RUMINATE_ERROR_SHORT_READ,
 	RUMINATE_ERROR_UNIMPLEMENTED,
 	RUMINATE_ERROR_UNSPEC
 } RuminateError;
 
+G_BEGIN_DECLS
+
+/// @private
+GQuark ruminate_error_quark();
+
+/// @private
+GQuark ruminate_errno_quark();
+
 G_END_DECLS
 
-#endif
+/** The error quark representing errors produced by this library.
+ *
+ * This quark will be placed in the `domain` field of a `GError` produced when
+ * an error occurrs.
+ *
+ * @see [GQuark](https://developer.gnome.org/glib/2.34/glib-Quarks.html)
+ */
+#define RUMINATE_ERROR (ruminate_error_quark())
+
+/** The error quark representing errors produced by the standard C library.
+ *
+ * This quark will be placed in the `domain` field of a `GError` produced when
+ * an error occurrs.
+ *
+ * @see [GQuark](https://developer.gnome.org/glib/2.34/glib-Quarks.html)
+ */
+#define RUMINATE_ERRNO_ERROR (ruminate_errno_quark())

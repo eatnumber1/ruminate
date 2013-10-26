@@ -30,6 +30,7 @@
 #include "ruminate/rumination.h"
 
 #include "private/common.h"
+#include "private/errors.h"
 #include "private/gettid.h"
 #include "private/memory.h"
 #include "private/type.h"
@@ -52,7 +53,7 @@ void rumination_hit_breakpoint() RUMINATE_NOEXCEPT {
 
 static void setup_env() RUMINATE_NOEXCEPT {
 	// TODO: Remove this
-	setenv("PYTHONPATH", "ice:src:.:/usr/local/lib/python2.7/site-packages", true);
+	setenv("PYTHONPATH", "ice:src", true);
 }
 
 static gint fork_child( GError **err ) RUMINATE_NOEXCEPT {
@@ -96,12 +97,20 @@ static int read_child_port( gint child_stdout, GError **error ) RUMINATE_NOEXCEP
 	do {
 		ssize_t count = read(child_stdout, port_ptr, sizeof(int) - nb_read);
 		if( count == -1 ) {
-			// TODO: Error handling
-			g_assert(false);
+			r_perror(error, "read");
+			return -1;
 		}
 		nb_read += count;
 		port_ptr += count;
-		g_assert(nb_read > 0);
+		if( nb_read == 0 ) {
+			g_set_error_literal(
+				error,
+				RUMINATE_ERROR,
+				RUMINATE_ERROR_SHORT_READ,
+				"Couldn't read listening port from child"
+			);
+			return -1;
+		}
 		g_assert(nb_read <= sizeof(int));
 	} while( nb_read != sizeof(int) );
 

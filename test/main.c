@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <signal.h>
 
+#if 0
 typedef struct SubprocessTestFunction {
 	void (*parent)( int );
 	GTestFunc child;
@@ -86,6 +87,51 @@ int main( int argc, char **argv ) {
 		.child = test_signal_delivery_subprocess
 	};
 	g_test_add_data_func("/signal", &test_signal_delivery_data, (GTestDataFunc) test_with_subprocess);
+
+	return g_test_run();
+}
+#endif
+
+static void do_rumination_init( char **prgname ) {
+	GError *err = NULL;
+	int argc = 1;
+	*prgname = g_strdup(g_get_prgname());
+	char *argv[] = { *prgname, NULL };
+
+	rumination_init(&argc, argv, &err);
+	g_assert_no_error(err);
+}
+
+static void do_rumination_destroy( char **prgname ) {
+	GError *err = NULL;
+
+	rumination_destroy(&err);
+	g_assert_no_error(err);
+	g_free(*prgname);
+}
+
+#if 0
+static void test_rumination_init_and_destroy_subprocess() {
+	char *prgname;
+	do_rumination_init(&prgname);
+	do_rumination_destroy(&prgname);
+}
+#endif
+
+static void test_rumination_init_and_destroy() {
+	//g_test_trap_subprocess("/init_and_destroy/subprocess", 5 * G_USEC_PER_SEC, G_TEST_SUBPROCESS_INHERIT_STDERR | G_TEST_SUBPROCESS_INHERIT_STDOUT);
+	//g_test_trap_assert_passed();
+
+	char *prgname;
+	do_rumination_init(&prgname);
+	do_rumination_destroy(&prgname);
+}
+
+int main( int argc, char **argv ) {
+	g_test_init(&argc, &argv, NULL);
+
+	g_test_add_func("/init_and_destroy", test_rumination_init_and_destroy);
+	//g_test_add_func("/init_and_destroy/subprocess", test_rumination_init_and_destroy_subprocess);
 
 	return g_test_run();
 }

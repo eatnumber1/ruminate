@@ -3,6 +3,12 @@ import sys, os, struct, Ice
 from Ruminate import *
 from debugger_factory_impl import *
 
+try:
+	import lldb
+except ImportError:
+	sys.path.insert(0, subprocess.check_output("lldb -P", shell = True).strip())
+	import lldb
+
 class Server(Ice.Application):
 	def interruptCallback(self, sig):
 		if self.factory != None:
