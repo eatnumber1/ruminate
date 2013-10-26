@@ -18,7 +18,7 @@ void foo() {
 
 int main( int argc, char *argv[] ) {
 	GError *err = NULL;
-	rumination_init(&argc, argv, &err);
+	ruminate_init(&argc, argv, &err);
 	g_assert_no_error(err);
 	foo();
 }

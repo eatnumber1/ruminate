@@ -16,7 +16,7 @@
 #include "ruminate/type_member.h"
 #include "ruminate/array_type.h"
 #include "ruminate/frame.h"
-#include "ruminate/rumination.h"
+#include "ruminate/ruminate.h"
 
 #include "private/gettid.h"
 #include "private/common.h"
@@ -54,7 +54,7 @@ static bool init_members( RArrayType *rat, GError **error ) RUMINATE_NOEXCEPT {
 		RType *rt = (RType *) rat;
 		// TODO: Handle exceptions
 		Ice::AsyncResultPtr arp = rt->type->begin_getMembers(gettid());
-		rumination_hit_breakpoint();
+		ruminate_hit_breakpoint();
 		rat->members.value = rt->type->end_getMembers(arp);
 		rat->members.valid = true;
 	}

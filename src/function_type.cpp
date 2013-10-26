@@ -20,7 +20,7 @@
 #include "ruminate/type_member.h"
 #include "ruminate/function_type.h"
 #include "ruminate/frame.h"
-#include "ruminate/rumination.h"
+#include "ruminate/ruminate.h"
 
 #include "private/common.h"
 #include "private/gettid.h"
@@ -78,7 +78,7 @@ RString *r_function_type_name( RFunctionType *rft, GError **error ) RUMINATE_NOE
 		Ice::AsyncResultPtr arp;
 		if( !gxx_call(arp = rt->type->begin_getName(gettid()), error) )
 			return NULL;
-		rumination_hit_breakpoint();
+		ruminate_hit_breakpoint();
 		if( !gxx_call(name = rt->type->end_getName(arp), error) )
 			return NULL;
 		rft->name = r_string_new(name.c_str());

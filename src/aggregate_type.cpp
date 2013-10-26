@@ -20,7 +20,7 @@
 #include "ruminate/tag_type.h"
 #include "ruminate/function_type.h"
 #include "ruminate/frame.h"
-#include "ruminate/rumination.h"
+#include "ruminate/ruminate.h"
 
 #include "private/common.h"
 #include "private/gettid.h"

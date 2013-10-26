@@ -15,7 +15,7 @@ SRC_SOURCES := \
 	aggregate_member.cpp \
 	type_member.cpp \
 	frame.cpp \
-	rumination.cpp
+	ruminate.cpp
 SRC_SOURCES := $(SRC_SOURCES:%=$(CURDIR)/%)
 
 SRC_OBJECTS := $(SRC_SOURCES:.c=.o)

@@ -7,7 +7,7 @@ INCLUDE_RUMINATE_PUBLIC_HEADERS := \
 	pointer_type.h \
 	aggregate_member.h \
 	aggregate_type.h \
-	rumination.h \
+	ruminate.h \
 	string.h \
 	tag_type.h \
 	type.h \

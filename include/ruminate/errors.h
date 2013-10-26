@@ -10,7 +10,7 @@
  * @file errors.h
  */
 
-/** The various errors produced by rumination.
+/** The various errors produced by ruminate.
  *
  * These will be placed in the `code` field of a `GError` produced when an error
  * occurrs.

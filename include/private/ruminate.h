@@ -5,4 +5,4 @@ typedef struct {
 	// TODO: Deal with bad states
 	Ice::AsyncResultPtr arp;
 	GPid child_pid;
-} Rumination;
+} Ruminate;

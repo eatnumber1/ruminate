@@ -1,6 +1,6 @@
 /** Top-level and utility functions.
  *
- * @file rumination.h
+ * @file include/ruminate/ruminate.h
  */
 
 G_BEGIN_DECLS
@@ -13,7 +13,7 @@ G_BEGIN_DECLS
  *
  * @return Whether or not an error occurred.
  */
-bool RUMINATE_EXPORT rumination_destroy(
+bool RUMINATE_EXPORT ruminate_destroy(
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
@@ -23,16 +23,16 @@ bool RUMINATE_EXPORT rumination_destroy(
  *
  * @return Whether or not an error occurred.
  */
-bool RUMINATE_EXPORT rumination_init(
+bool RUMINATE_EXPORT ruminate_init(
 	int *arglen /** [in,out] a pointer to the number of arguments */,
 	char *args[] /** [in,out] an array of string arguments */,
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /// @private
-bool RUMINATE_EXPORT rumination_begin_get_type_by_variable_name( const char *, GError ** ) RUMINATE_NOEXCEPT;
+bool RUMINATE_EXPORT ruminate_begin_get_type_by_variable_name( const char *, GError ** ) RUMINATE_NOEXCEPT;
 /// @private
-RType * RUMINATE_EXPORT rumination_end_get_type_by_variable_name( void *, GError ** ) RUMINATE_NOEXCEPT;
+RType * RUMINATE_EXPORT ruminate_end_get_type_by_variable_name( void *, GError ** ) RUMINATE_NOEXCEPT;
 
 /** Generate a backtrace.
  *
@@ -42,13 +42,13 @@ RType * RUMINATE_EXPORT rumination_end_get_type_by_variable_name( void *, GError
  *         caller's call stack. This RFrameList must be freed using
  *         r_frame_list_unref().
  */
-RFrameList * RUMINATE_EXPORT rumination_backtrace(
+RFrameList * RUMINATE_EXPORT ruminate_backtrace(
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /// @private
 __attribute__((noinline))
-void RUMINATE_EXPORT rumination_hit_breakpoint() RUMINATE_NOEXCEPT;
+void RUMINATE_EXPORT ruminate_hit_breakpoint() RUMINATE_NOEXCEPT;
 
 G_END_DECLS
 
@@ -58,22 +58,22 @@ G_END_DECLS
  * expression.
  *
  * Note that you must first have initialized the ruminate library via a call to
- * rumination_init().
+ * ruminate_init().
  *
  * @param[in] expr The expression to determine the type of.
  * @param[out] error see errors.h
  * @return A pointer to an RType or `NULL` if an error occurred. This RType
  *         must be freed using r_type_unref().
  */
-#define rumination_get_type(expr, error) ({ \
+#define ruminate_get_type(expr, error) ({ \
 	__typeof__(expr) *_expr = g_malloc(sizeof(__typeof__(expr))); \
 	*_expr = (expr); \
 	RType *ret; \
-	if( !rumination_begin_get_type_by_variable_name("_expr", error) ) { \
+	if( !ruminate_begin_get_type_by_variable_name("_expr", error) ) { \
 		ret = NULL; \
 	} else { \
-		rumination_hit_breakpoint(); \
-		ret = rumination_end_get_type_by_variable_name(_expr, error); \
+		ruminate_hit_breakpoint(); \
+		ret = ruminate_end_get_type_by_variable_name(_expr, error); \
 	} \
 	ret; \
 })

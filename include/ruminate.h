@@ -1,6 +1,6 @@
 /** The only file you should need to include.
  *
- * @file ruminate.h
+ * @file include/ruminate.h
  */
 
 #ifndef _RUMINATE_H_
@@ -32,7 +32,7 @@ G_BEGIN_DECLS
 #include <ruminate/function_type.h>
 
 #include <ruminate/frame.h>
-#include <ruminate/rumination.h>
+#include <ruminate/ruminate.h>
 
 G_END_DECLS
 

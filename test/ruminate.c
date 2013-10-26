@@ -13,7 +13,7 @@
 #define print_json_for_type(expr, err) ({ \
 	GError **_err = (err); \
 	__typeof__(expr) __expr = (expr); \
-	RType *_type = rumination_get_type(__expr, _err); \
+	RType *_type = ruminate_get_type(__expr, _err); \
 	bool ret = _type == NULL ? false : _print_json_for_type(_type, &__expr, _err); \
 	r_type_unref(_type); \
 	ret; \
@@ -315,7 +315,7 @@ int main( int argc, char *argv[] ) {
 	setlocale(LC_ALL, "");
 
 	GError *err = NULL;
-	rumination_init(&argc, argv, &err);
+	ruminate_init(&argc, argv, &err);
 	die_if_error(err);
 
 	MyTypedef f = {
@@ -352,7 +352,7 @@ int main( int argc, char *argv[] ) {
 
 	{
 		// TODO: Type check
-		RPointerType *pt = (RPointerType *) rumination_get_type(&print_function_type, &err);
+		RPointerType *pt = (RPointerType *) ruminate_get_type(&print_function_type, &err);
 		die_if_error(err);
 
 		RType *type = r_pointer_type_pointee(pt, &err);

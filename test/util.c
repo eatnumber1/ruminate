@@ -19,7 +19,7 @@ void abort_if_error( GError *err ) {
 void abort_with_backtrace( const char *message ) {
 	GError *err = NULL;
 
-	RFrameList *frames = rumination_backtrace(&err);
+	RFrameList *frames = ruminate_backtrace(&err);
 	abort_if_error(err);
 
 	fprintf(stderr, "abort(): %s\n", message == NULL ? "" : message);

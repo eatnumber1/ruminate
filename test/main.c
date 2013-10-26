@@ -37,33 +37,33 @@ static void test_with_subprocess( SubprocessTestFunction *sptf ) {
 	}
 }
 
-static void do_rumination_init() {
+static void do_ruminate_init() {
 	GError *err = NULL;
 	int argc = 1;
 	char *argv[] = { g_get_prgname() };
 
-	rumination_init(&argc, argv, &err);
+	ruminate_init(&argc, argv, &err);
 	g_assert_no_error(err);
 }
 
-static void do_rumination_destroy() {
+static void do_ruminate_destroy() {
 	GError *err = NULL;
 
-	rumination_destroy(&err);
+	ruminate_destroy(&err);
 	g_assert_no_error(err);
 }
 
-static void test_rumination_init_subprocess() {
-	do_rumination_init();
-	do_rumination_destroy();
+static void test_ruminate_init_subprocess() {
+	do_ruminate_init();
+	do_ruminate_destroy();
 }
 
-static void test_rumination_init( int stat ) {
+static void test_ruminate_init( int stat ) {
 	assert_child_success(stat);
 }
 
 static void test_signal_delivery_subprocess() {
-	do_rumination_init();
+	do_ruminate_init();
 	kill(getpid(), SIGINT);
 	g_assert(false);
 }
@@ -75,11 +75,11 @@ static void test_signal_delivery( int stat ) {
 int main( int argc, char **argv ) {
 	g_test_init(&argc, &argv, NULL);
 
-	SubprocessTestFunction test_rumination_init_data = {
-		.parent = test_rumination_init,
-		.child = test_rumination_init_subprocess
+	SubprocessTestFunction test_ruminate_init_data = {
+		.parent = test_ruminate_init,
+		.child = test_ruminate_init_subprocess
 	};
-	g_test_add_data_func("/start", &test_rumination_init_data, (GTestDataFunc) test_with_subprocess);
+	g_test_add_data_func("/start", &test_ruminate_init_data, (GTestDataFunc) test_with_subprocess);
 
 
 	SubprocessTestFunction test_signal_delivery_data = {
@@ -92,46 +92,46 @@ int main( int argc, char **argv ) {
 }
 #endif
 
-static void do_rumination_init( char **prgname ) {
+static void do_ruminate_init( char **prgname ) {
 	GError *err = NULL;
 	int argc = 1;
 	*prgname = g_strdup(g_get_prgname());
 	char *argv[] = { *prgname, NULL };
 
-	rumination_init(&argc, argv, &err);
+	ruminate_init(&argc, argv, &err);
 	g_assert_no_error(err);
 }
 
-static void do_rumination_destroy( char **prgname ) {
+static void do_ruminate_destroy( char **prgname ) {
 	GError *err = NULL;
 
-	rumination_destroy(&err);
+	ruminate_destroy(&err);
 	g_assert_no_error(err);
 	g_free(*prgname);
 }
 
 #if 0
-static void test_rumination_init_and_destroy_subprocess() {
+static void test_ruminate_init_and_destroy_subprocess() {
 	char *prgname;
-	do_rumination_init(&prgname);
-	do_rumination_destroy(&prgname);
+	do_ruminate_init(&prgname);
+	do_ruminate_destroy(&prgname);
 }
 #endif
 
-static void test_rumination_init_and_destroy() {
+static void test_ruminate_init_and_destroy() {
 	//g_test_trap_subprocess("/init_and_destroy/subprocess", 5 * G_USEC_PER_SEC, G_TEST_SUBPROCESS_INHERIT_STDERR | G_TEST_SUBPROCESS_INHERIT_STDOUT);
 	//g_test_trap_assert_passed();
 
 	char *prgname;
-	do_rumination_init(&prgname);
-	do_rumination_destroy(&prgname);
+	do_ruminate_init(&prgname);
+	do_ruminate_destroy(&prgname);
 }
 
 int main( int argc, char **argv ) {
 	g_test_init(&argc, &argv, NULL);
 
-	g_test_add_func("/init_and_destroy", test_rumination_init_and_destroy);
-	//g_test_add_func("/init_and_destroy/subprocess", test_rumination_init_and_destroy_subprocess);
+	g_test_add_func("/init_and_destroy", test_ruminate_init_and_destroy);
+	//g_test_add_func("/init_and_destroy/subprocess", test_ruminate_init_and_destroy_subprocess);
 
 	return g_test_run();
 }
