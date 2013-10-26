@@ -14,8 +14,8 @@
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
 #include "ruminate/type.h"
-#include "ruminate/record_member.h"
-#include "ruminate/record_type.h"
+#include "ruminate/aggregate_member.h"
+#include "ruminate/aggregate_type.h"
 #include "ruminate/builtin_type.h"
 #include "ruminate/pointer_type.h"
 #include "ruminate/typedef_type.h"
@@ -25,7 +25,7 @@
 #include "private/common.h"
 #include "private/memory.h"
 #include "private/type.h"
-#include "private/record_type.h"
+#include "private/aggregate_type.h"
 #include "private/builtin_type.h"
 #include "private/pointer_type.h"
 #include "private/typedef_type.h"
@@ -46,7 +46,7 @@ bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_N
 		case Ruminate::TypeIdUnion:
 		case Ruminate::TypeIdEnum:
 		case Ruminate::TypeIdFunction:
-			rt->id = R_TYPE_RECORD;
+			rt->id = R_TYPE_AGGREGATE;
 			break;
 		case Ruminate::TypeIdInt:
 		case Ruminate::TypeIdLong:
@@ -72,8 +72,8 @@ bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_N
 
 	bool ret = true;
 	switch( rt->id ) {
-		case R_TYPE_RECORD:
-			ret = r_record_type_init((RRecordType *) rt, error);
+		case R_TYPE_AGGREGATE:
+			ret = r_aggregate_type_init((RAggregateType *) rt, error);
 			break;
 		case R_TYPE_BUILTIN:
 			ret = r_builtin_type_init((RBuiltinType *) rt, error);
@@ -99,8 +99,8 @@ bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_N
 
 void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 	switch( rt->id ) {
-		case R_TYPE_RECORD:
-			r_record_type_destroy((RRecordType *) rt);
+		case R_TYPE_AGGREGATE:
+			r_aggregate_type_destroy((RAggregateType *) rt);
 			break;
 		case R_TYPE_BUILTIN:
 			r_builtin_type_destroy((RBuiltinType *) rt);
@@ -134,7 +134,7 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdEnum:
 		case Ruminate::TypeIdUnion:
 		case Ruminate::TypeIdFunction:
-			return (RType *) r_record_type_alloc(id, error);
+			return (RType *) r_aggregate_type_alloc(id, error);
 		case Ruminate::TypeIdInt:
 		case Ruminate::TypeIdLong:
 		case Ruminate::TypeIdDouble:
@@ -166,7 +166,7 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 		case Ruminate::TypeIdUnion:
 		case Ruminate::TypeIdEnum:
 		case Ruminate::TypeIdFunction:
-			r_record_type_free((RRecordType *) rt);
+			r_aggregate_type_free((RAggregateType *) rt);
 			break;
 		case Ruminate::TypeIdInt:
 		case Ruminate::TypeIdLong:

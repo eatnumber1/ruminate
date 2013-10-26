@@ -5,8 +5,8 @@ INCLUDE_RUMINATE_PUBLIC_HEADERS := \
 	frame.h \
 	function_type.h \
 	pointer_type.h \
-	record_member.h \
-	record_type.h \
+	aggregate_member.h \
+	aggregate_type.h \
 	rumination.h \
 	string.h \
 	tag_type.h \

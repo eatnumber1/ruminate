@@ -48,7 +48,7 @@ void r_array_type_free( RArrayType *rat ) RUMINATE_NOEXCEPT {
 	g_slice_free(RArrayType, rat);
 }
 
-// TODO: Dedup this with RRecordType?
+// TODO: Dedup this with RAggregateType?
 static bool init_members( RArrayType *rat, GError **error ) RUMINATE_NOEXCEPT {
 	if( !rat->members.valid ) {
 		RType *rt = (RType *) rat;

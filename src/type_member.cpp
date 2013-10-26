@@ -14,14 +14,14 @@
 #include "ruminate/string.h"
 #include "ruminate/type.h"
 #include "ruminate/type_member.h"
-#include "ruminate/record_member.h"
+#include "ruminate/aggregate_member.h"
 
 #include "private/common.h"
 #include "private/memory.h"
 #include "private/string.h"
 #include "private/type.h"
 #include "private/type_member.h"
-#include "private/record_member.h"
+#include "private/aggregate_member.h"
 
 bool r_type_member_init( RTypeMember *tm, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
 	tm->refcnt = 1;
@@ -31,8 +31,8 @@ bool r_type_member_init( RTypeMember *tm, RMemory *rv, void *cur, GError **error
 	switch( tm->id ) {
 		case R_TYPE_MEMBER_ARRAY:
 			break;
-		case R_TYPE_MEMBER_RECORD:
-			if( !r_record_member_init((RRecordMember *) tm, error) )
+		case R_TYPE_MEMBER_AGGREGATE:
+			if( !r_aggregate_member_init((RAggregateMember *) tm, error) )
 				goto err_child_init;
 			break;
 		default:
@@ -48,8 +48,8 @@ err_child_init:
 
 void r_type_member_destroy( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 	switch( tm->id ) {
-		case R_TYPE_MEMBER_RECORD:
-			r_record_member_destroy((RRecordMember *) tm);
+		case R_TYPE_MEMBER_AGGREGATE:
+			r_aggregate_member_destroy((RAggregateMember *) tm);
 		case R_TYPE_MEMBER_ARRAY:
 			break;
 		default:
@@ -62,8 +62,8 @@ void r_type_member_destroy( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 
 RTypeMember *r_type_member_alloc( RTypeMemberId id, GError **error ) RUMINATE_NOEXCEPT {
 	switch( id ) {
-		case R_TYPE_MEMBER_RECORD:
-			return (RTypeMember *) r_record_member_alloc(error);
+		case R_TYPE_MEMBER_AGGREGATE:
+			return (RTypeMember *) r_aggregate_member_alloc(error);
 		case R_TYPE_MEMBER_ARRAY: {
 			RTypeMember *ret = g_slice_new(RTypeMember);
 			new (ret) RTypeMember();
@@ -76,8 +76,8 @@ RTypeMember *r_type_member_alloc( RTypeMemberId id, GError **error ) RUMINATE_NO
 
 void r_type_member_free( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 	switch( tm->id ) {
-		case R_TYPE_MEMBER_RECORD:
-			r_record_member_free((RRecordMember *) tm);
+		case R_TYPE_MEMBER_AGGREGATE:
+			r_aggregate_member_free((RAggregateMember *) tm);
 			break;
 		case R_TYPE_MEMBER_ARRAY:
 			tm->~RTypeMember();

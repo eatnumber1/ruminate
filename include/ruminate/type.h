@@ -12,7 +12,7 @@
  */
 typedef enum RTypeId {
 	R_TYPE_BUILTIN /** a builtin type @see RBuiltinType */,
-	R_TYPE_RECORD /** a record, or aggregate type @see RRecordType */,
+	R_TYPE_AGGREGATE /** an aggregate type @see RAggregateType */,
 	R_TYPE_TYPEDEF /** a typedef @see RTypedefType */,
 	R_TYPE_POINTER /** a pointer @see RPointerType */,
 	R_TYPE_ARRAY /** an array @see RArrayType */,

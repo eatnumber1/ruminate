@@ -1,7 +1,7 @@
 /** An opaque struct representing a function.
  *
  * @struct RFunctionType
- * @extends RRecordType
+ * @extends RAggregateType
  */
 typedef struct RFunctionType RFunctionType;
 

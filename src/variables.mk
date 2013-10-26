@@ -11,8 +11,8 @@ SRC_SOURCES := \
 	typedef_type.cpp \
 	tag_type.cpp \
 	function_type.cpp \
-	record_type.cpp \
-	record_member.cpp \
+	aggregate_type.cpp \
+	aggregate_member.cpp \
 	type_member.cpp \
 	frame.cpp \
 	rumination.cpp

@@ -11,14 +11,14 @@
 #include "ruminate/errors.h"
 #include "ruminate/string.h"
 #include "ruminate/type.h"
-#include "ruminate/record_member.h"
-#include "ruminate/record_type.h"
+#include "ruminate/aggregate_member.h"
+#include "ruminate/aggregate_type.h"
 #include "ruminate/tag_type.h"
 
 #include "private/common.h"
 #include "private/memory.h"
 #include "private/type.h"
-#include "private/record_type.h"
+#include "private/aggregate_type.h"
 #include "private/tag_type.h"
 
 bool r_tag_type_init( RTagType *rtt, GError **error ) RUMINATE_NOEXCEPT {

@@ -1,5 +1,5 @@
 struct RFunctionType {
-	RRecordType parent;
+	RAggregateType parent;
 	RString *name;
 };
 

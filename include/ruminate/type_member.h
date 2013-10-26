@@ -1,7 +1,7 @@
 /** Type members
  *
- * A RTypeMember represents a member of an array (RArrayType) or record
- * (RRecordType) type.
+ * A RTypeMember represents a member of an array (RArrayType) or aggregate
+ * (RAggregateType) type.
  *
  * @file type_member.h
  * @see RTypeMember
@@ -14,7 +14,7 @@
  * @enum RTypeMemberId
  */
 typedef enum RTypeMemberId {
-	R_TYPE_MEMBER_RECORD /** a RRecordMember @see RRecordMember */,
+	R_TYPE_MEMBER_AGGREGATE /** a RAggregateMember @see RAggregateMember */,
 	R_TYPE_MEMBER_ARRAY /** an array member */
 } RTypeMemberId;
 
@@ -47,11 +47,11 @@ RType * RUMINATE_EXPORT r_type_member_type(
 /** Get the offset of this type member into it's container.
  *
  * This is the number of bytes into this type member's container (either an
- * RArrayType, or an RRecordType) that this member is located.
+ * RArrayType, or an RAggregateType) that this member is located.
  *
  * @memberof RTypeMember
  * @see RArrayType
- * @see RRecordType
+ * @see RAggregateType
  */
 off_t RUMINATE_EXPORT r_type_member_offset(
 	RTypeMember *member /** [in] the type member to get the offset of */,

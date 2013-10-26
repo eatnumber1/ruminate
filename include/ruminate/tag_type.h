@@ -25,7 +25,7 @@ typedef enum RTagTypeId {
 /** An opaque struct representing a tagged type.
  *
  * @struct RTagType
- * @extends RRecordType
+ * @extends RAggregateType
  */
 typedef struct RTagType RTagType;
 

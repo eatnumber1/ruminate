@@ -107,30 +107,30 @@ static bool _print_json_for_builtin( RBuiltinType *type, void *data, GError **er
 
 static bool _print_json_for_type( RType *type, void *data, GError **err );
 
-static bool _print_json_for_record( RRecordType *rt, void *data, GError **error ) {
-	RRecordTypeId id = r_record_type_id(rt, error);
+static bool _print_json_for_aggregate( RAggregateType *rt, void *data, GError **error ) {
+	RAggregateTypeId id = r_aggregate_type_id(rt, error);
 	die_if_error(*error);
 	// TODO: Error checking
 
 	switch( id ) {
-		case R_RECORD_TYPE_TAG:
-		case R_RECORD_TYPE_FUNCTION:
+		case R_AGGREGATE_TYPE_TAG:
+		case R_AGGREGATE_TYPE_FUNCTION:
 			break;
 		default:
 			g_assert_not_reached();
 	}
 
-	size_t nmembers = r_record_type_nmembers(rt, error);
+	size_t nmembers = r_aggregate_type_nmembers(rt, error);
 	die_if_error(*error);
 	// TODO: Error checking
 
 	printf("{");
 	for( size_t i = 0; i < nmembers; i++ ) {
-		RRecordMember *member = r_record_type_member_at(rt, i, error);
+		RAggregateMember *member = r_aggregate_type_member_at(rt, i, error);
 		RTypeMember *tmember = (RTypeMember *) member;
 		// TODO: Error checking
 
-		RString *name = r_record_member_name(member, error);
+		RString *name = r_aggregate_member_name(member, error);
 		die_if_error(*error);
 		// TODO: Error checking
 
@@ -169,7 +169,7 @@ static bool _print_json_for_string( RType *rt, void *data, GError **err ) {
 }
 
 static bool print_function_type( RFunctionType *rft, GError **error ) {
-	RRecordType *rrt = (RRecordType *) rft;
+	RAggregateType *rrt = (RAggregateType *) rft;
 	RType *rtype = r_function_type_return_type(rft, error);
 	die_if_error(*error);
 	// TODO: Error checking
@@ -188,12 +188,12 @@ static bool print_function_type( RFunctionType *rft, GError **error ) {
 	r_string_unref(rtname);
 	r_string_unref(rfname);
 
-	size_t narguments = r_record_type_nmembers(rrt, error);
+	size_t narguments = r_aggregate_type_nmembers(rrt, error);
 	die_if_error(*error);
 	// TODO: Error checking
 
 	for( size_t i = 0; i < narguments; i++ ) {
-		RRecordMember *arg = r_record_type_member_at(rrt, i, error);
+		RAggregateMember *arg = r_aggregate_type_member_at(rrt, i, error);
 		die_if_error(*error);
 		// TODO: Error checking
 
@@ -280,9 +280,9 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 			die_if_error(*error);
 			// TODO: Error checking
 			break;
-		case R_TYPE_RECORD:
+		case R_TYPE_AGGREGATE:
 			// TODO: Support other tag types.
-			_print_json_for_record((RRecordType *) type, data, error);
+			_print_json_for_aggregate((RAggregateType *) type, data, error);
 			die_if_error(*error);
 			// TODO: Error checking
 			break;
