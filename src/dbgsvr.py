@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-import sys, os, struct, Ice
-from RuminateBackend import *
-from debugger_factory_impl import *
+import sys, subprocess
 
 try:
 	import lldb
 except ImportError:
 	sys.path.insert(0, subprocess.check_output("lldb -P", shell = True).strip())
 	import lldb
+
+import os, struct, Ice
+from RuminateBackend import *
+from debugger_factory_impl import *
 
 class Server(Ice.Application):
 	def interruptCallback(self, sig):
