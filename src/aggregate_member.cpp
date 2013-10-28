@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <new>
 
+#include <stdint.h>
+
 #include <Ice/Ice.h>
 #include "ice/type.h"
 #include "ice/type_member.h"
