@@ -1,5 +1,10 @@
 var searchData=
 [
+  ['r_5faggregate_5fmember_5fbitfield',['R_AGGREGATE_MEMBER_BITFIELD',['../aggregate__member_8h.html#ae66a822b4bce9e1559fef33422de505ca17343b5e162dcfc468d86be5c4035472',1,'aggregate_member.h']]],
+  ['r_5faggregate_5fmember_5fenum',['R_AGGREGATE_MEMBER_ENUM',['../aggregate__member_8h.html#ae66a822b4bce9e1559fef33422de505ca595c194029b15546ab67947f7539e2a9',1,'aggregate_member.h']]],
+  ['r_5faggregate_5fmember_5fother',['R_AGGREGATE_MEMBER_OTHER',['../aggregate__member_8h.html#ae66a822b4bce9e1559fef33422de505cac2b6f8b0706160a7994cc2ca43432700',1,'aggregate_member.h']]],
+  ['r_5faggregate_5ftype_5ffunction',['R_AGGREGATE_TYPE_FUNCTION',['../aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61aa145e538575fb274daa3e0f896be2c386',1,'aggregate_type.h']]],
+  ['r_5faggregate_5ftype_5ftag',['R_AGGREGATE_TYPE_TAG',['../aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61aad7d4855d82f47ace4689eef6af2104f5',1,'aggregate_type.h']]],
   ['r_5fbuiltin_5ftype_5fbool',['R_BUILTIN_TYPE_BOOL',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80caa2f78ebf380cc94ab7c3b73eaa30e3d1',1,'builtin_type.h']]],
   ['r_5fbuiltin_5ftype_5fchar',['R_BUILTIN_TYPE_CHAR',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80ca522e3cde81f0f3bd98ac9eb3f302267a',1,'builtin_type.h']]],
   ['r_5fbuiltin_5ftype_5fdouble',['R_BUILTIN_TYPE_DOUBLE',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80cae875979c13faa722ea7ea3f7d7ec0d5b',1,'builtin_type.h']]],
@@ -7,17 +12,15 @@ var searchData=
   ['r_5fbuiltin_5ftype_5flong',['R_BUILTIN_TYPE_LONG',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80ca36faa0523ded95ededf69e188b3396ba',1,'builtin_type.h']]],
   ['r_5fbuiltin_5ftype_5fshort',['R_BUILTIN_TYPE_SHORT',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80caf128c571162a77fe48a93371a43f8013',1,'builtin_type.h']]],
   ['r_5fbuiltin_5ftype_5fvoid',['R_BUILTIN_TYPE_VOID',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80ca27dd26ba34fa61cfca7a5c9192337d5f',1,'builtin_type.h']]],
-  ['r_5frecord_5ftype_5ffunction',['R_RECORD_TYPE_FUNCTION',['../record__type_8h.html#a5ed2ad3aa11a512930a70ce473fcd4bcab3a0b4bf4d8737ddf50062788c8daf99',1,'record_type.h']]],
-  ['r_5frecord_5ftype_5ftag',['R_RECORD_TYPE_TAG',['../record__type_8h.html#a5ed2ad3aa11a512930a70ce473fcd4bca9e3c8a0777906195dae0c90512f27bca',1,'record_type.h']]],
   ['r_5ftag_5ftype_5fenum',['R_TAG_TYPE_ENUM',['../tag__type_8h.html#a3ae813ac6154b72f8733ecca52dfdc17a03d6419d3903069df5b6b5a631c40b09',1,'tag_type.h']]],
   ['r_5ftag_5ftype_5fstructure',['R_TAG_TYPE_STRUCTURE',['../tag__type_8h.html#a3ae813ac6154b72f8733ecca52dfdc17a59532fe9d8261521155465e2d7ee552a',1,'tag_type.h']]],
   ['r_5ftag_5ftype_5funion',['R_TAG_TYPE_UNION',['../tag__type_8h.html#a3ae813ac6154b72f8733ecca52dfdc17a2e580e4e0007bc5b07eac2beadddf9a3',1,'tag_type.h']]],
+  ['r_5ftype_5faggregate',['R_TYPE_AGGREGATE',['../type_8h.html#a200873d33e0b46e4ae64e4bfd4f7ac9da057d30f9615d979d5a2332de0df43b8f',1,'type.h']]],
   ['r_5ftype_5farray',['R_TYPE_ARRAY',['../type_8h.html#a200873d33e0b46e4ae64e4bfd4f7ac9da1ee9891276d12198fdca1808d8a079c9',1,'type.h']]],
   ['r_5ftype_5fbuiltin',['R_TYPE_BUILTIN',['../type_8h.html#a200873d33e0b46e4ae64e4bfd4f7ac9da368bdc336958a3d87d9509b21fcbef43',1,'type.h']]],
+  ['r_5ftype_5fmember_5faggregate',['R_TYPE_MEMBER_AGGREGATE',['../type__member_8h.html#a57b8dacec0c2e6283f307c07aae6fb7fafcf3def90fa8ac680b96be1083ac268a',1,'type_member.h']]],
   ['r_5ftype_5fmember_5farray',['R_TYPE_MEMBER_ARRAY',['../type__member_8h.html#a57b8dacec0c2e6283f307c07aae6fb7fa5706c405067c9fe67e1cc63d1af86c74',1,'type_member.h']]],
-  ['r_5ftype_5fmember_5frecord',['R_TYPE_MEMBER_RECORD',['../type__member_8h.html#a57b8dacec0c2e6283f307c07aae6fb7fad2451f455378a85b78858ded615f1e9e',1,'type_member.h']]],
   ['r_5ftype_5fpointer',['R_TYPE_POINTER',['../type_8h.html#a200873d33e0b46e4ae64e4bfd4f7ac9dac6a4a9aab257fac806e9a43e31faf7c6',1,'type.h']]],
-  ['r_5ftype_5frecord',['R_TYPE_RECORD',['../type_8h.html#a200873d33e0b46e4ae64e4bfd4f7ac9da0566d99973859a90427dcead4e076a4e',1,'type.h']]],
   ['r_5ftype_5ftypedef',['R_TYPE_TYPEDEF',['../type_8h.html#a200873d33e0b46e4ae64e4bfd4f7ac9dae5cb8b24200d7e3a9d72a6a747f6640f',1,'type.h']]],
   ['r_5ftype_5funknown',['R_TYPE_UNKNOWN',['../type_8h.html#a200873d33e0b46e4ae64e4bfd4f7ac9da24521610ba6d34451ef96b8f69a11274',1,'type.h']]]
 ];

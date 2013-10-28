@@ -1,9 +1,9 @@
 <map id="RType" name="RType">
-<area shape="rect" id="node2" href="$struct_r_array_type.html" title="An opaque struct representing an array type. " alt="" coords="5,83,96,111"/>
-<area shape="rect" id="node3" href="$struct_r_builtin_type.html" title="An opaque struct representing a builtin type. " alt="" coords="120,83,216,111"/>
-<area shape="rect" id="node4" href="$struct_r_pointer_type.html" title="An opaque struct representing a pointer to another type. " alt="" coords="240,83,341,111"/>
-<area shape="rect" id="node5" href="$struct_r_record_type.html" title="An opaque struct representing a record type. " alt="" coords="366,83,468,111"/>
-<area shape="rect" id="node8" href="$struct_r_typedef_type.html" title="An opaque struct representing a typedef&#39;ed type. " alt="" coords="493,83,600,111"/>
-<area shape="rect" id="node6" href="$struct_r_function_type.html" title="An opaque struct representing a function. " alt="" coords="302,161,412,189"/>
-<area shape="rect" id="node7" href="$struct_r_tag_type.html" title="An opaque struct representing a tagged type. " alt="" coords="437,161,517,189"/>
+<area shape="rect" id="node2" href="$struct_r_aggregate_type.html" title="An opaque struct representing a aggregate type. " alt="" coords="59,83,180,111"/>
+<area shape="rect" id="node5" href="$struct_r_array_type.html" title="An opaque struct representing an array type. " alt="" coords="205,83,296,111"/>
+<area shape="rect" id="node6" href="$struct_r_builtin_type.html" title="An opaque struct representing a builtin type. " alt="" coords="320,83,416,111"/>
+<area shape="rect" id="node7" href="$struct_r_pointer_type.html" title="An opaque struct representing a pointer to another type. " alt="" coords="440,83,541,111"/>
+<area shape="rect" id="node8" href="$struct_r_typedef_type.html" title="An opaque struct representing a typedef&#39;ed type. " alt="" coords="565,83,672,111"/>
+<area shape="rect" id="node3" href="$struct_r_function_type.html" title="An opaque struct representing a function. " alt="" coords="4,161,115,189"/>
+<area shape="rect" id="node4" href="$struct_r_tag_type.html" title="An opaque struct representing a tagged type. " alt="" coords="139,161,220,189"/>
 </map>
