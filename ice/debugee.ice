@@ -1,7 +1,7 @@
 #ifndef _DEBUGGER_ICE_
 #define _DEBUGGER_ICE_
 
-module Ruminate {
+module RuminateBackend {
 	interface Debugee {
 		void stop();
 	};

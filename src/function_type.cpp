@@ -42,7 +42,7 @@ void r_function_type_destroy( RFunctionType *rft ) RUMINATE_NOEXCEPT {
 	if( rft->name != NULL ) r_string_unref(rft->name);
 }
 
-RFunctionType *r_function_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
+RFunctionType *r_function_type_alloc( RuminateBackend::TypeId, GError ** ) RUMINATE_NOEXCEPT {
 	RFunctionType *ret = g_slice_new(RFunctionType);
 	new (ret) RFunctionType();
 	return ret;
@@ -57,7 +57,7 @@ G_BEGIN_DECLS
 
 RType *r_function_type_return_type( RFunctionType *rft, GError **error ) RUMINATE_NOEXCEPT {
 	RType *rt = (RType *) rft;
-	Ruminate::TypePrx t;
+	RuminateBackend::TypePrx t;
 	if( !gxx_call(t = rt->type->getReturnType(), error) )
 		return NULL;
 

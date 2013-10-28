@@ -42,7 +42,7 @@
 
 static Ruminate *ruminate;
 
-static Ice::Identity init_callbacks( Ice::CommunicatorPtr &, Ruminate::DebuggerFactoryPrx & );
+static Ice::Identity init_callbacks( Ice::CommunicatorPtr &, RuminateBackend::DebuggerFactoryPrx & );
 
 G_BEGIN_DECLS
 
@@ -124,7 +124,7 @@ G_STATIC_ASSERT(sizeof(::Ice::Long) >= sizeof(size_t) && "A pointer cannot fit i
 
 bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT {
 	GError *err = NULL;
-	Ruminate::DebuggerFactoryOptions opts;
+	RuminateBackend::DebuggerFactoryOptions opts;
 	char *proxy_str;
 	Ice::ObjectPrx factory_proxy;
 	gint child_stdout;
@@ -164,7 +164,7 @@ bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT 
 	if( !gxx_call(factory_proxy = ruminate->communicator->stringToProxy(proxy_str), error) )
 		goto error_communicator_stringToProxy;
 
-	if( !gxx_call(ruminate->factory = Ruminate::DebuggerFactoryPrx::checkedCast(factory_proxy), error) )
+	if( !gxx_call(ruminate->factory = RuminateBackend::DebuggerFactoryPrx::checkedCast(factory_proxy), error) )
 		goto error_checkedCast;
 
 	// TODO: Handle exceptions
@@ -216,7 +216,7 @@ bool ruminate_begin_get_type_by_variable_name( const char *varname, GError **err
 
 RType *ruminate_end_get_type_by_variable_name( void *mem, GError **error ) RUMINATE_NOEXCEPT {
 	g_assert(ruminate->arp != 0);
-	Ruminate::TypePrx t;
+	RuminateBackend::TypePrx t;
 	if( !gxx_call(t = ruminate->debugger->end_getTypeByVariableName(ruminate->arp), error) ) {
 		// TODO: Cleanup
 		return NULL;
@@ -240,13 +240,13 @@ RFrameList *ruminate_backtrace( GError **error ) RUMINATE_NOEXCEPT {
 	if( !gxx_call(arp = ruminate->debugger->begin_getBacktrace(gettid()), error) )
 		return NULL;
 	ruminate_hit_breakpoint();
-	Ruminate::FrameList fl = ruminate->debugger->end_getBacktrace(arp);
+	RuminateBackend::FrameList fl = ruminate->debugger->end_getBacktrace(arp);
 	return r_frame_list_new(fl, error);
 }
 
 G_END_DECLS
 
-class DebugeeImpl : public Ruminate::Debugee {
+class DebugeeImpl : public RuminateBackend::Debugee {
 public:
 	void stop( const Ice::Current & = Ice::Current() ) {
 		fprintf(stderr, "Hello World!\n");
@@ -254,12 +254,12 @@ public:
 	}
 };
 
-static Ice::Identity init_callbacks( Ice::CommunicatorPtr &communicator, Ruminate::DebuggerFactoryPrx &proxy ) {
+static Ice::Identity init_callbacks( Ice::CommunicatorPtr &communicator, RuminateBackend::DebuggerFactoryPrx &proxy ) {
 	Ice::ObjectAdapterPtr adapter = communicator->createObjectAdapter("");
 	Ice::Identity ident;
 	ident.name = IceUtil::generateUUID();
 	ident.category = "";
-	Ruminate::DebugeePtr cb = new DebugeeImpl();
+	RuminateBackend::DebugeePtr cb = new DebugeeImpl();
 	adapter->add(cb, ident);
 	adapter->activate();
 	proxy->ice_getConnection()->setAdapter(adapter);

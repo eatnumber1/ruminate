@@ -5,7 +5,7 @@
 #include <type.ice>
 #include <frame.ice>
 
-module Ruminate {
+module RuminateBackend {
 	interface Debugger {
 		Type *getTypeByVariableName( string variable, long tid ) throws RuminateException;
 		FrameList getBacktrace( long tid ) throws RuminateException;

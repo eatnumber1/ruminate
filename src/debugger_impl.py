@@ -2,7 +2,7 @@ from __future__ import print_function, absolute_import, nested_scopes, with_stat
 
 from lldb import *
 
-from Ruminate import *
+from RuminateBackend import *
 from lldb_utils import *
 from type_impl_factory import *
 from lldb_em import *

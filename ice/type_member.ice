@@ -1,7 +1,7 @@
 #ifndef _TYPE_MEMBER_ICE_
 #define _TYPE_MEMBER_ICE_
 
-module Ruminate {
+module RuminateBackend {
 	interface Type;
 
 	// TODO: Subclass TypeMember from some shared superclass for arrays
@@ -16,6 +16,9 @@ module Ruminate {
 		idempotent long getBitfieldSizeInBits();
 
 		idempotent bool isBitfield();
+
+		// TODO: Properly support unsigned values
+		idempotent long getValueSigned();
 	};
 
 	sequence<TypeMember *> TypeMemberList;

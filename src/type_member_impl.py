@@ -1,4 +1,4 @@
-from Ruminate import *
+from RuminateBackend import *
 
 class SBTypeListAdapter(TypeMember):
 	@staticmethod
@@ -55,6 +55,9 @@ class SBTypeMemberAdapter(TypeMember):
 
 	def isBitfield(self, current = None):
 		return self.sbtypemember.is_bitfield
+
+	def getValueSigned(self, current = None):
+		return self.sbtypemember.signed
 
 class SBTypeAdapter(TypeMember):
 	@staticmethod

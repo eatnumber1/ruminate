@@ -6,12 +6,12 @@ struct RFrameList {
 
 struct RFrame {
 	RType *functionType;
-	Ruminate::Frame frame;
+	RuminateBackend::Frame frame;
 	gint refcnt;
 	RString *function_name;
 	RString *module_name;
 	RString *compile_unit_name;
 };
 
-RFrameList *r_frame_list_new( Ruminate::FrameList &, GError ** ) RUMINATE_NOEXCEPT;
-RFrame *r_frame_new( Ruminate::Frame &, GError ** ) RUMINATE_NOEXCEPT;
+RFrameList *r_frame_list_new( RuminateBackend::FrameList &, GError ** ) RUMINATE_NOEXCEPT;
+RFrame *r_frame_new( RuminateBackend::Frame &, GError ** ) RUMINATE_NOEXCEPT;

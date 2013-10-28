@@ -36,12 +36,12 @@ bool r_aggregate_type_init( RAggregateType *rrt, GError **error ) RUMINATE_NOEXC
 	rrt->members_init = false;
 
 	switch( ((RType *) rrt)->type_id ) {
-		case Ruminate::TypeIdStructure:
-		case Ruminate::TypeIdUnion:
-		case Ruminate::TypeIdEnum:
+		case RuminateBackend::TypeIdStructure:
+		case RuminateBackend::TypeIdUnion:
+		case RuminateBackend::TypeIdEnum:
 			rrt->id = R_AGGREGATE_TYPE_TAG;
 			return r_tag_type_init((RTagType *) rrt, error);;
-		case Ruminate::TypeIdFunction:
+		case RuminateBackend::TypeIdFunction:
 			rrt->id = R_AGGREGATE_TYPE_FUNCTION;
 			return r_function_type_init((RFunctionType *) rrt, error);
 		default:
@@ -69,13 +69,13 @@ void r_aggregate_type_destroy( RAggregateType *rrt ) RUMINATE_NOEXCEPT {
 	}
 }
 
-RAggregateType *r_aggregate_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
+RAggregateType *r_aggregate_type_alloc( RuminateBackend::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 	switch( id ) {
-		case Ruminate::TypeIdFunction:
+		case RuminateBackend::TypeIdFunction:
 			return (RAggregateType *) r_function_type_alloc(id, error);
-		case Ruminate::TypeIdUnion:
-		case Ruminate::TypeIdEnum:
-		case Ruminate::TypeIdStructure:
+		case RuminateBackend::TypeIdUnion:
+		case RuminateBackend::TypeIdEnum:
+		case RuminateBackend::TypeIdStructure:
 			return (RAggregateType *) r_tag_type_alloc(id, error);
 		default:
 			g_assert_not_reached();
@@ -121,14 +121,14 @@ size_t r_aggregate_type_nmembers( RAggregateType *rrt, GError **error ) RUMINATE
 RAggregateMember *r_aggregate_type_member_at( RAggregateType *rrt, size_t i, GError **error ) RUMINATE_NOEXCEPT {
 	if( !init_members(rrt, error) ) return 0;
 	// TODO: vector access could throw
-	Ruminate::TypeMemberPrx tmp = rrt->members[i];
+	RuminateBackend::TypeMemberPrx tmp = rrt->members[i];
 	off_t offset = 0;
 	if( rrt->id != R_AGGREGATE_TYPE_FUNCTION ) {
 		if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
 	}
 	// TODO: Memoize RAggregateMembers
 	RType *rt = (RType *) rrt;
-	return (RAggregateMember *) r_type_member_new(tmp, R_TYPE_MEMBER_AGGREGATE, rt->ptr, ((uint8_t *) rt->cur) + offset, error);
+	return (RAggregateMember *) r_type_member_new(tmp, rt, rt->ptr, ((uint8_t *) rt->cur) + offset, error);
 }
 
 G_END_DECLS

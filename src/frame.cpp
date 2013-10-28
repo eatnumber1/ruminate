@@ -23,7 +23,7 @@
 #include "private/type.h"
 #include "private/frame.h"
 
-RFrame *r_frame_new( Ruminate::Frame &frame, GError ** ) RUMINATE_NOEXCEPT {
+RFrame *r_frame_new( RuminateBackend::Frame &frame, GError ** ) RUMINATE_NOEXCEPT {
 	RFrame *ret = g_slice_new(RFrame);
 	new (ret) RFrame();
 	ret->refcnt = 1;
@@ -34,7 +34,7 @@ RFrame *r_frame_new( Ruminate::Frame &frame, GError ** ) RUMINATE_NOEXCEPT {
 	return ret;
 }
 
-RFrameList *r_frame_list_new( Ruminate::FrameList &list, GError **error ) RUMINATE_NOEXCEPT {
+RFrameList *r_frame_list_new( RuminateBackend::FrameList &list, GError **error ) RUMINATE_NOEXCEPT {
 	RFrameList *ret = g_slice_new(RFrameList);
 	new (ret) RFrameList();
 	ret->refcnt = 1;

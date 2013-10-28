@@ -1,6 +1,6 @@
 from __future__ import nested_scopes, with_statement
 
-from Ruminate import *
+from RuminateBackend import *
 from array_member_impl import *
 from stopped_thread import *
 import type_member_impl
@@ -140,6 +140,17 @@ class TypeImpl(Type):
 						)
 					)
 				return ret
+			elif self.id == TypeId.TypeIdEnum:
+				ret = []
+				for enum_member in self.sbtype.enum_members:
+					ret.append(
+						type_member_impl.SBTypeMemberAdapter.proxyFor(
+							sbtypemember = enum_member,
+							base_address = self.address,
+							type_factory = self.factory,
+							current = current
+						)
+					)
 			else:
 				ret = []
 				for field in self.sbtype.fields:

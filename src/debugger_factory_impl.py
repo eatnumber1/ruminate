@@ -1,6 +1,6 @@
 from __future__ import print_function
 import sys
-from Ruminate import *
+from RuminateBackend import *
 from debugger_impl import *
 
 class DebuggerFactoryImpl(DebuggerFactory):

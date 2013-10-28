@@ -21,25 +21,25 @@
 
 bool r_builtin_type_init( RBuiltinType *rbt, GError ** ) RUMINATE_NOEXCEPT {
 	switch( ((RType *) rbt)->type_id ) {
-		case Ruminate::TypeIdInt:
+		case RuminateBackend::TypeIdInt:
 			rbt->id = R_BUILTIN_TYPE_INT;
 			break;
-		case Ruminate::TypeIdLong:
+		case RuminateBackend::TypeIdLong:
 			rbt->id = R_BUILTIN_TYPE_LONG;
 			break;
-		case Ruminate::TypeIdDouble:
+		case RuminateBackend::TypeIdDouble:
 			rbt->id = R_BUILTIN_TYPE_DOUBLE;
 			break;
-		case Ruminate::TypeIdVoid:
+		case RuminateBackend::TypeIdVoid:
 			rbt->id = R_BUILTIN_TYPE_VOID;
 			break;
-		case Ruminate::TypeIdShort:
+		case RuminateBackend::TypeIdShort:
 			rbt->id = R_BUILTIN_TYPE_SHORT;
 			break;
-		case Ruminate::TypeIdChar:
+		case RuminateBackend::TypeIdChar:
 			rbt->id = R_BUILTIN_TYPE_CHAR;
 			break;
-		case Ruminate::TypeIdBool:
+		case RuminateBackend::TypeIdBool:
 			rbt->id = R_BUILTIN_TYPE_BOOL;
 			break;
 		default:
@@ -51,7 +51,7 @@ bool r_builtin_type_init( RBuiltinType *rbt, GError ** ) RUMINATE_NOEXCEPT {
 
 void r_builtin_type_destroy( RBuiltinType * ) RUMINATE_NOEXCEPT {}
 
-RBuiltinType *r_builtin_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
+RBuiltinType *r_builtin_type_alloc( RuminateBackend::TypeId, GError ** ) RUMINATE_NOEXCEPT {
 	RBuiltinType *ret = g_slice_new(RBuiltinType);
 	new (ret) RBuiltinType();
 	return ret;

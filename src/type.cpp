@@ -39,31 +39,31 @@ bool r_type_init( RType *rt, RMemory *rv, void *cur, GError **error ) RUMINATE_N
 	rt->cur = cur;
 
 	switch( rt->type_id ) {
-		case Ruminate::TypeIdArray:
+		case RuminateBackend::TypeIdArray:
 			rt->id = R_TYPE_ARRAY;
 			break;
-		case Ruminate::TypeIdStructure:
-		case Ruminate::TypeIdUnion:
-		case Ruminate::TypeIdEnum:
-		case Ruminate::TypeIdFunction:
+		case RuminateBackend::TypeIdStructure:
+		case RuminateBackend::TypeIdUnion:
+		case RuminateBackend::TypeIdEnum:
+		case RuminateBackend::TypeIdFunction:
 			rt->id = R_TYPE_AGGREGATE;
 			break;
-		case Ruminate::TypeIdInt:
-		case Ruminate::TypeIdLong:
-		case Ruminate::TypeIdDouble:
-		case Ruminate::TypeIdVoid:
-		case Ruminate::TypeIdShort:
-		case Ruminate::TypeIdChar:
-		case Ruminate::TypeIdBool:
+		case RuminateBackend::TypeIdInt:
+		case RuminateBackend::TypeIdLong:
+		case RuminateBackend::TypeIdDouble:
+		case RuminateBackend::TypeIdVoid:
+		case RuminateBackend::TypeIdShort:
+		case RuminateBackend::TypeIdChar:
+		case RuminateBackend::TypeIdBool:
 			rt->id = R_TYPE_BUILTIN;
 			break;
-		case Ruminate::TypeIdTypedef:
+		case RuminateBackend::TypeIdTypedef:
 			rt->id = R_TYPE_TYPEDEF;
 			break;
-		case Ruminate::TypeIdPointer:
+		case RuminateBackend::TypeIdPointer:
 			rt->id = R_TYPE_POINTER;
 			break;
-		case Ruminate::TypeIdUnknown:
+		case RuminateBackend::TypeIdUnknown:
 			rt->id = R_TYPE_UNKNOWN;
 			break;
 		default:
@@ -126,28 +126,28 @@ void r_type_destroy( RType *rt ) RUMINATE_NOEXCEPT {
 }
 
 
-RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
+RType *r_type_alloc( RuminateBackend::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 	switch( id ) {
-		case Ruminate::TypeIdArray:
+		case RuminateBackend::TypeIdArray:
 			return (RType *) r_array_type_alloc(id, error);
-		case Ruminate::TypeIdStructure:
-		case Ruminate::TypeIdEnum:
-		case Ruminate::TypeIdUnion:
-		case Ruminate::TypeIdFunction:
+		case RuminateBackend::TypeIdStructure:
+		case RuminateBackend::TypeIdEnum:
+		case RuminateBackend::TypeIdUnion:
+		case RuminateBackend::TypeIdFunction:
 			return (RType *) r_aggregate_type_alloc(id, error);
-		case Ruminate::TypeIdInt:
-		case Ruminate::TypeIdLong:
-		case Ruminate::TypeIdDouble:
-		case Ruminate::TypeIdVoid:
-		case Ruminate::TypeIdShort:
-		case Ruminate::TypeIdChar:
-		case Ruminate::TypeIdBool:
+		case RuminateBackend::TypeIdInt:
+		case RuminateBackend::TypeIdLong:
+		case RuminateBackend::TypeIdDouble:
+		case RuminateBackend::TypeIdVoid:
+		case RuminateBackend::TypeIdShort:
+		case RuminateBackend::TypeIdChar:
+		case RuminateBackend::TypeIdBool:
 			return (RType *) r_builtin_type_alloc(id, error);
-		case Ruminate::TypeIdTypedef:
+		case RuminateBackend::TypeIdTypedef:
 			return (RType *) r_typedef_type_alloc(id, error);
-		case Ruminate::TypeIdPointer:
+		case RuminateBackend::TypeIdPointer:
 			return (RType *) r_pointer_type_alloc(id, error);
-		case Ruminate::TypeIdUnknown: {
+		case RuminateBackend::TypeIdUnknown: {
 			RType *ret = g_slice_new(RType);
 			new (ret) RType();
 			return ret;
@@ -159,31 +159,31 @@ RType *r_type_alloc( Ruminate::TypeId id, GError **error ) RUMINATE_NOEXCEPT {
 
 void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 	switch( rt->type_id ) {
-		case Ruminate::TypeIdArray:
+		case RuminateBackend::TypeIdArray:
 			r_array_type_free((RArrayType *) rt);
 			break;
-		case Ruminate::TypeIdStructure:
-		case Ruminate::TypeIdUnion:
-		case Ruminate::TypeIdEnum:
-		case Ruminate::TypeIdFunction:
+		case RuminateBackend::TypeIdStructure:
+		case RuminateBackend::TypeIdUnion:
+		case RuminateBackend::TypeIdEnum:
+		case RuminateBackend::TypeIdFunction:
 			r_aggregate_type_free((RAggregateType *) rt);
 			break;
-		case Ruminate::TypeIdInt:
-		case Ruminate::TypeIdLong:
-		case Ruminate::TypeIdDouble:
-		case Ruminate::TypeIdVoid:
-		case Ruminate::TypeIdShort:
-		case Ruminate::TypeIdChar:
-		case Ruminate::TypeIdBool:
+		case RuminateBackend::TypeIdInt:
+		case RuminateBackend::TypeIdLong:
+		case RuminateBackend::TypeIdDouble:
+		case RuminateBackend::TypeIdVoid:
+		case RuminateBackend::TypeIdShort:
+		case RuminateBackend::TypeIdChar:
+		case RuminateBackend::TypeIdBool:
 			r_builtin_type_free((RBuiltinType *) rt);
 			break;
-		case Ruminate::TypeIdTypedef:
+		case RuminateBackend::TypeIdTypedef:
 			r_typedef_type_free((RTypedefType *) rt);
 			break;
-		case Ruminate::TypeIdPointer:
+		case RuminateBackend::TypeIdPointer:
 			r_pointer_type_free((RPointerType *) rt);
 			break;
-		case Ruminate::TypeIdUnknown:
+		case RuminateBackend::TypeIdUnknown:
 			rt->~RType();
 			g_slice_free(RType, rt);
 			break;
@@ -192,9 +192,9 @@ void r_type_free( RType *rt ) RUMINATE_NOEXCEPT {
 	}
 }
 
-RType *r_type_new( Ruminate::TypePrx &type, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
+RType *r_type_new( RuminateBackend::TypePrx &type, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
 	RType *rt;
-	Ruminate::TypeId id;
+	RuminateBackend::TypeId id;
 
 	if( !gxx_call(id = type->getId(), error) )
 		goto error_getId;
@@ -252,7 +252,7 @@ void r_type_unref( RType *rt ) RUMINATE_NOEXCEPT {
 RType *r_type_pointer( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	// TODO: Runtime error if rt is not value-backed.
 	RMemory *rm;
-	Ruminate::TypePrx t;
+	RuminateBackend::TypePrx t;
 	void **ptrptr;
 	
 	ptrptr = g_new(void *, 1);

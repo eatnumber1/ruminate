@@ -23,6 +23,7 @@ G_BEGIN_DECLS
 #include <ruminate/type.h>
 #include <ruminate/type_member.h>
 #include <ruminate/aggregate_member.h>
+#include <ruminate/enum_member.h>
 #include <ruminate/builtin_type.h>
 #include <ruminate/array_type.h>
 #include <ruminate/typedef_type.h>

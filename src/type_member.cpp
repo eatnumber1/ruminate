@@ -23,16 +23,31 @@
 #include "private/type_member.h"
 #include "private/aggregate_member.h"
 
-bool r_type_member_init( RTypeMember *tm, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
+bool r_type_member_init( RTypeMember *tm, RType *container, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
+	switch( container->type_id ) {
+		case RuminateBackend::TypeIdArray:
+			tm->id = R_TYPE_MEMBER_ARRAY;
+			break;
+		case RuminateBackend::TypeIdStructure:
+		case RuminateBackend::TypeIdEnum:
+		case RuminateBackend::TypeIdUnion:
+		case RuminateBackend::TypeIdFunction:
+			tm->id = R_TYPE_MEMBER_AGGREGATE;
+			break;
+		default:
+			g_assert_not_reached();
+	}
+
 	tm->refcnt = 1;
 	tm->ptr = r_memory_ref(rv);
 	tm->cur = cur;
+	tm->type = NULL;
 
 	switch( tm->id ) {
 		case R_TYPE_MEMBER_ARRAY:
 			break;
 		case R_TYPE_MEMBER_AGGREGATE:
-			if( !r_aggregate_member_init((RAggregateMember *) tm, error) )
+			if( !r_aggregate_member_init((RAggregateMember *) tm, container, error) )
 				goto err_child_init;
 			break;
 		default:
@@ -55,23 +70,30 @@ void r_type_member_destroy( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 		default:
 			g_assert_not_reached();
 	}
+	if( tm->type != NULL ) r_type_unref(tm->type);
+	tm->type = NULL;
 	r_memory_unref(tm->ptr);
 	tm->ptr = NULL;
 	tm->cur = NULL;
 }
 
-RTypeMember *r_type_member_alloc( RTypeMemberId id, GError **error ) RUMINATE_NOEXCEPT {
-	switch( id ) {
-		case R_TYPE_MEMBER_AGGREGATE:
-			return (RTypeMember *) r_aggregate_member_alloc(error);
-		case R_TYPE_MEMBER_ARRAY: {
+RTypeMember *r_type_member_alloc( RType *container, GError **error ) RUMINATE_NOEXCEPT {
+	switch( container->type_id ) {
+		case RuminateBackend::TypeIdArray: {
 			RTypeMember *ret = g_slice_new(RTypeMember);
 			new (ret) RTypeMember();
 			return ret;
 		}
+		case RuminateBackend::TypeIdStructure:
+		case RuminateBackend::TypeIdEnum:
+		case RuminateBackend::TypeIdUnion:
+		case RuminateBackend::TypeIdFunction:
+			return (RTypeMember *) r_aggregate_member_alloc(container, error);
 		default:
 			g_assert_not_reached();
 	}
+
+	g_assert_not_reached();
 }
 
 void r_type_member_free( RTypeMember *tm ) RUMINATE_NOEXCEPT {
@@ -88,14 +110,13 @@ void r_type_member_free( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 	}
 }
 
-RTypeMember *r_type_member_new( Ruminate::TypeMemberPrx &member, RTypeMemberId id, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
-	RTypeMember *tm = r_type_member_alloc(id, error);
+RTypeMember *r_type_member_new( RuminateBackend::TypeMemberPrx &member, RType *container, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
+	RTypeMember *tm = r_type_member_alloc(container, error);
 	if( tm == NULL ) goto error_r_type_member_alloc;
 
 	tm->member = member;
-	tm->id = id;
 
-	if( !r_type_member_init(tm, rv, cur, error) ) goto error_r_type_member_init;
+	if( !r_type_member_init(tm, container, rv, cur, error) ) goto error_r_type_member_init;
 	return tm;
 
 error_r_type_member_init:
@@ -109,7 +130,7 @@ void r_type_member_delete( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 	r_type_member_free(tm);
 }
 
-bool _r_type_member_offset( Ruminate::TypeMemberPrx &tmp, off_t *out, GError **error ) RUMINATE_NOEXCEPT {
+bool _r_type_member_offset( RuminateBackend::TypeMemberPrx &tmp, off_t *out, GError **error ) RUMINATE_NOEXCEPT {
 	G_STATIC_ASSERT(sizeof(off_t) >= sizeof(__typeof__(tmp->getOffsetInBytes())));
 	g_assert(out != NULL);
 
@@ -128,11 +149,14 @@ RTypeMemberId r_type_member_id( RTypeMember *tm, GError ** ) RUMINATE_NOEXCEPT {
 }
 
 RType *r_type_member_type( RTypeMember *tm, GError **error ) RUMINATE_NOEXCEPT {
-	Ruminate::TypePrx t;
+	if( tm->type != NULL ) return r_type_ref(tm->type);
+
+	RuminateBackend::TypePrx t;
 	if( !gxx_call(t = tm->member->getType(), error) )
 		return NULL;
 
-	return r_type_new(t, tm->ptr, tm->cur, error);
+	tm->type = r_type_new(t, tm->ptr, tm->cur, error);
+	return r_type_ref(tm->type);
 }
 
 off_t r_type_member_offset( RTypeMember *tm, GError **error ) RUMINATE_NOEXCEPT {

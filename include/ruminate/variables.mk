@@ -6,6 +6,7 @@ INCLUDE_RUMINATE_PUBLIC_HEADERS := \
 	function_type.h \
 	pointer_type.h \
 	aggregate_member.h \
+	enum_member.h \
 	aggregate_type.h \
 	ruminate.h \
 	string.h \

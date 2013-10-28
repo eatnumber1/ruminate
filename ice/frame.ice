@@ -3,7 +3,7 @@
 
 #include <type.ice>
 
-module Ruminate {
+module RuminateBackend {
 	struct Frame {
 		string functionName;
 		string moduleName;

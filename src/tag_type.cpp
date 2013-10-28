@@ -23,13 +23,13 @@
 
 bool r_tag_type_init( RTagType *rtt, GError **error ) RUMINATE_NOEXCEPT {
 	switch( ((RType *) rtt)->type_id ) {
-		case Ruminate::TypeIdStructure:
+		case RuminateBackend::TypeIdStructure:
 			rtt->id = R_TAG_TYPE_STRUCTURE;
 			break;
-		case Ruminate::TypeIdUnion:
+		case RuminateBackend::TypeIdUnion:
 			rtt->id = R_TAG_TYPE_UNION;
 			break;
-		case Ruminate::TypeIdEnum:
+		case RuminateBackend::TypeIdEnum:
 			rtt->id = R_TAG_TYPE_ENUM;
 			break;
 		default:
@@ -41,11 +41,11 @@ bool r_tag_type_init( RTagType *rtt, GError **error ) RUMINATE_NOEXCEPT {
 
 void r_tag_type_destroy( RTagType * ) RUMINATE_NOEXCEPT {}
 
-RTagType *r_tag_type_alloc( Ruminate::TypeId id, GError ** ) RUMINATE_NOEXCEPT {
+RTagType *r_tag_type_alloc( RuminateBackend::TypeId id, GError ** ) RUMINATE_NOEXCEPT {
 	switch( id ) {
-		case Ruminate::TypeIdStructure:
-		case Ruminate::TypeIdUnion:
-		case Ruminate::TypeIdEnum: {
+		case RuminateBackend::TypeIdStructure:
+		case RuminateBackend::TypeIdUnion:
+		case RuminateBackend::TypeIdEnum: {
 			RTagType *ret = g_slice_new(RTagType);
 			new (ret) RTagType();
 			return ret;

@@ -4,6 +4,7 @@
  *
  * @file aggregate_member.h
  * @see RAggregateMember
+ * @see RAggregateType
  */
 
 /** An identifier denoting the real type of this RAggregateMember.
@@ -13,14 +14,16 @@
  * @enum RAggregateMemberId
  */
 typedef enum RAggregateMemberId {
-	R_AGGREGATE_MEMBER_BITFIELD,
-	R_AGGREGATE_MEMBER_OTHER
+	R_AGGREGATE_MEMBER_BITFIELD /** a bitfield */,
+	R_AGGREGATE_MEMBER_ENUM /** an instance of REnumMember @see REnumMember */,
+	R_AGGREGATE_MEMBER_OTHER /** a "normal" type (non enum-member nor bitfield) */
 } RAggregateMemberId;
 
 /** An opaque struct representing a aggregate member.
  *
  * @struct RAggregateMember
  * @extends RTypeMember
+ * @see RAggregateType
  */
 typedef struct RAggregateMember RAggregateMember;
 

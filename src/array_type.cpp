@@ -37,7 +37,7 @@ void r_array_type_destroy( RArrayType *rat ) RUMINATE_NOEXCEPT {
 	}
 }
 
-RArrayType *r_array_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
+RArrayType *r_array_type_alloc( RuminateBackend::TypeId, GError ** ) RUMINATE_NOEXCEPT {
 	RArrayType *ret = g_slice_new(RArrayType);
 	new (ret) RArrayType();
 	return ret;
@@ -74,12 +74,12 @@ size_t r_array_type_size( RArrayType *rat, GError **error ) RUMINATE_NOEXCEPT {
 RTypeMember *r_array_type_member_at( RArrayType *rat, size_t idx, GError **error ) RUMINATE_NOEXCEPT {
 	if( !init_members(rat, error) ) return NULL;
 	// TODO: vector access could throw
-	Ruminate::TypeMemberPrx tmp = rat->members.value[idx];
+	RuminateBackend::TypeMemberPrx tmp = rat->members.value[idx];
 	off_t offset;
 	if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
 	// TODO: Memoize RTypeMembers
 	RType *rt = (RType *) rat;
-	return r_type_member_new(tmp, R_TYPE_MEMBER_ARRAY, rt->ptr, ((uint8_t *) rt->cur) + offset, error);
+	return r_type_member_new(tmp, (RType *) rat, rt->ptr, ((uint8_t *) rt->cur) + offset, error);
 }
 
 G_END_DECLS

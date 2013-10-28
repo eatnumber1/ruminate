@@ -12,6 +12,7 @@ SRC_SOURCES := \
 	tag_type.cpp \
 	function_type.cpp \
 	aggregate_type.cpp \
+	enum_member.cpp \
 	aggregate_member.cpp \
 	type_member.cpp \
 	frame.cpp \

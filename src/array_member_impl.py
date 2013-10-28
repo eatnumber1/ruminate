@@ -1,4 +1,4 @@
-from Ruminate import *
+from RuminateBackend import *
 
 class ArrayMemberImpl(TypeMember):
 	@staticmethod

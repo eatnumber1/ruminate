@@ -1,7 +1,7 @@
 #ifndef _EXCEPTIONS_ICE_
 #define _EXCEPTIONS_ICE_
 
-module Ruminate {
+module RuminateBackend {
 	exception RuminateException {};
 	exception LLDBException extends RuminateException {};
 	exception SBInvalidException extends LLDBException {};

@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from Ruminate import SBInvalidException, SBErrorException, LLDBException
+from RuminateBackend import SBInvalidException, SBErrorException, LLDBException
 from lldb import SBError, SBStream, SBEvent, SBProcess
 import lldb
 

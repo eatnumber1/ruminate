@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys, os, struct, Ice
-from Ruminate import *
+from RuminateBackend import *
 from debugger_factory_impl import *
 
 try:

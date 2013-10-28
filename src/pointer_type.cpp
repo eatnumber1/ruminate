@@ -25,7 +25,7 @@ bool r_pointer_type_init( RPointerType *, GError ** ) RUMINATE_NOEXCEPT {
 
 void r_pointer_type_destroy( RPointerType * ) RUMINATE_NOEXCEPT {}
 
-RPointerType *r_pointer_type_alloc( Ruminate::TypeId, GError ** ) RUMINATE_NOEXCEPT {
+RPointerType *r_pointer_type_alloc( RuminateBackend::TypeId, GError ** ) RUMINATE_NOEXCEPT {
 	RPointerType *ret = g_slice_new(RPointerType);
 	new (ret) RPointerType();
 	return ret;
@@ -41,7 +41,7 @@ G_BEGIN_DECLS
 RType *r_pointer_type_pointee( RPointerType *rpt, GError **error ) RUMINATE_NOEXCEPT {
 	RType *rt = (RType *) rpt;
 	void *ptr = *((void **) rt->cur);
-	Ruminate::TypePrx t;
+	RuminateBackend::TypePrx t;
 	G_STATIC_ASSERT(sizeof(ptr) <= sizeof(::Ice::Long));
 	if( !gxx_call(t = ((RType *) rpt)->type->getPointeeType((::Ice::Long) ptr), error) )
 		return NULL;

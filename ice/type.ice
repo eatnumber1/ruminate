@@ -3,7 +3,7 @@
 
 #include <type_member.ice>
 
-module Ruminate {
+module RuminateBackend {
 	enum TypeId {
 		TypeIdStructure,
 		TypeIdEnum,

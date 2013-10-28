@@ -4,7 +4,7 @@
 #include <Ice/Identity.ice>
 #include <debugger.ice>
 
-module Ruminate {
+module RuminateBackend {
 	struct DebuggerFactoryOptions {
 		string exename;
 		long pid;
