@@ -8,9 +8,11 @@ src/clean:
 src/depclean:
 	$(RM) $(SRC_DEPS)
 
-src/install:
+src/install: $(SRC_PKG_CONFIG_FILES)
 	$(INSTALL) -d $(PREFIX)/lib
 	$(INSTALL) $(LIBRUMINATE) $(PREFIX)/lib
+	$(INSTALL) -d $(PREFIX)/lib/pkgconfig
+	$(INSTALL) $(SRC_PKG_CONFIG_FILES) $(PREFIX)/lib/pkgconfig
 
 $(LIBRUMINATE): $(SRC_OBJECTS) $(ICE_OBJECTS) $(ICE_PY_SOURCES)
 $(LIBRUMINATE): SO_OBJECTS := $(SRC_OBJECTS) $(ICE_OBJECTS)

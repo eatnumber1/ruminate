@@ -4,6 +4,7 @@ SLICE2CPP := slice2cpp
 SLICE2PY := slice2py
 
 INSTALL ?= install
+SED ?= sed
 
 PREFIX ?= /usr/local
 
@@ -139,5 +140,8 @@ CURDIR := $(TOPDIR)
 
 %.$(SO_SUFFIX):
 	$(CXX) $(SO_LINK_FLAGS) -o $@ $(SO_OBJECTS) $(FLAGS_LINKER)
+
+%.pc: %.pc.in
+	$(SED) -e "s,@prefix@,$(PREFIX:,=\,),g" $< > $@ || $(RM) $@
 
 # vim:tw=80

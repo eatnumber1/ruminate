@@ -19,6 +19,10 @@ SRC_SOURCES := \
 	ruminate.cpp
 SRC_SOURCES := $(SRC_SOURCES:%=$(CURDIR)/%)
 
+SRC_PKG_CONFIG_IN := ruminate.pc.in
+SRC_PKG_CONFIG_IN := $(SRC_PKG_CONFIG_IN:%=$(CURDIR)/%)
+SRC_PKG_CONFIG_FILES := $(SRC_PKG_CONFIG_IN:.pc.in=.pc)
+
 SRC_OBJECTS := $(SRC_SOURCES:.c=.o)
 SRC_OBJECTS := $(SRC_OBJECTS:.cpp=.o)
 
