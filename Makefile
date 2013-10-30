@@ -28,8 +28,8 @@ FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER_CXX) -std=c++98
 FLAGS_PREPROC_AND_COMPILER_C := $(FLAGS_PREPROC_AND_COMPILER_C) -std=c99
 FLAGS_COMPILER := $(FLAGS_COMPILER) -g -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls -fPIC -fvisibility=hidden
 
-FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) $(shell $(PKG_CONFIG) --cflags gthread-2.0) $(shell $(PKG_CONFIG) --cflags glib-2.0)
-FLAGS_LINKER := $(FLAGS_LINKER) $(shell $(PKG_CONFIG) --libs gthread-2.0) $(shell $(PKG_CONFIG) --libs glib-2.0)
+FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) $(shell $(PKG_CONFIG) --cflags gthread-2.0) $(shell $(PKG_CONFIG) --cflags 'glib-2.0 >= 2.38')
+FLAGS_LINKER := $(FLAGS_LINKER) $(shell $(PKG_CONFIG) --libs gthread-2.0) $(shell $(PKG_CONFIG) --libs 'glib-2.0 >= 2.38')
 
 ifeq ($(shell uname),Darwin)
 SO_SUFFIX := dylib
