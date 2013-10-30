@@ -3,6 +3,10 @@ CXX := clang++
 SLICE2CPP := slice2cpp
 SLICE2PY := slice2py
 
+INSTALL ?= install
+
+PREFIX ?= /usr/local
+
 PKG_CONFIG ?= pkg-config
 
 SUBDIRS := ice include src test doc include/ruminate

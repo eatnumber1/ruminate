@@ -1,4 +1,5 @@
 INCLUDE_RUMINATE_PUBLIC_HEADERS := \
+	common.h \
 	array_type.h \
 	builtin_type.h \
 	errors.h \

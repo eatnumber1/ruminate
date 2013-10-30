@@ -1,4 +1,4 @@
-.PHONY: src/all src/clean src/depclean
+.PHONY: src/all src/clean src/depclean src/install
 
 src/all: $(LIBRUMINATE)
 
@@ -7,6 +7,10 @@ src/clean:
 
 src/depclean:
 	$(RM) $(SRC_DEPS)
+
+src/install:
+	$(INSTALL) -d $(PREFIX)/lib
+	$(INSTALL) $(LIBRUMINATE) $(PREFIX)/lib
 
 $(LIBRUMINATE): $(SRC_OBJECTS) $(ICE_OBJECTS) $(ICE_PY_SOURCES)
 $(LIBRUMINATE): SO_OBJECTS := $(SRC_OBJECTS) $(ICE_OBJECTS)
