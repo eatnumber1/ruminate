@@ -7,7 +7,10 @@ except ImportError:
 	sys.path.insert(0, subprocess.check_output("lldb -P", shell = True).strip())
 	import lldb
 
-import os, struct, Ice
+import os, struct, Ice, site
+
+sys.path.insert(0, "@prefix@/lib/python%d.%d/site-packages" % (sys.version_info.major, sys.version_info.minor))
+
 from RuminateBackend import *
 from debugger_factory_impl import *
 

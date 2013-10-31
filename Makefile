@@ -14,6 +14,7 @@ FLOCK ?= flock
 LN ?= ln -f
 CP ?= cp
 PYTHON ?= python
+CHMOD ?= chmod
 
 SUBDIRS := ice include src test doc include/ruminate python
 
@@ -34,7 +35,7 @@ FLAGS_ALL := $(FLAGS_ALL) -ferror-limit=3
 FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) -Wall -Wextra -Wnonnull
 FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER_CXX) -std=c++98
 FLAGS_PREPROC_AND_COMPILER_C := $(FLAGS_PREPROC_AND_COMPILER_C) -std=c99
-FLAGS_COMPILER := $(FLAGS_COMPILER) -g -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls -fPIC -fvisibility=hidden
+FLAGS_COMPILER := $(FLAGS_COMPILER) -g -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls -fPIC -fvisibility=hidden -pipe
 
 FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) $(shell $(PKG_CONFIG) --cflags 'glib-2.0 >= 2.38')
 FLAGS_LINKER := $(FLAGS_LINKER) $(shell $(PKG_CONFIG) --libs 'glib-2.0 >= 2.38')
@@ -140,10 +141,10 @@ vars:
 	$(CXX) -MM -MQ $(@:.d=.o) -MQ $@ -MF $*.d $< $(FLAGS_PREPROCESSOR_CXX) $(FLAGS_PREPROC_AND_COMPILER_CXX) -w
 
 %_ice.py.d: %.ice
-	( $(SLICE2PY) --depend $< $(FLAGS_SLICE2PY) | sed -e '1 s,\([^ ]\+[ :]\),$(@D)/\1,g' -e '1 s,\([^ ]\+\)\.py[ :],\1.py.d &,1' > $@ ) || $(RM) $@
+	( $(SLICE2PY) --depend $< $(FLAGS_SLICE2PY) | $(SED) -e '1 s,\([^ ]\+[ :]\),$(@D)/\1,g' -e '1 s,\([^ ]\+\)\.py[ :],\1.py.d &,1' > $@ ) || $(RM) $@
 
 %.cpp.d: %.ice
-	( $(SLICE2CPP) --depend $< $(FLAGS_SLICE2CPP) | sed -e '1 s,\([^ ]\+[ :]\),$(@D)/\1,g' -e '1 s,\([^ ]\+\).h[ :],\1.cpp.d &,1' > $@ ) || $(RM) $@
+	( $(SLICE2CPP) --depend $< $(FLAGS_SLICE2CPP) | $(SED) -e '1 s,\([^ ]\+[ :]\),$(@D)/\1,g' -e '1 s,\([^ ]\+\).h[ :],\1.cpp.d &,1' > $@ ) || $(RM) $@
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(FLAGS_PREPROCESSOR_C) $(FLAGS_COMPILER_C) $(FLAGS_PREPROC_AND_COMPILER_C)
@@ -160,5 +161,5 @@ vars:
 %.$(SO_SUFFIX):
 	$(CXX) $(SO_LINK_FLAGS) -o $@ $(SO_OBJECTS) $(FLAGS_LINKER)
 
-%.pc: %.pc.in
+%: %.in
 	$(SED) -e "s,@prefix@,$(PREFIX:,=\,),g" $< > $@ || $(RM) $@

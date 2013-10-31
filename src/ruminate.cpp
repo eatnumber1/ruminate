@@ -49,11 +49,6 @@ void ruminate_hit_breakpoint() RUMINATE_NOEXCEPT {
 	asm("");
 }
 
-static void setup_env() RUMINATE_NOEXCEPT {
-	// TODO: Remove this
-	setenv("PYTHONPATH", "ice:python", true);
-}
-
 static gint fork_child( GError **err ) RUMINATE_NOEXCEPT {
 	size_t len = strlen(RUMINATE_DEBUGGER_CONTROLLER_PATH) + 1;
 	char controller_path[len];
@@ -68,7 +63,7 @@ static gint fork_child( GError **err ) RUMINATE_NOEXCEPT {
 		argv,
 		NULL,
 		(GSpawnFlags) 0,
-		(GSpawnChildSetupFunc) &setup_env,
+		NULL,
 		NULL,
 		&ruminate->child_pid,
 		NULL,
