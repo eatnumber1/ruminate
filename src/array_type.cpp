@@ -53,9 +53,12 @@ static bool init_members( RArrayType *rat, GError **error ) RUMINATE_NOEXCEPT {
 	if( !rat->members.valid ) {
 		RType *rt = (RType *) rat;
 		// TODO: Handle exceptions
-		Ice::AsyncResultPtr arp = rt->type->begin_getMembers(gettid());
+		Ice::AsyncResultPtr arp;
+		if( !gxx_call(arp = rt->type->begin_getMembers(gettid()), error) )
+			return false;
 		ruminate_hit_breakpoint();
-		rat->members.value = rt->type->end_getMembers(arp);
+		if( !gxx_call(rat->members.value = rt->type->end_getMembers(arp), error) )
+			return false;
 		rat->members.valid = true;
 	}
 	return true;

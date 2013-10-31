@@ -257,25 +257,22 @@ static bool _print_json_for_identified_union( RAggregateType *rt, void *data, GE
 }
 
 static bool _print_json_for_aggregate( RAggregateType *rt, void *data, GError **error ) {
-	switch( r_aggregate_type_id(rt, error) ) {
-		case R_AGGREGATE_TYPE_TAG:
-			if( r_tag_type_id((RTagType *) rt, error) == R_TAG_TYPE_STRUCTURE ) {
-				RString *rs = r_type_name((RType *) rt, error);
-				die_if_error(*error);
-				// TODO: Error checking
-				bool is_identified_union = (strcmp(r_string_bytes(rs), "IdentifiedUnion") == 0);
-				r_string_unref(rs);
-				if( is_identified_union )
-					return _print_json_for_identified_union(rt, data, error);
-			} else {
-				// TODO: Error checking
-				die_if_error(*error);
-			}
-			// Fallthrough
-		default:
-			// TODO: Error checking
-			die_if_error(*error);
+	RAggregateTypeId id = r_aggregate_type_id(rt, error);
+	die_if_error(*error);
+	// TODO: Error checking
 
+	switch( id ) {
+		case R_AGGREGATE_TYPE_STRUCT: {
+			RString *rs = r_type_name((RType *) rt, error);
+			die_if_error(*error);
+			// TODO: Error checking
+			bool is_identified_union = (strcmp(r_string_bytes(rs), "IdentifiedUnion") == 0);
+			r_string_unref(rs);
+			if( is_identified_union )
+				return _print_json_for_identified_union(rt, data, error);
+			// Fallthrough
+		}
+		default: {
 			size_t nmembers = r_aggregate_type_nmembers(rt, error);
 			die_if_error(*error);
 			// TODO: Error checking
@@ -294,6 +291,7 @@ static bool _print_json_for_aggregate( RAggregateType *rt, void *data, GError **
 				if( i != nmembers - 1 ) printf(",");
 			}
 			printf("}");
+		}
 	}
 
 	return true;
@@ -423,7 +421,6 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 			// TODO: Error checking
 			break;
 		case R_TYPE_AGGREGATE:
-			// TODO: Support other tag types.
 			_print_json_for_aggregate((RAggregateType *) type, data, error);
 			die_if_error(*error);
 			// TODO: Error checking

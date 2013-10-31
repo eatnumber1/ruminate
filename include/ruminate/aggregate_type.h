@@ -13,8 +13,11 @@
  * @enum RAggregateTypeId
  */
 typedef enum RAggregateTypeId {
-	R_AGGREGATE_TYPE_TAG /** a tagged type @see RTagType */,
-	R_AGGREGATE_TYPE_FUNCTION /** a function type @see RFunctionType */
+	R_AGGREGATE_TYPE_STRUCT /** a `struct` */,
+	R_AGGREGATE_TYPE_UNION /** a `union` */,
+	R_AGGREGATE_TYPE_ENUM /** an `enum` */,
+	R_AGGREGATE_TYPE_FUNCTION /** a function type @see RFunctionType */,
+	R_AGGREGATE_TYPE_UNKNOWN /** an unknown type */
 } RAggregateTypeId;
 
 /** An opaque struct representing a aggregate type.

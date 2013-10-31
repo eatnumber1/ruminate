@@ -11,7 +11,6 @@ INCLUDE_RUMINATE_PUBLIC_HEADERS := \
 	aggregate_type.h \
 	ruminate.h \
 	string.h \
-	tag_type.h \
 	type.h \
 	type_member.h \
 	typedef_type.h

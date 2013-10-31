@@ -9,7 +9,6 @@ SRC_SOURCES := \
 	array_type.cpp \
 	pointer_type.cpp \
 	typedef_type.cpp \
-	tag_type.cpp \
 	function_type.cpp \
 	aggregate_type.cpp \
 	enum_member.cpp \

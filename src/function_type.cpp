@@ -16,7 +16,6 @@
 #include "ruminate/type.h"
 #include "ruminate/aggregate_member.h"
 #include "ruminate/aggregate_type.h"
-#include "ruminate/tag_type.h"
 #include "ruminate/type_member.h"
 #include "ruminate/function_type.h"
 #include "ruminate/frame.h"
@@ -30,7 +29,6 @@
 #include "private/aggregate_member.h"
 #include "private/type.h"
 #include "private/aggregate_type.h"
-#include "private/tag_type.h"
 #include "private/function_type.h"
 
 bool r_function_type_init( RFunctionType *rft, GError ** ) RUMINATE_NOEXCEPT {

@@ -28,7 +28,6 @@ G_BEGIN_DECLS
 #include <ruminate/array_type.h>
 #include <ruminate/typedef_type.h>
 #include <ruminate/pointer_type.h>
-#include <ruminate/tag_type.h>
 #include <ruminate/aggregate_type.h>
 #include <ruminate/function_type.h>
 

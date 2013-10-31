@@ -17,7 +17,6 @@
 #include "ruminate/type_member.h"
 #include "ruminate/aggregate_member.h"
 #include "ruminate/aggregate_type.h"
-#include "ruminate/tag_type.h"
 #include "ruminate/function_type.h"
 #include "ruminate/frame.h"
 #include "ruminate/ruminate.h"
@@ -29,43 +28,47 @@
 #include "private/type_member.h"
 #include "private/aggregate_member.h"
 #include "private/aggregate_type.h"
-#include "private/tag_type.h"
 #include "private/function_type.h"
 
-bool r_aggregate_type_init( RAggregateType *rrt, GError **error ) RUMINATE_NOEXCEPT {
-	rrt->members_init = false;
+bool r_aggregate_type_init( RAggregateType *rat, GError **error ) RUMINATE_NOEXCEPT {
+	rat->members_init = false;
 
-	switch( ((RType *) rrt)->type_id ) {
+	switch( ((RType *) rat)->type_id ) {
 		case RuminateBackend::TypeIdStructure:
+			rat->id = R_AGGREGATE_TYPE_STRUCT;
+			break;
 		case RuminateBackend::TypeIdUnion:
+			rat->id = R_AGGREGATE_TYPE_UNION;
+			break;
 		case RuminateBackend::TypeIdEnum:
-			rrt->id = R_AGGREGATE_TYPE_TAG;
-			return r_tag_type_init((RTagType *) rrt, error);;
+			rat->id = R_AGGREGATE_TYPE_ENUM;
+			break;
 		case RuminateBackend::TypeIdFunction:
-			rrt->id = R_AGGREGATE_TYPE_FUNCTION;
-			return r_function_type_init((RFunctionType *) rrt, error);
+			rat->id = R_AGGREGATE_TYPE_FUNCTION;
+			return r_function_type_init((RFunctionType *) rat, error);
 		default:
 			g_assert_not_reached();
 	}
 
-	g_assert_not_reached();
+	return true;
 }
 
-void r_aggregate_type_destroy( RAggregateType *rrt ) RUMINATE_NOEXCEPT {
-	switch( rrt->id ) {
-		case R_AGGREGATE_TYPE_TAG:
-			r_tag_type_destroy((RTagType *) rrt);
+void r_aggregate_type_destroy( RAggregateType *rat ) RUMINATE_NOEXCEPT {
+	switch( rat->id ) {
+		case R_AGGREGATE_TYPE_STRUCT:
+		case R_AGGREGATE_TYPE_UNION:
+		case R_AGGREGATE_TYPE_ENUM:
 			break;
 		case R_AGGREGATE_TYPE_FUNCTION:
-			r_function_type_destroy((RFunctionType *) rrt);
+			r_function_type_destroy((RFunctionType *) rat);
 			break;
 		default:
 			g_assert_not_reached();
 	}
 
-	if( rrt->members_init ) {
-		rrt->members.clear();
-		rrt->members_init = false;
+	if( rat->members_init ) {
+		rat->members.clear();
+		rat->members_init = false;
 	}
 }
 
@@ -75,8 +78,11 @@ RAggregateType *r_aggregate_type_alloc( RuminateBackend::TypeId id, GError **err
 			return (RAggregateType *) r_function_type_alloc(id, error);
 		case RuminateBackend::TypeIdUnion:
 		case RuminateBackend::TypeIdEnum:
-		case RuminateBackend::TypeIdStructure:
-			return (RAggregateType *) r_tag_type_alloc(id, error);
+		case RuminateBackend::TypeIdStructure: {
+			RAggregateType *ret = g_slice_new(RAggregateType);
+			new (ret) RAggregateType();
+			return ret;
+		}
 		default:
 			g_assert_not_reached();
 	}
@@ -84,50 +90,53 @@ RAggregateType *r_aggregate_type_alloc( RuminateBackend::TypeId id, GError **err
 	g_assert_not_reached();
 }
 
-void r_aggregate_type_free( RAggregateType *rrt ) RUMINATE_NOEXCEPT {
-	switch( rrt->id ) {
-		case R_AGGREGATE_TYPE_TAG:
-			r_tag_type_free((RTagType *) rrt);
+void r_aggregate_type_free( RAggregateType *rat ) RUMINATE_NOEXCEPT {
+	switch( rat->id ) {
+		case R_AGGREGATE_TYPE_STRUCT:
+		case R_AGGREGATE_TYPE_UNION:
+		case R_AGGREGATE_TYPE_ENUM:
+			rat->~RAggregateType();
+			g_slice_free(RAggregateType, rat);
 			break;
 		case R_AGGREGATE_TYPE_FUNCTION:
-			r_function_type_free((RFunctionType *) rrt);
+			r_function_type_free((RFunctionType *) rat);
 			break;
 		default:
 			g_assert_not_reached();
 	}
 }
 
-static bool init_members( RAggregateType *rrt, GError **error ) RUMINATE_NOEXCEPT {
-	if( !rrt->members_init ) {
-		RType *rt = (RType *) rrt;
-		if( !gxx_call(rrt->members = rt->type->getMembers(IceUtil::None), error) )
+static bool init_members( RAggregateType *rat, GError **error ) RUMINATE_NOEXCEPT {
+	if( !rat->members_init ) {
+		RType *rt = (RType *) rat;
+		if( !gxx_call(rat->members = rt->type->getMembers(IceUtil::None), error) )
 			return false;
-		rrt->members_init = true;
+		rat->members_init = true;
 	}
 	return true;
 }
 
 G_BEGIN_DECLS
 
-RAggregateTypeId r_aggregate_type_id( RAggregateType *rrt, GError ** ) RUMINATE_NOEXCEPT {
-	return rrt->id;
+RAggregateTypeId r_aggregate_type_id( RAggregateType *rat, GError ** ) RUMINATE_NOEXCEPT {
+	return rat->id;
 }
 
-size_t r_aggregate_type_nmembers( RAggregateType *rrt, GError **error ) RUMINATE_NOEXCEPT {
-	if( !init_members(rrt, error) ) return 0;
-	return rrt->members.size();
+size_t r_aggregate_type_nmembers( RAggregateType *rat, GError **error ) RUMINATE_NOEXCEPT {
+	if( !init_members(rat, error) ) return 0;
+	return rat->members.size();
 }
 
-RAggregateMember *r_aggregate_type_member_at( RAggregateType *rrt, size_t i, GError **error ) RUMINATE_NOEXCEPT {
-	if( !init_members(rrt, error) ) return 0;
+RAggregateMember *r_aggregate_type_member_at( RAggregateType *rat, size_t i, GError **error ) RUMINATE_NOEXCEPT {
+	if( !init_members(rat, error) ) return 0;
 	// TODO: vector access could throw
-	RuminateBackend::TypeMemberPrx tmp = rrt->members[i];
+	RuminateBackend::TypeMemberPrx tmp = rat->members[i];
 	off_t offset = 0;
-	if( rrt->id != R_AGGREGATE_TYPE_FUNCTION ) {
+	if( rat->id != R_AGGREGATE_TYPE_FUNCTION ) {
 		if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
 	}
 	// TODO: Memoize RAggregateMembers
-	RType *rt = (RType *) rrt;
+	RType *rt = (RType *) rat;
 	return (RAggregateMember *) r_type_member_new(tmp, rt, rt->ptr, ((uint8_t *) rt->cur) + offset, error);
 }
 
