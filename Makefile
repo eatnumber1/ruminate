@@ -1,3 +1,4 @@
+# TODO: GMSL http://gmsl.sourceforge.net/ can simplify things
 CC := clang
 CXX := clang++
 SLICE2CPP := slice2cpp
@@ -10,7 +11,7 @@ PREFIX ?= /usr/local
 
 PKG_CONFIG ?= pkg-config
 
-SUBDIRS := ice include src test doc include/ruminate
+SUBDIRS := ice include src test doc include/ruminate python
 
 CSCOPE_FILES := cscope.out cscope.po.out cscope.in.out
 
@@ -77,28 +78,23 @@ $(DOC_TARGETS):
 
 define variableRule
  CURDIR := $$(TOPDIR)/$$$(1)
+ CURDIR_SHORT := $$$(1)
+ COMPILE_FLAGS_PREFIX := $(shell echo "$$$(1)" | tr '[:lower:]' '[:upper:]' | tr '/' '_')_
  include $$(CURDIR)/variables.mk
 endef
 $(foreach subdir, $(SUBDIRS), $(eval $(call variableRule, $(subdir))))
+CURDIR := $(TOPDIR)
+CURDIR_SHORT :=
+COMPILE_FLAGS_PREFIX :=
 
-FLAGS_PREPROC_AND_COMPILER_C := $(FLAGS_PREPROC_AND_COMPILER) $(FLAGS_PREPROC_AND_COMPILER_C)
-FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER) $(FLAGS_PREPROC_AND_COMPILER_CXX)
-
-FLAGS_PREPROCESSOR := $(FLAGS_ALL) $(FLAGS_PREPROCESSOR) $(FLAGS_PREPROC_AND_COMPILER)
-FLAGS_PREPROCESSOR_C := $(FLAGS_PREPROCESSOR) $(FLAGS_PREPROCESSOR_C)
-FLAGS_PREPROCESSOR_CXX := $(FLAGS_PREPROCESSOR) $(FLAGS_PREPROCESSOR_CXX)
-
-FLAGS_COMPILER := $(FLAGS_ALL) $(FLAGS_COMPILER)
-FLAGS_COMPILER_C := $(FLAGS_COMPILER) $(FLAGS_COMPILER_C)
-FLAGS_COMPILER_CXX := $(FLAGS_COMPILER) $(FLAGS_COMPILER_CXX)
-
-FLAGS_LINKER := $(FLAGS_ALL) $(FLAGS_LINKER)
+include $(TOPDIR)/mk/compile_flags.mk
 
 # This defines the following for every dir in SUBDIRS:
 #   Sets CURDIR to the $(TOPDIR)/$(dir)
 #   Includes a makefile in $(CURDIR)/Makefile
 define subdirRule
  CURDIR := $$(TOPDIR)/$$$(1)
+ CURDIR_SHORT := $$$(1)
  $$$(1)/all: CURDIR := $$(CURDIR)
  $$$(1)/clean: CURDIR := $$(CURDIR)
  $$$(1)/depclean: CURDIR := $$(CURDIR)
@@ -113,6 +109,17 @@ endef
 $(foreach subdir, $(SUBDIRS), $(eval $(call subdirRule, $(subdir))))
 # Reset CURDIR back to what it should be.
 CURDIR := $(TOPDIR)
+CURDIR_SHORT :=
+COMPILE_FLAGS_PREFIX :=
+
+vars:
+	echo $(SRC_FLAGS_PREPROC_AND_COMPILER)
+	echo $(SRC_FLAGS_PREPROC_AND_COMPILER_C)
+	echo $(FLAGS_PREPROC_AND_COMPILER_C)
+	echo $(test)
+	echo $(foo)
+	echo $(INCLUDE_FLAGS_PREPROC_AND_COMPILER)
+	echo $(INCLUDE_FLAGS_PREPROC_AND_COMPILER_C)
 
 %.exe:
 	$(CXX) -o $@ $(EXE_OBJECTS) $(FLAGS_LINKER)

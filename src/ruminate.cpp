@@ -37,9 +37,6 @@
 #include "private/frame.h"
 #include "private/ruminate.h"
 
-// TODO: Remove this
-#define RUMINATE_DEBUGGER_CONTROLLER_PATH "./src/dbgsvr.py"
-
 static Ruminate *ruminate;
 
 static Ice::Identity init_callbacks( Ice::CommunicatorPtr &, RuminateBackend::DebuggerFactoryPrx & );
@@ -54,7 +51,7 @@ void ruminate_hit_breakpoint() RUMINATE_NOEXCEPT {
 
 static void setup_env() RUMINATE_NOEXCEPT {
 	// TODO: Remove this
-	setenv("PYTHONPATH", "ice:src", true);
+	setenv("PYTHONPATH", "ice:python", true);
 }
 
 static gint fork_child( GError **err ) RUMINATE_NOEXCEPT {

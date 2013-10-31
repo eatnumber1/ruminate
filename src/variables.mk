@@ -29,21 +29,9 @@ SRC_OBJECTS := $(SRC_OBJECTS:.cpp=.o)
 SRC_DEPS := $(SRC_OBJECTS:.o=.d)
 
 SRC_FLAGS_LINKER := $(SRC_LIBRARIES) -lIce -lIceUtil
+SRC_FLAGS_PREPROC_AND_COMPILER := $(SRC_FLAGS_PREPROC_AND_COMPILER) -DRUMINATE_DEBUGGER_CONTROLLER_PATH="\"./python/dbgsvr.py\""
 
 LIBRUMINATE := $(CURDIR)/libruminate.$(SO_SUFFIX)
 LIBRUMINATE_FLAGS_LINKER := -L$(CURDIR) -lruminate
 
-ifneq ($(shell uname),Darwin)
-FLAGS_LINKER := $(FLAGS_LINKER) -Wl,-rpath,$(CURDIR)
-endif
-
-SRC_PYTHON := \
-	src/dbgsvr.py \
-	src/debugger_impl.py \
-	src/lldb_utils.py \
-	src/type_member_impl.py \
-	src/debugger_factory_impl.py \
-	src/lldb_em.py \
-	src/type_impl.py
-
-SRC_PYTHON_OBJECTS := $(SRC_PYTHON:%=%c)
+include $(TOPDIR)/mk/compile_flags.mk
