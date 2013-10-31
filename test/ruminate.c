@@ -14,8 +14,11 @@
 	GError **_err = (err); \
 	__typeof__(expr) __expr = (expr); \
 	RType *_type = ruminate_get_type(__expr, _err); \
-	bool ret = _type == NULL ? false : _print_json_for_type(_type, &__expr, _err); \
-	r_type_unref(_type); \
+    bool ret = false; \
+    if( _type != NULL ) { \
+		ret = _print_json_for_type(_type, &__expr, _err); \
+		r_type_unref(_type); \
+	} \
 	ret; \
 })
 
@@ -29,10 +32,10 @@ struct IdentifiedUnion {
 	union {
 		long a_long;
 		char a_char;
-	} value;
+	};
 };
 
-typedef struct __attribute__((packed)) MyStruct {
+typedef struct MyStruct {
 	short a_short;
 	string a_string;
 	struct {
@@ -126,9 +129,9 @@ static bool _print_json_for_builtin( RBuiltinType *type, void *data, GError **er
 			} else {
 				char c = *((char *) data);
 				if( isalnum(c) ) {
-					printf("'%c'", c);
+					printf("\"%c\"", c);
 				} else {
-					printf("0x%x", c);
+					printf("%hhu", (unsigned char) c);
 				}
 			}
 			break;
@@ -143,7 +146,7 @@ static bool _print_json_for_builtin( RBuiltinType *type, void *data, GError **er
 			}
 			break;
 		default:
-			printf("<unknowable>");
+			printf("\"<unknowable>\"");
 	}
 
 	r_type_unref((RType *) type);
@@ -472,15 +475,11 @@ int main( int argc, char *argv[] ) {
 		.an_enum = AN_ENUM_VALUE,
 		.an_identified_union = {
 			.id = A_LONG,
-			.value = {
-				.a_long = 1024L
-			}
+			.a_long = 1024L
 		},
 		.another_identified_union = {
 			.id = A_CHAR,
-			.value = {
-				.a_char = 'x'
-			}
+			.a_char = 'x'
 		}
 	};
 
