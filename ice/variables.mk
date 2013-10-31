@@ -8,7 +8,9 @@ ICE_SOURCES := \
 	debugee.ice
 ICE_SOURCES := $(ICE_SOURCES:%=$(CURDIR)/%)
 
-ICE_DEPS := $(ICE_DEPS:.ice=.cpp.d) $(ICE_DEPS:.ice=.py.d)
+ICE_CPP_DEPS := $(ICE_SOURCES:.ice=.cpp.d)
+ICE_PY_DEPS := $(ICE_SOURCES:.ice=.py.d)
+ICE_DEPS := $(ICE_CPP_DEPS) $(ICE_PY_DEPS)
 
 ICE_CPP_SOURCES := $(ICE_SOURCES:.ice=.cpp)
 ICE_PY_SOURCES := $(ICE_SOURCES:%.ice=%_ice.py)

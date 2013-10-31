@@ -130,8 +130,11 @@ vars:
 %.d: %.cpp
 	$(CXX) -MM -MQ $(@:.d=.o) -MQ $@ -MF $*.d $< $(FLAGS_PREPROCESSOR_CXX) $(FLAGS_PREPROC_AND_COMPILER_CXX) -w
 
-%.d: %.ice
-	$(SLICE2CPP) --depend $< $(FLAGS_SLICE2CPP) > $@
+%.py.d: %.ice
+	( $(SLICE2PY) --depend $< $(FLAGS_SLICE2PY) | sed -e '1 s,\([^ ]\+[ :]\),$(@D)/\1,g' -e '1 s,\([^ ]\+\)\.py[ :],\1.py.d &,1' > $@ ) || $(RM) $@
+
+%.cpp.d: %.ice
+	( $(SLICE2CPP) --depend $< $(FLAGS_SLICE2CPP) | sed -e '1 s,\([^ ]\+[ :]\),$(@D)/\1,g' -e '1 s,\([^ ]\+\).h[ :],\1.cpp.d &,1' > $@ ) || $(RM) $@
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(FLAGS_PREPROCESSOR_C) $(FLAGS_COMPILER_C) $(FLAGS_PREPROC_AND_COMPILER_C)
