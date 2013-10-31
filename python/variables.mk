@@ -1,10 +1,13 @@
 PYTHON_SOURCES := \
-	src/dbgsvr.py \
-	src/debugger_impl.py \
-	src/lldb_utils.py \
-	src/type_member_impl.py \
-	src/debugger_factory_impl.py \
-	src/lldb_em.py \
-	src/type_impl.py
+	array_member_impl.py \
+	debugger_factory_impl.py \
+	debugger_impl.py \
+	lldb_em.py \
+	lldb_utils.py \
+	stopped_thread.py \
+	type_impl.py \
+	type_impl_factory.py \
+	type_member_impl.py
+PYTHON_SOURCES := $(PYTHON_SOURCES:%=$(CURDIR)/%)
 
-PYTHON_OBJECTS := $(PYTHON_SOURCES:%=%c)
+PYTHON_OBJECTS := $(PYTHON_SOURCES:.py=.pyc)
