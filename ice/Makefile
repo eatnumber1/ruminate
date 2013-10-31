@@ -20,6 +20,7 @@ $(PYDIR)/%_ice.py: $(CURDIR)/%_ice.py
 	$(LN) $< $@
 
 $(ICE_IN_PYDIR_PY_MODDIR): $(ICE_PY_MODDIR)
+	$(RM) -r $@
 	$(CP) -rl $< $@
 
 $(ICE_OBJECTS): FLAGS_PREPROCESSOR_CXX := $(FLAGS_PREPROCESSOR_CXX) $(ICE_FLAGS_PREPROCESSOR)
