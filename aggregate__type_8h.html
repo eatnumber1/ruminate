@@ -100,9 +100,15 @@ $(document).ready(function(){initNavTree('aggregate__type_8h.html','');});
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:ae208e3e28b5dcedb640f7f4b0581d61a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61a">RAggregateTypeId</a> { <br/>
-&#160;&#160;<a class="el" href="aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61aad7d4855d82f47ace4689eef6af2104f5">R_AGGREGATE_TYPE_TAG</a>, 
+&#160;&#160;<a class="el" href="aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61aacbef5ea8a6646ea30c8af2618c98b77d">R_AGGREGATE_TYPE_STRUCT</a>, 
 <br/>
-&#160;&#160;<a class="el" href="aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61aa145e538575fb274daa3e0f896be2c386">R_AGGREGATE_TYPE_FUNCTION</a>
+&#160;&#160;<a class="el" href="aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61aa654a40297b4c4f6e363ae34596ab7e1a">R_AGGREGATE_TYPE_UNION</a>, 
+<br/>
+&#160;&#160;<a class="el" href="aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61aa66dfd502a84ed416a4245ac248a1c344">R_AGGREGATE_TYPE_ENUM</a>, 
+<br/>
+&#160;&#160;<a class="el" href="aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61aa145e538575fb274daa3e0f896be2c386">R_AGGREGATE_TYPE_FUNCTION</a>, 
+<br/>
+&#160;&#160;<a class="el" href="aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61aa1a6412d28d7ed4fd0cddaad1bc3b84c4">R_AGGREGATE_TYPE_UNKNOWN</a>
 <br/>
  }</td></tr>
 <tr class="memdesc:ae208e3e28b5dcedb640f7f4b0581d61a"><td class="mdescLeft">&#160;</td><td class="mdescRight">An identifier denoting the child type of this <a class="el" href="struct_r_aggregate_type.html" title="An opaque struct representing a aggregate type. ">RAggregateType</a>.  <a href="aggregate__type_8h.html#ae208e3e28b5dcedb640f7f4b0581d61a">More...</a><br/></td></tr>
@@ -126,13 +132,21 @@ Enumerations</h2></td></tr>
 <p>An identifier denoting the child type of this <a class="el" href="struct_r_aggregate_type.html" title="An opaque struct representing a aggregate type. ">RAggregateType</a>. </p>
 <p>This identifier can be retrieved using <a class="el" href="struct_r_aggregate_type.html#a3ad647b94dd87268b91e92f630b84726" title="Get the aggregate type identifier of this aggregate type. ">r_aggregate_type_id()</a>. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="ae208e3e28b5dcedb640f7f4b0581d61aad7d4855d82f47ace4689eef6af2104f5"></a>R_AGGREGATE_TYPE_TAG</em>&nbsp;</td><td class="fielddoc">
-<p>a tagged type </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="struct_r_tag_type.html" title="An opaque struct representing a tagged type. ">RTagType</a> </dd></dl>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="ae208e3e28b5dcedb640f7f4b0581d61aacbef5ea8a6646ea30c8af2618c98b77d"></a>R_AGGREGATE_TYPE_STRUCT</em>&nbsp;</td><td class="fielddoc">
+<p>a <code>struct</code> </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ae208e3e28b5dcedb640f7f4b0581d61aa654a40297b4c4f6e363ae34596ab7e1a"></a>R_AGGREGATE_TYPE_UNION</em>&nbsp;</td><td class="fielddoc">
+<p>a <code>union</code> </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ae208e3e28b5dcedb640f7f4b0581d61aa66dfd502a84ed416a4245ac248a1c344"></a>R_AGGREGATE_TYPE_ENUM</em>&nbsp;</td><td class="fielddoc">
+<p>an <code>enum</code> </p>
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="ae208e3e28b5dcedb640f7f4b0581d61aa145e538575fb274daa3e0f896be2c386"></a>R_AGGREGATE_TYPE_FUNCTION</em>&nbsp;</td><td class="fielddoc">
 <p>a function type </p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="struct_r_function_type.html" title="An opaque struct representing a function. ">RFunctionType</a> </dd></dl>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ae208e3e28b5dcedb640f7f4b0581d61aa1a6412d28d7ed4fd0cddaad1bc3b84c4"></a>R_AGGREGATE_TYPE_UNKNOWN</em>&nbsp;</td><td class="fielddoc">
+<p>an unknown type </p>
 </td></tr>
 </table>
 
@@ -144,7 +158,7 @@ Enumerations</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_1229bae49d98528e082d5169ebe9d673.html">ruminate</a></li><li class="navelem"><a class="el" href="aggregate__type_8h.html">aggregate_type.h</a></li>
-    <li class="footer">Generated on Wed Oct 30 2013 17:41:02 for Ruminate by
+    <li class="footer">Generated on Thu Oct 31 2013 06:38:22 for Ruminate by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.5 </li>
   </ul>

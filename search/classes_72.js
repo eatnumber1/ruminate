@@ -10,7 +10,6 @@ var searchData=
   ['rfunctiontype',['RFunctionType',['../struct_r_function_type.html',1,'']]],
   ['rpointertype',['RPointerType',['../struct_r_pointer_type.html',1,'']]],
   ['rstring',['RString',['../struct_r_string.html',1,'']]],
-  ['rtagtype',['RTagType',['../struct_r_tag_type.html',1,'']]],
   ['rtype',['RType',['../struct_r_type.html',1,'']]],
   ['rtypedeftype',['RTypedefType',['../struct_r_typedef_type.html',1,'']]],
   ['rtypemember',['RTypeMember',['../struct_r_type_member.html',1,'']]]

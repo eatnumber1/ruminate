@@ -10,7 +10,6 @@ var annotated =
     [ "RFunctionType", "struct_r_function_type.html", "struct_r_function_type" ],
     [ "RPointerType", "struct_r_pointer_type.html", "struct_r_pointer_type" ],
     [ "RString", "struct_r_string.html", "struct_r_string" ],
-    [ "RTagType", "struct_r_tag_type.html", "struct_r_tag_type" ],
     [ "RType", "struct_r_type.html", "struct_r_type" ],
     [ "RTypedefType", "struct_r_typedef_type.html", "struct_r_typedef_type" ],
     [ "RTypeMember", "struct_r_type_member.html", "struct_r_type_member" ]

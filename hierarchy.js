@@ -5,8 +5,7 @@ var hierarchy =
     [ "RString", "struct_r_string.html", null ],
     [ "RType", "struct_r_type.html", [
       [ "RAggregateType", "struct_r_aggregate_type.html", [
-        [ "RFunctionType", "struct_r_function_type.html", null ],
-        [ "RTagType", "struct_r_tag_type.html", null ]
+        [ "RFunctionType", "struct_r_function_type.html", null ]
       ] ],
       [ "RArrayType", "struct_r_array_type.html", null ],
       [ "RBuiltinType", "struct_r_builtin_type.html", null ],

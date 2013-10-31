@@ -30,8 +30,6 @@ var searchData=
   ['r_5fstring_5flength',['r_string_length',['../struct_r_string.html#a0a79ee2cc5a5db38f5841051f6591c5b',1,'RString']]],
   ['r_5fstring_5fref',['r_string_ref',['../struct_r_string.html#a16c711c95a1852b3315664834421e143',1,'RString']]],
   ['r_5fstring_5funref',['r_string_unref',['../struct_r_string.html#a934c8be70f5c569cd25a0cf93304e17a',1,'RString']]],
-  ['r_5ftag_5ftype_5fid',['r_tag_type_id',['../struct_r_tag_type.html#a3538eac20f9fd756d19e0bb5fb2d47b2',1,'RTagType']]],
-  ['r_5ftag_5ftype_5fname',['r_tag_type_name',['../struct_r_tag_type.html#a22f7407d571041407890d70d3777c607',1,'RTagType']]],
   ['r_5ftype_5fid',['r_type_id',['../struct_r_type.html#a40ec26771acf938d1d4fd4968272bf43',1,'RType']]],
   ['r_5ftype_5fmember_5fid',['r_type_member_id',['../struct_r_type_member.html#af0e43672c62600335cb0569266feb221',1,'RTypeMember']]],
   ['r_5ftype_5fmember_5foffset',['r_type_member_offset',['../struct_r_type_member.html#ad6b74c091a9c9e15a5c36ff543eb99d8',1,'RTypeMember']]],
