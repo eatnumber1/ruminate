@@ -4,12 +4,16 @@ CXX := clang++
 SLICE2CPP := slice2cpp
 SLICE2PY := slice2py
 
-INSTALL ?= install
-SED ?= sed
-
 PREFIX ?= /usr/local
 
 PKG_CONFIG ?= pkg-config
+INSTALL ?= install
+SED ?= sed
+MKDIR ?= mkdir
+FLOCK ?= flock
+LN ?= ln -f
+CP ?= cp
+PYTHON ?= python
 
 SUBDIRS := ice include src test doc include/ruminate python
 
@@ -22,6 +26,9 @@ TOPDIR := $(PWD)
 INCDIR := $(TOPDIR)/include
 SRCDIR := $(TOPDIR)/src
 ICEDIR := $(TOPDIR)/ice
+PYDIR := $(TOPDIR)/python
+
+SLICE2PY_LOCKFILE := $(TOPDIR)/.slice2py-lock
 
 FLAGS_ALL := $(FLAGS_ALL) -ferror-limit=3
 FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) -Wall -Wextra -Wnonnull
@@ -29,8 +36,8 @@ FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER_CXX) -std=c++98
 FLAGS_PREPROC_AND_COMPILER_C := $(FLAGS_PREPROC_AND_COMPILER_C) -std=c99
 FLAGS_COMPILER := $(FLAGS_COMPILER) -g -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls -fPIC -fvisibility=hidden
 
-FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) $(shell $(PKG_CONFIG) --cflags gthread-2.0) $(shell $(PKG_CONFIG) --cflags 'glib-2.0 >= 2.38')
-FLAGS_LINKER := $(FLAGS_LINKER) $(shell $(PKG_CONFIG) --libs gthread-2.0) $(shell $(PKG_CONFIG) --libs 'glib-2.0 >= 2.38')
+FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) $(shell $(PKG_CONFIG) --cflags 'glib-2.0 >= 2.38')
+FLAGS_LINKER := $(FLAGS_LINKER) $(shell $(PKG_CONFIG) --libs 'glib-2.0 >= 2.38')
 
 ifeq ($(shell uname),Darwin)
 SO_SUFFIX := dylib
@@ -55,12 +62,14 @@ DOC_TARGETS := $(SUBDIRS:=/doc)
 .DEFAULT_GOAL: all
 
 all: $(ALL_TARGETS)
-clean: $(CLEAN_TARGETS)
 depclean: clean $(DEPCLEAN_TARGETS)
 pristine: depclean cscope-clean
 install: $(INSTALL_TARGETS)
 test: $(TEST_TARGETS)
 doc: $(DOC_TARGETS)
+
+clean: $(CLEAN_TARGETS)
+	$(RM) $(SLICE2PY_LOCKFILE)
 
 cscope-clean:
 	$(RM) $(CSCOPE_FILES)
@@ -130,7 +139,7 @@ vars:
 %.d: %.cpp
 	$(CXX) -MM -MQ $(@:.d=.o) -MQ $@ -MF $*.d $< $(FLAGS_PREPROCESSOR_CXX) $(FLAGS_PREPROC_AND_COMPILER_CXX) -w
 
-%.py.d: %.ice
+%_ice.py.d: %.ice
 	( $(SLICE2PY) --depend $< $(FLAGS_SLICE2PY) | sed -e '1 s,\([^ ]\+[ :]\),$(@D)/\1,g' -e '1 s,\([^ ]\+\)\.py[ :],\1.py.d &,1' > $@ ) || $(RM) $@
 
 %.cpp.d: %.ice
@@ -146,12 +155,10 @@ vars:
 	$(SLICE2CPP) $(FLAGS_SLICE2CPP) $<
 
 %_ice.py: %.ice
-	$(SLICE2PY) $(FLAGS_SLICE2PY) $<
+	$(FLOCK) $(SLICE2PY_LOCKFILE) -c "$(SLICE2PY) $(FLAGS_SLICE2PY) $<"
 
 %.$(SO_SUFFIX):
 	$(CXX) $(SO_LINK_FLAGS) -o $@ $(SO_OBJECTS) $(FLAGS_LINKER)
 
 %.pc: %.pc.in
 	$(SED) -e "s,@prefix@,$(PREFIX:,=\,),g" $< > $@ || $(RM) $@
-
-# vim:tw=80

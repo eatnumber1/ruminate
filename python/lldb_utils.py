@@ -42,14 +42,14 @@ def waitForState(process, state):
 	listener = process.target.debugger.GetListener()
 	broadcaster = process.broadcaster
 	while process.state != state:
-		print("Waiting...")
+		#print("Waiting...")
 		listener.WaitForEventForBroadcasterWithType(
 			2**32-1,
 			broadcaster,
 			SBProcess.eBroadcastBitStateChanged,
 			event)
 		validate(event)
-		print("Got event " + getDescription(event))
+		#print("Got event " + getDescription(event))
 		# TODO: Check event type
 
 #def ensureState(process, state):

@@ -10,7 +10,7 @@ class DebuggerFactoryImpl(DebuggerFactory):
 		self.adapter = adapter
 
 	def shutdown(self, current = None):
-		print("Shutting down")
+		#print("Shutting down")
 		for uuid in self.debuggers:
 			self.debuggers[uuid].shutdown()
 			self.adapter.remove(uuid)

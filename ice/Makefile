@@ -4,6 +4,7 @@ ice/all: $(ICE_PY_SOURCES)
 
 ice/clean:
 	$(RM) $(ICE_CPP_SOURCES) $(ICE_OBJECTS) $(ICE_PY_SOURCES)
+	$(RM) -r $(ICE_PY_MODDIR)
 
 ice/depclean:
 	$(RM) $(ICE_DEPS) $(ICE_HEADERS)
@@ -11,9 +12,15 @@ ice/depclean:
 $(ICE_CPP_SOURCES) $(ICE_HEADERS) $(ICE_CPP_DEPS): FLAGS_SLICE2CPP := $(ICE_FLAGS_SLICE) $(ICE_FLAGS_SLICE2CPP) $(FLAGS_SLICE) $(FLAGS_SLICE2CPP)
 $(ICE_PY_SOURCES) $(ICE_PY_DEPS): FLAGS_SLICE2PY := $(ICE_FLAGS_SLICE) $(ICE_FLAGS_SLICE2PY) $(FLAGS_SLICE) $(FLAGS_SLICE2PY)
 
-#$(ICE_OBJECTS): FLAGS_COMPILER_CXX := -g -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls -fPIC -fvisibility=hidden -stdlib=libc++
-#$(ICE_OBJECTS): FLAGS_PREPROCESSOR_CXX := -I$(ICEDIR) -nostdinc++ -I$(HOME)/Sources/libcxx/include
-#$(ICE_OBJECTS): FLAGS_PREPROC_AND_COMPILER_CXX := -w
+$(ICE_PY_SOURCES): $(ICE_PY_MODDIR)
+$(ICE_PY_MODDIR):
+	$(MKDIR) $@
+
+$(PYDIR)/%_ice.py: $(CURDIR)/%_ice.py
+	$(LN) $< $@
+
+$(ICE_IN_PYDIR_PY_MODDIR): $(ICE_PY_MODDIR)
+	$(CP) -rl $< $@
 
 $(ICE_OBJECTS): FLAGS_PREPROCESSOR_CXX := $(FLAGS_PREPROCESSOR_CXX) $(ICE_FLAGS_PREPROCESSOR)
 

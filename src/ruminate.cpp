@@ -156,7 +156,6 @@ bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT 
 		goto error_ice_initialize;
 
 	proxy_str = g_strdup_printf("DebuggerFactory:default -h 127.0.0.1 -p %d", port);
-	printf("Connecting to proxy: \"%s\"\n", proxy_str);
 
 	if( !gxx_call(factory_proxy = ruminate->communicator->stringToProxy(proxy_str), error) )
 		goto error_communicator_stringToProxy;

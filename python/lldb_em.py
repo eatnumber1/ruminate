@@ -54,7 +54,7 @@ class LLDBEventMachine(threading.Thread):
 			if not self.listener.WaitForEvent(1, event):
 				continue
 			validate(event)
-			print("Got event " + getDescription(event))
+			#print("Got event " + getDescription(event))
 			self.onEvent(event)
 
 	def onEvent(self, event):
