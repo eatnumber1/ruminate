@@ -19,7 +19,8 @@ typedef enum RBuiltinTypeId {
 	R_BUILTIN_TYPE_SHORT /** a short */,
 	R_BUILTIN_TYPE_CHAR /** a char */,
 	R_BUILTIN_TYPE_VOID /** the void type */,
-	R_BUILTIN_TYPE_BOOL /** a bool */
+	R_BUILTIN_TYPE_BOOL /** a bool */,
+	R_BUILTIN_TYPE_UNKNOWN /** an unknown type */
 } RBuiltinTypeId;
 
 /** An opaque struct representing a builtin type.

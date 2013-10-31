@@ -4,7 +4,7 @@ enum REnumMemberValueType {
 };
 
 struct REnumMember {
-	RAggregateMember *parent;
+	RAggregateMember parent;
 	struct {
 		enum REnumMemberValueType type;
 		union {

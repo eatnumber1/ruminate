@@ -24,11 +24,11 @@ typedef char *string;
 struct IdentifiedUnion {
 	enum {
 		A_LONG,
-		A_SHORT
+		A_CHAR
 	} id;
 	union {
 		long a_long;
-		short a_short;
+		char a_char;
 	} value;
 };
 
@@ -46,8 +46,8 @@ typedef struct __attribute__((packed)) MyStruct {
 	enum {
 		AN_ENUM_VALUE
 	} an_enum;
-	/*
 	struct IdentifiedUnion an_identified_union, another_identified_union;
+	/*
 	bool a_bitfield : 1;
 	char an_array_of_unspecified_length[];
 	*/
@@ -64,62 +64,32 @@ void die_if_error( GError *err ) {
 static bool _print_json_for_type( RType *type, void *data, GError **err );
 
 static bool _print_json_for_aggregate_member( RAggregateMember *member, void *data, GError **error ) {
-	GError *err = NULL;
-
 	RTypeMember *tmember = (RTypeMember *) member;
 	// TODO: Error checking
+
+	r_type_member_ref(tmember);
 
 	RType *member_type = r_type_member_type(tmember, error);
 	die_if_error(*error);
 	// TODO: Error checking
 
-	RAggregateMemberId id = r_aggregate_member_id(member, &err);
-	if( err != NULL ) {
-		g_propagate_error(error, err);
-		return false;
-	}
-	switch( id ) {
-		case R_AGGREGATE_MEMBER_ENUM: {
-			REnumMember *emember = (REnumMember *) member;
-			g_assert(r_type_id(member_type, NULL) == R_TYPE_BUILTIN);
-			RBuiltinType *builtin_member_type = (RBuiltinType *) member_type;
-			bool signd = r_builtin_type_is_signed(builtin_member_type, error);
-			die_if_error(*error);
-			// TODO: Error checking
-			if( signd ) {
-				intmax_t val = r_enum_member_value_signed(emember, error);
-				die_if_error(*error);
-				// TODO: Error checking
-				printf("%jd", val);
-			} else {
-				uintmax_t val = r_enum_member_value_signed(emember, error);
-				die_if_error(*error);
-				// TODO: Error checking
-				printf("%ju", val);
-			}
-		}
-		default: {
-			RString *name = r_aggregate_member_name(member, error);
-			die_if_error(*error);
-			// TODO: Error checking
+	RString *name = r_aggregate_member_name(member, error);
+	die_if_error(*error);
+	// TODO: Error checking
 
-			printf("\"%s\":", r_string_bytes(name));
+	printf("\"%s\":", r_string_bytes(name));
 
-			r_string_unref(name);
+	r_string_unref(name);
 
-			off_t offset = r_type_member_offset(tmember, error);
-			die_if_error(*error);
-			// TODO: Error checking
+	off_t offset = r_type_member_offset(tmember, error);
+	die_if_error(*error);
+	// TODO: Error checking
 
-			_print_json_for_type(
-				member_type,
-				((uint8_t *) data) + offset,
-				error
-			);
-		}
-	}
-
-	return true;
+	return _print_json_for_type(
+		member_type,
+		((uint8_t *) data) + offset,
+		error
+	);
 }
 
 static bool _print_json_for_builtin( RBuiltinType *type, void *data, GError **error ) {
@@ -165,47 +135,164 @@ static bool _print_json_for_builtin( RBuiltinType *type, void *data, GError **er
 		case R_BUILTIN_TYPE_BOOL:
 			printf("%s", *((_Bool *) data) ? "true" : "false");
 			break;
+		case R_BUILTIN_TYPE_LONG:
+			if( is_unsigned ) {
+				printf("%lu", *((unsigned long *) data));
+			} else {
+				printf("%ld", *((long *) data));
+			}
+			break;
 		default:
-			printf("\"unknown primitive type\"");
+			printf("<unknowable>");
 	}
 
 	r_type_unref((RType *) type);
 	return true;
 }
 
-static bool _print_json_for_aggregate( RAggregateType *rt, void *data, GError **error ) {
-	RAggregateTypeId id = r_aggregate_type_id(rt, error);
-	die_if_error(*error);
-	// TODO: Error checking
+static bool _print_json_for_identified_union( RAggregateType *rt, void *data, GError **error ) {
+	RBuiltinTypeId union_type_id = R_BUILTIN_TYPE_UNKNOWN;
 
-	switch( id ) {
-		case R_AGGREGATE_TYPE_TAG:
-		case R_AGGREGATE_TYPE_FUNCTION:
+	{
+		RTypeMember *struct_memb = (RTypeMember *) r_aggregate_type_member_at(rt, 0, error);
+		die_if_error(*error);
+		// TODO: Error checking
+
+		RAggregateType *_enum = (RAggregateType *) r_type_member_type(struct_memb, error);
+		die_if_error(*error);
+		// TODO: Error checking
+
+		r_type_member_unref(struct_memb);
+
+		for( size_t i = 0; i < r_aggregate_type_nmembers(_enum, error); i++ ) {
+			die_if_error(*error);
+			// TODO: Error checking
+
+			REnumMember *enum_memb = (REnumMember *) r_aggregate_type_member_at(_enum, i, error);
+			die_if_error(*error);
+			// TODO: Error checking
+
+			intmax_t enum_memb_val = (intmax_t) r_enum_member_value_unsigned(enum_memb, error);
+			die_if_error(*error);
+			// TODO: Error checking
+
+			r_type_member_unref((RTypeMember *) enum_memb);
+
+			if( enum_memb_val != *((__typeof__(A_LONG) *) data) ) continue;
+
+			static const RBuiltinTypeId supported_types[] = {
+				[A_LONG] = R_BUILTIN_TYPE_LONG,
+				[A_CHAR] = R_BUILTIN_TYPE_CHAR
+			};
+			union_type_id = supported_types[enum_memb_val];
 			break;
+		}
+		die_if_error(*error);
+		// TODO: Error checking
+
+		r_type_unref((RType *) _enum);
+	}
+
+	RType *union_value_type = NULL;
+	off_t union_value_off = 0;
+	{
+		RTypeMember *struct_memb = (RTypeMember *) r_aggregate_type_member_at(rt, 1, error);
+		die_if_error(*error);
+		// TODO: Error checking
+
+		RAggregateType *_union = (RAggregateType *) r_type_member_type(struct_memb, error);
+		die_if_error(*error);
+		// TODO: Error checking
+
+		for( size_t i = 0; i < r_aggregate_type_nmembers(_union, error); i++ ) {
+			die_if_error(*error);
+			// TODO: Error checking
+
+			RTypeMember *union_memb = (RTypeMember *) r_aggregate_type_member_at(_union, i, error);
+			die_if_error(*error);
+			// TODO: Error checking
+
+			RBuiltinType *union_memb_type = (RBuiltinType *) r_type_member_type(union_memb, error);
+			die_if_error(*error);
+			// TODO: Error checking
+
+			if( r_builtin_type_id(union_memb_type, error) == union_type_id ) {
+				union_value_type = (RType *) union_memb_type;
+
+				union_value_off = r_type_member_offset(struct_memb, error);
+				die_if_error(*error);
+
+				// TODO: Error checking
+				union_value_off += r_type_member_offset(union_memb, error);
+				die_if_error(*error);
+			} else {
+				die_if_error(*error);
+				// TODO: Error checking
+
+				r_type_unref((RType *) union_memb_type);
+			}
+
+			r_type_member_unref(union_memb);
+
+			if( union_value_type != NULL ) break;
+		}
+		die_if_error(*error);
+		// TODO: Error checking
+
+		r_type_unref((RType *) _union);
+		r_type_member_unref(struct_memb);
+
+		g_assert(union_value_type != NULL);
+		if( !_print_json_for_type(union_value_type, data + union_value_off, error) ) {
+			// TODO: This leaks
+			return false;
+		}
+	}
+
+	r_type_unref(union_value_type);
+	return true;
+}
+
+static bool _print_json_for_aggregate( RAggregateType *rt, void *data, GError **error ) {
+	switch( r_aggregate_type_id(rt, error) ) {
+		case R_AGGREGATE_TYPE_TAG:
+			if( r_tag_type_id((RTagType *) rt, error) == R_TAG_TYPE_STRUCTURE ) {
+				RString *rs = r_type_name((RType *) rt, error);
+				die_if_error(*error);
+				// TODO: Error checking
+				bool is_identified_union = (strcmp(r_string_bytes(rs), "IdentifiedUnion") == 0);
+				r_string_unref(rs);
+				if( is_identified_union )
+					return _print_json_for_identified_union(rt, data, error);
+			} else {
+				// TODO: Error checking
+				die_if_error(*error);
+			}
+			// Fallthrough
 		default:
-			g_assert_not_reached();
+			// TODO: Error checking
+			die_if_error(*error);
+
+			size_t nmembers = r_aggregate_type_nmembers(rt, error);
+			die_if_error(*error);
+			// TODO: Error checking
+
+			printf("{");
+			for( size_t i = 0; i < nmembers; i++ ) {
+				RAggregateMember *member = r_aggregate_type_member_at(rt, i, error);
+				die_if_error(*error);
+				// TODO: Error checking
+
+				_print_json_for_aggregate_member(member, data, error);
+				die_if_error(*error);
+				// TODO: Error checking
+
+				r_type_member_unref((RTypeMember *) member);
+				if( i != nmembers - 1 ) printf(",");
+			}
+			printf("}");
 	}
 
-	size_t nmembers = r_aggregate_type_nmembers(rt, error);
-	die_if_error(*error);
-	// TODO: Error checking
-
-	printf("{");
-	for( size_t i = 0; i < nmembers; i++ ) {
-		RAggregateMember *member = r_aggregate_type_member_at(rt, i, error);
-		die_if_error(*error);
-		// TODO: Error checking
-
-		_print_json_for_aggregate_member(member, data, error);
-		die_if_error(*error);
-		// TODO: Error checking
-
-		r_type_member_unref((RTypeMember *) member);
-		if( i != nmembers - 1 ) printf(",");
-	}
-	printf("}");
-
-	r_type_unref((RType *) rt);
 	return true;
 }
 
@@ -283,7 +370,10 @@ static bool _print_json_for_array( RArrayType *type, void *data, GError **error 
 		die_if_error(*error);
 		// TODO: Error checking
 
-		_print_json_for_type(member_type, &data[i], error);
+		if( !_print_json_for_type(member_type, &data[i], error) ) {
+			// TODO: This leaks
+			return false;
+		}
 		if( i < size - 1 )
 			printf(", ");
 
@@ -321,6 +411,7 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 	} else {
 		r_type_ref(type);
 	}
+	r_type_ref(type);
 
 	switch( id ) {
 		case R_TYPE_BUILTIN:
@@ -361,6 +452,7 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 
 int main( int argc, char *argv[] ) {
 	setlocale(LC_ALL, "");
+	setbuf(stdout, NULL);
 
 	GError *err = NULL;
 	ruminate_init(&argc, argv, &err);
@@ -377,8 +469,7 @@ int main( int argc, char *argv[] ) {
 		.a_union = {
 			.a_double = 3.14
 		},
-		.an_enum = AN_ENUM_VALUE
-		/*
+		.an_enum = AN_ENUM_VALUE,
 		.an_identified_union = {
 			.id = A_LONG,
 			.value = {
@@ -386,12 +477,11 @@ int main( int argc, char *argv[] ) {
 			}
 		},
 		.another_identified_union = {
-			.id = A_SHORT,
+			.id = A_CHAR,
 			.value = {
-				.a_short = 255
+				.a_char = 'x'
 			}
 		}
-		*/
 	};
 
 	{

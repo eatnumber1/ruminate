@@ -44,13 +44,11 @@ class DebuggerImpl(Debugger):
 
 		running = threading.Event()
 		def onRunning(event):
-			print("onRunning")
 			self.em.removeCallback(lldb.eStateRunning, onRunning)
 			running.set()
 		self.em.addCallback(lldb.eStateRunning, onRunning)
 
 		def onStopped(event):
-			print("onStopped")
 			self.em.removeCallback(lldb.eStateStopped, onStopped)
 
 			process = SBProcess.GetProcessFromEvent(event)
@@ -72,7 +70,6 @@ class DebuggerImpl(Debugger):
 		self.em.addCallback(lldb.eStateStopped, onStopped)
 
 		def doShutdown(event):
-			print("doShutdown(" + getDescription(event) + ")")
 			shutdown()
 		self.em.addCallback(lldb.eStateCrashed, doShutdown)
 		self.em.addCallback(lldb.eStateExited, doShutdown)
@@ -80,51 +77,38 @@ class DebuggerImpl(Debugger):
 		self.em.begin()
 		running.wait()
 
-		print("__init__: end")
-
 	def shutdown(self):
 		self.em.shutdown()
 
 	def getTypeByVariableName(self, variable, tid, current):
-		print("getTypeByVariableName: begin")
-
-		try:
-			with StoppedThread(self.em, self.process, tid) as thread:
-				frame = validate(thread.frame[1])
-				print(frame)
-
-				value = validate(frame.FindVariable(variable))
-				print(value)
-
-				t = validate(value.type)
-				print(t)
-
-				return self.type_factory.proxy(
-					sbtype = t,
-					current = current,
-					address = value.address_of.unsigned
-				)
-		finally:
-			print("getTypeByVariableName: exit")
+		with StoppedThread(self.em, self.process, tid) as thread:
+			frame = validate(thread.frame[1])
+			value = validate(frame.FindVariable(variable))
+			t = validate(value.type)
+			return self.type_factory.proxy(
+				sbtype = t,
+				current = current,
+				address = value.address_of.unsigned
+			)
 
 	def getBacktrace(self, tid, current):
-		print("getBacktrace: begin")
-		try:
-			with StoppedThread(self.em, self.process, tid) as thread:
-				frame_list = []
+		with StoppedThread(self.em, self.process, tid) as thread:
+			frame_list = []
 
-				for sbframe in thread.frames:
-					frame = Frame()
-					frame.functionName = sbframe.name
-					frame.moduleName = sbframe.module.file.basename
-					frame.compileUnitName = sbframe.compile_unit.file.basename
-					frame.functionType = self.type_factory.proxy(sbframe.function.type, current)
-					frame.line = sbframe.line_entry.line
-					frame_list.append(frame)
+			for sbframe in thread.frames:
+				frame = Frame()
+				frame.functionName = sbframe.name
+				frame.moduleName = sbframe.module.file.basename
+				frame.compileUnitName = sbframe.compile_unit.file.basename
+				frame.functionType = self.type_factory.proxy(
+					sbtype = sbframe.function.type,
+					address = sbframe.function.addr.load_addr,
+					current = current
+				)
+				frame.line = sbframe.line_entry.line
+				frame_list.append(frame)
 
-				return frame_list
-		finally:
-			print("getBacktrace: end")
+			return frame_list
 
 	def createSBValueFor(self, sbtype, address):
 		# TODO: Check for errors here

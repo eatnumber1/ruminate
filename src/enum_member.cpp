@@ -93,13 +93,19 @@ G_BEGIN_DECLS
 
 uintmax_t r_enum_member_value_signed( REnumMember *em, GError **error ) RUMINATE_NOEXCEPT {
 	if( !ensure_value_init(em, error) ) return 0;
-	if( em->value.type != ENUM_MEMBER_VALUE_TYPE_SIGNED ) return 0;
+	if( em->value.type != ENUM_MEMBER_VALUE_TYPE_SIGNED ) {
+		// TODO: Error here.
+		g_assert(false);
+	}
 	return em->value.signd;
 }
 
 intmax_t r_enum_member_value_unsigned( REnumMember *em, GError **error ) RUMINATE_NOEXCEPT {
 	if( !ensure_value_init(em, error) ) return 0;
-	if( em->value.type != ENUM_MEMBER_VALUE_TYPE_UNSIGNED ) return 0;
+	if( em->value.type != ENUM_MEMBER_VALUE_TYPE_UNSIGNED )  {
+		// TODO: Error here.
+		g_assert(false);
+	}
 	return em->value.unsignd;
 }
 

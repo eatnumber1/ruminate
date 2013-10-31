@@ -21,6 +21,35 @@ class SBTypeListAdapter(TypeMember):
 			current = current
 		)
 
+class SBTypeEnumMemberAdapter(TypeMember):
+	@staticmethod
+	def proxyFor(**kwargs):
+		current = kwargs.pop("current")
+		return TypeMemberPrx.uncheckedCast(
+			current.adapter.addWithUUID(SBTypeEnumMemberAdapter(**kwargs))
+		)
+
+	def __init__(self, sbtypemember, base_address, type_factory):
+		self.sbtypemember = sbtypemember
+		self.type_factory = type_factory
+		self.address = base_address
+
+	def getType(self, current = None):
+		return self.type_factory.proxy(
+			sbtype = self.sbtypemember.type,
+			address = self.address,
+			current = current
+		)
+
+	def getName(self, current = None):
+		return self.sbtypemember.name
+
+	def getOffsetInBytes(self, current = None):
+		return 0
+
+	def getValueSigned(self, current = None):
+		return self.sbtypemember.signed
+
 class SBTypeMemberAdapter(TypeMember):
 	@staticmethod
 	def proxyFor(**kwargs):
@@ -55,9 +84,6 @@ class SBTypeMemberAdapter(TypeMember):
 
 	def isBitfield(self, current = None):
 		return self.sbtypemember.is_bitfield
-
-	def getValueSigned(self, current = None):
-		return self.sbtypemember.signed
 
 class SBTypeAdapter(TypeMember):
 	@staticmethod

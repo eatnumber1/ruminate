@@ -15,6 +15,7 @@
  * This identifier can be retrieved using r_tag_type_id().
  *
  * @enum RTagTypeId
+ * @todo This class is unnecessary as r_type_name() already returns the tag name.
  */
 typedef enum RTagTypeId {
 	R_TAG_TYPE_STRUCTURE /** a `struct` */,

@@ -1,4 +1,4 @@
-from __future__ import nested_scopes, with_statement
+from __future__ import nested_scopes, with_statement, print_function
 
 from RuminateBackend import *
 from array_member_impl import *
@@ -144,13 +144,14 @@ class TypeImpl(Type):
 				ret = []
 				for enum_member in self.sbtype.enum_members:
 					ret.append(
-						type_member_impl.SBTypeMemberAdapter.proxyFor(
+						type_member_impl.SBTypeEnumMemberAdapter.proxyFor(
 							sbtypemember = enum_member,
 							base_address = self.address,
 							type_factory = self.factory,
 							current = current
 						)
 					)
+				return ret
 			else:
 				ret = []
 				for field in self.sbtype.fields:
