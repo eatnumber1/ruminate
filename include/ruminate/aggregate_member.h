@@ -43,6 +43,8 @@ RAggregateMemberId RUMINATE_EXPORT r_aggregate_member_id(
  *
  * @memberof RAggregateMember
  * @return a RString containing the name of this aggregate member
+ * @todo Function argument names return `""`. I'm not sure it's even possible to
+ *       get these, so this feature might go away.
  */
 RString * RUMINATE_EXPORT r_aggregate_member_name(
 	RAggregateMember *member /** [in] the aggregate member to get the name of */,
