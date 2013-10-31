@@ -8,7 +8,7 @@ src/clean:
 src/depclean:
 	$(RM) $(SRC_DEPS)
 
-src/install: $(SRC_PKG_CONFIG_FILES)
+src/install: $(SRC_PKG_CONFIG_FILES) $(LIBRUMINATE)
 	$(INSTALL) -d $(PREFIX)/lib
 	$(INSTALL) $(LIBRUMINATE) $(PREFIX)/lib
 	$(INSTALL) -d $(PREFIX)/lib/pkgconfig
