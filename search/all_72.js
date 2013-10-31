@@ -21,6 +21,7 @@ var searchData=
   ['r_5fbuiltin_5ftype_5fis_5funsigned',['r_builtin_type_is_unsigned',['../struct_r_builtin_type.html#a539615767bc3af7470da1e73456bfe10',1,'RBuiltinType']]],
   ['r_5fbuiltin_5ftype_5flong',['R_BUILTIN_TYPE_LONG',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80ca36faa0523ded95ededf69e188b3396ba',1,'builtin_type.h']]],
   ['r_5fbuiltin_5ftype_5fshort',['R_BUILTIN_TYPE_SHORT',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80caf128c571162a77fe48a93371a43f8013',1,'builtin_type.h']]],
+  ['r_5fbuiltin_5ftype_5funknown',['R_BUILTIN_TYPE_UNKNOWN',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80cac6acf9f77979e6021dc2c023d00a0431',1,'builtin_type.h']]],
   ['r_5fbuiltin_5ftype_5fvoid',['R_BUILTIN_TYPE_VOID',['../builtin__type_8h.html#a245d1724f16dd995c090e6666722c80ca27dd26ba34fa61cfca7a5c9192337d5f',1,'builtin_type.h']]],
   ['r_5fenum_5fmember_5fvalue_5fsigned',['r_enum_member_value_signed',['../struct_r_enum_member.html#aa02f6653aadf116778ef23fdadd8c8c4',1,'REnumMember']]],
   ['r_5fenum_5fmember_5fvalue_5funsigned',['r_enum_member_value_unsigned',['../struct_r_enum_member.html#a2d94ce29d5b218e5f30d4190d8a8ec93',1,'REnumMember']]],
