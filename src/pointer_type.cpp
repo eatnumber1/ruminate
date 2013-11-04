@@ -42,7 +42,7 @@ RType *r_pointer_type_pointee( RPointerType *rpt, GError **error ) RUMINATE_NOEX
 	RType *rt = (RType *) rpt;
 	void *ptr = *((void **) rt->cur);
 	RuminateBackend::TypePrx t;
-	G_STATIC_ASSERT(sizeof(ptr) <= sizeof(::Ice::Long));
+	R_STATIC_ASSERT(sizeof(ptr) <= sizeof(::Ice::Long));
 	if( !gxx_call(t = ((RType *) rpt)->type->getPointeeType((::Ice::Long) ptr), error) )
 		return NULL;
 

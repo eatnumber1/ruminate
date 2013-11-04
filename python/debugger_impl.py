@@ -53,18 +53,18 @@ class DebuggerImpl(Debugger):
 
 			process = SBProcess.GetProcessFromEvent(event)
 
-			#unix_signals = validate(process.GetUnixSignals())
-			## This may not need to be here, we might be able to put it
-			## outside the onStopped func
-			#for sig in unix_signals.signals:
-			#	unix_signals.SetShouldSuppress(sig, False)
-			#	unix_signals.SetShouldStop(sig, False)
-			#	unix_signals.SetShouldNotify(sig, False)
-
-			# A temporary hack since the above is racy.
 			unix_signals = validate(process.GetUnixSignals())
+			# This may not need to be here, we might be able to put it
+			# outside the onStopped func
 			for sig in unix_signals.signals:
-				self.debugger.HandleCommand("process handle -n false -p true -s false " + unix_signals.GetSignalAsCString(sig))
+				unix_signals.SetShouldSuppress(sig, False)
+				unix_signals.SetShouldStop(sig, False)
+				unix_signals.SetShouldNotify(sig, False)
+
+			## A temporary hack since the above is racy.
+			#unix_signals = validate(process.GetUnixSignals())
+			#for sig in unix_signals.signals:
+			#	self.debugger.HandleCommand("process handle -n false -p true -s false " + unix_signals.GetSignalAsCString(sig))
 
 			process.Continue()
 		self.em.addCallback(lldb.eStateStopped, onStopped)

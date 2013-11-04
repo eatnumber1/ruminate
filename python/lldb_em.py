@@ -52,6 +52,8 @@ class LLDBEventMachine(threading.Thread):
 			event = lldb.SBEvent()
 			#validate(self.listener.WaitForEvent(2**32-1, event))
 			if not self.listener.WaitForEvent(1, event):
+				if self.shutdownRequested:
+					break
 				continue
 			validate(event)
 			#print("Got event " + getDescription(event))

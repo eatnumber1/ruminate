@@ -32,9 +32,9 @@ PYDIR := $(TOPDIR)/python
 SLICE2PY_LOCKFILE := $(TOPDIR)/.slice2py-lock
 
 FLAGS_ALL := $(FLAGS_ALL) -ferror-limit=3
-FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) -Wall -Wextra -Wnonnull
+FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) -Wall -Wextra -Wnonnull -Werror -pedantic
 FLAGS_PREPROC_AND_COMPILER_CXX := $(FLAGS_PREPROC_AND_COMPILER_CXX) -std=c++98
-FLAGS_PREPROC_AND_COMPILER_C := $(FLAGS_PREPROC_AND_COMPILER_C) -std=c99
+FLAGS_PREPROC_AND_COMPILER_C := $(FLAGS_PREPROC_AND_COMPILER_C) -std=c11
 FLAGS_COMPILER := $(FLAGS_COMPILER) -g -fno-omit-frame-pointer -O0 -fno-optimize-sibling-calls -fPIC -fvisibility=hidden -pipe
 
 FLAGS_PREPROC_AND_COMPILER := $(FLAGS_PREPROC_AND_COMPILER) $(shell $(PKG_CONFIG) --cflags 'glib-2.0 >= 2.38')
@@ -99,6 +99,10 @@ COMPILE_FLAGS_PREFIX :=
 
 include $(TOPDIR)/mk/compile_flags.mk
 
+define subst_vars
+$(SED) -e "s,@prefix@,$(PREFIX:,=\,),g" $< > $@ || $(RM) $@
+endef
+
 # This defines the following for every dir in SUBDIRS:
 #   Sets CURDIR to the $(TOPDIR)/$(dir)
 #   Includes a makefile in $(CURDIR)/Makefile
@@ -153,4 +157,4 @@ COMPILE_FLAGS_PREFIX :=
 	$(CXX) $(SO_LINK_FLAGS) -o $@ $(SO_OBJECTS) $(FLAGS_LINKER)
 
 %: %.in
-	$(SED) -e "s,@prefix@,$(PREFIX:,=\,),g" $< > $@ || $(RM) $@
+	$(subst_vars)

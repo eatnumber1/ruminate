@@ -66,7 +66,7 @@ static bool init_members( RArrayType *rat, GError **error ) RUMINATE_NOEXCEPT {
 
 G_BEGIN_DECLS
 
-G_STATIC_ASSERT(sizeof(size_t) >= sizeof(uint64_t));
+R_STATIC_ASSERT(sizeof(size_t) >= sizeof(uint64_t));
 
 size_t r_array_type_size( RArrayType *rat, GError **error ) RUMINATE_NOEXCEPT {
 	if( !init_members(rat, error) ) return 0;

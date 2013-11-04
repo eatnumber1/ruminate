@@ -116,7 +116,7 @@ class TypeImpl(Type):
 				ret = []
 				array = self.debugger.createSBValueFor(self.sbtype, self.address)
 				for index in range(0, array.num_children):
-					child = array.GetChildAtIndex(index, lldb.eDynamicDontRunTarget, False)
+					child = array.GetChildAtIndex(index, lldb.eDynamicCanRunTarget, False)
 					ret.append(
 						type_member_impl.SBTypeAdapter.proxyFor(
 							sbtype = child.type,

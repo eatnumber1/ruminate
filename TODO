@@ -1,1 +1,2 @@
 C++ variable initialization may throw
+Introspection of opaque types don't error

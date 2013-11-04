@@ -131,7 +131,7 @@ void r_type_member_delete( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 }
 
 bool _r_type_member_offset( RuminateBackend::TypeMemberPrx &tmp, ptrdiff_t *out, GError **error ) RUMINATE_NOEXCEPT {
-	G_STATIC_ASSERT(sizeof(ptrdiff_t) >= sizeof(__typeof__(tmp->getOffsetInBytes())));
+	R_STATIC_ASSERT(sizeof(ptrdiff_t) >= sizeof(__typeof__(tmp->getOffsetInBytes())));
 	g_assert(out != NULL);
 
 	// TODO: Error here if this type member has no offset (function arguments)

@@ -65,15 +65,19 @@ G_END_DECLS
  * @return A pointer to an RType or `NULL` if an error occurred. This RType
  *         must be freed using r_type_unref().
  */
-#define ruminate_get_type(expr, error) ({ \
-	__typeof__(expr) *_expr = g_malloc(sizeof(__typeof__(expr))); \
-	*_expr = (expr); \
-	RType *ret; \
-	if( !ruminate_begin_get_type_by_variable_name("_expr", error) ) { \
-		ret = NULL; \
-	} else { \
-		ruminate_hit_breakpoint(); \
-		ret = ruminate_end_get_type_by_variable_name(_expr, error); \
-	} \
-	ret; \
-})
+#define ruminate_get_type(expr, error) \
+	_Pragma("clang diagnostic push") \
+	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
+	({ \
+		__typeof__(expr) *_expr = g_malloc(sizeof(__typeof__(expr))); \
+		*_expr = (expr); \
+		RType *ret; \
+		if( !ruminate_begin_get_type_by_variable_name("_expr", error) ) { \
+			ret = NULL; \
+		} else { \
+			ruminate_hit_breakpoint(); \
+			ret = ruminate_end_get_type_by_variable_name(_expr, error); \
+		} \
+		ret; \
+	}) \
+	_Pragma("clang diagnostic pop")

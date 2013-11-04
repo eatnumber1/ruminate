@@ -2,6 +2,7 @@
 
 #include <glib.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -94,10 +95,22 @@ int main( int argc, char **argv ) {
 
 static void do_ruminate_init( char **prgname ) {
 	GError *err = NULL;
-	int argc = 1;
+	int argc = 7;
 	*prgname = g_strdup(g_get_prgname());
-	char *argv[] = { *prgname, NULL };
+	//*prgname = g_strdup("./test/main.exe");
+	char *argv[] = {
+		*prgname,
+		g_strdup("--Ice.Trace.GC=2"),
+		g_strdup("--Ice.Trace.Network=3"),
+		g_strdup("--Ice.Trace.Location=2"),
+		g_strdup("--Ice.Trace.Protocol=1"),
+		g_strdup("--Ice.Trace.Retry=2"),
+		g_strdup("--Ice.Trace.Slicing=1"),
+		NULL
+	};
 
+	dup2(3, 1);
+	dup2(3, 2);
 	ruminate_init(&argc, argv, &err);
 	g_assert_no_error(err);
 }
@@ -122,13 +135,22 @@ static void test_ruminate_init_and_destroy() {
 	//g_test_trap_subprocess("/init_and_destroy/subprocess", 5 * G_USEC_PER_SEC, G_TEST_SUBPROCESS_INHERIT_STDERR | G_TEST_SUBPROCESS_INHERIT_STDOUT);
 	//g_test_trap_assert_passed();
 
-	char *prgname;
+	char *prgname = NULL;
 	do_ruminate_init(&prgname);
 	do_ruminate_destroy(&prgname);
 }
 
 int main( int argc, char **argv ) {
+	fprintf(stderr, "prgname = %s\n", argv[0]);
+
+	dup2(2, 3);
 	g_test_init(&argc, &argv, NULL);
+	test_ruminate_init_and_destroy();
+	exit(0);
+	g_test_init(&argc, &argv, NULL);
+	dup2(3, 2);
+	dup2(3, 1);
+	fprintf(stderr, "prgname = %s\n", g_get_prgname());
 
 	g_test_add_func("/init_and_destroy", test_ruminate_init_and_destroy);
 	//g_test_add_func("/init_and_destroy/subprocess", test_ruminate_init_and_destroy_subprocess);

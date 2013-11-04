@@ -10,17 +10,20 @@
 #include <ctype.h>
 #include <locale.h>
 
-#define print_json_for_type(expr, err) ({ \
-	GError **_err = (err); \
-	__typeof__(expr) __expr = (expr); \
-	RType *_type = ruminate_get_type(__expr, _err); \
-    bool ret = false; \
-    if( _type != NULL ) { \
-		ret = _print_json_for_type(_type, &__expr, _err); \
-		r_type_unref(_type); \
-	} \
-	ret; \
-})
+#define print_json_for_type(expr, err) \
+	_Pragma("clang diagnostic push") \
+	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
+	({ \
+		__typeof__(expr) __expr = (expr); \
+		RType *_type = ruminate_get_type(__expr, err); \
+		bool ret = false; \
+		if( _type != NULL ) { \
+			ret = _print_json_for_type(_type, &__expr, err); \
+			r_type_unref(_type); \
+		} \
+		ret; \
+	}) \
+	_Pragma("clang diagnostic pop")
 
 typedef char *string;
 
@@ -246,7 +249,7 @@ static bool _print_json_for_identified_union( RAggregateType *rt, void *data, GE
 		r_type_member_unref(struct_memb);
 
 		g_assert(union_value_type != NULL);
-		if( !_print_json_for_type(union_value_type, data + union_value_off, error) ) {
+		if( !_print_json_for_type(union_value_type, ((char *) data) + union_value_off, error) ) {
 			// TODO: This leaks
 			return false;
 		}
@@ -371,7 +374,11 @@ static bool _print_json_for_array( RArrayType *type, void *data, GError **error 
 		die_if_error(*error);
 		// TODO: Error checking
 
-		if( !_print_json_for_type(member_type, &data[i], error) ) {
+		ptrdiff_t offset = r_type_member_offset(member, error);
+		die_if_error(*error);
+		// TODO: Error checking
+
+		if( !_print_json_for_type(member_type, ((char *) data) + offset, error) ) {
 			// TODO: This leaks
 			return false;
 		}

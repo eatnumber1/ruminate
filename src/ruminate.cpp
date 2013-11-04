@@ -39,7 +39,9 @@
 
 static Ruminate *ruminate;
 
+#if 0
 static Ice::Identity init_callbacks( Ice::CommunicatorPtr &, RuminateBackend::DebuggerFactoryPrx & );
+#endif
 
 G_BEGIN_DECLS
 
@@ -51,7 +53,10 @@ void ruminate_hit_breakpoint() RUMINATE_NOEXCEPT {
 
 static gint fork_child( GError **err ) RUMINATE_NOEXCEPT {
 	size_t len = strlen(RUMINATE_DEBUGGER_CONTROLLER_PATH) + 1;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wvla-extension"
 	char controller_path[len];
+#pragma clang diagnostic pop
 	memcpy(controller_path, RUMINATE_DEBUGGER_CONTROLLER_PATH, len);
 	char *argv[] = {
 		controller_path,
@@ -111,8 +116,8 @@ static int read_child_port( gint child_stdout, GError **error ) RUMINATE_NOEXCEP
 	return port;
 }
 
-G_STATIC_ASSERT(sizeof(::Ice::Long) >= sizeof(pid_t) && "A pid cannot fit in a long!");
-G_STATIC_ASSERT(sizeof(::Ice::Long) >= sizeof(size_t) && "A pointer cannot fit in a long!");
+R_STATIC_ASSERT(sizeof(::Ice::Long) >= sizeof(pid_t) && "A pid cannot fit in a long!");
+R_STATIC_ASSERT(sizeof(::Ice::Long) >= sizeof(size_t) && "A pointer cannot fit in a long!");
 
 bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT {
 	GError *err = NULL;
@@ -121,7 +126,9 @@ bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT 
 	Ice::ObjectPrx factory_proxy;
 	gint child_stdout;
 	int port;
+#if 0
 	Ice::Identity cbid;
+#endif
 	Ice::PropertiesPtr props;
 	Ice::InitializationData id;
 
@@ -141,11 +148,14 @@ bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT 
 		goto error_read_child_port;
 	}
 
-	// TODO: Handle exceptions
+	// TODO: Move all this checked C++ code into it's own method which can throw
 	// TODO: Remove ice arguments from argc.
-	props = Ice::createProperties(*argc, argv);
-	props->setProperty("Ice.ACM.Client", "0");
-	id.properties = props;
+	if( !gxx_call(props = Ice::createProperties(*argc, argv), error) )
+		goto error_ice_create_properties;
+	if( !gxx_call(props->setProperty("Ice.ACM.Client", "0"), error) )
+		goto error_ice_set_property;
+	if( !gxx_call(id.properties = props, error) )
+		goto error_ice_assign_properties;
 
 	if( !gxx_call(ruminate->communicator = Ice::initialize(id), error) )
 		goto error_ice_initialize;
@@ -158,15 +168,23 @@ bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT 
 	if( !gxx_call(ruminate->factory = RuminateBackend::DebuggerFactoryPrx::checkedCast(factory_proxy), error) )
 		goto error_checkedCast;
 
+#if 0
 	// TODO: Handle exceptions
-	cbid = init_callbacks(ruminate->communicator, ruminate->factory);
+	if( !gxx_call(cbid = init_callbacks(ruminate->communicator, ruminate->factory), error) )
+		goto error_init_callbacks;
+#endif
 
 	opts.exename = argv[0];
 	opts.pid = getpid();
 	opts.breakpointAddress = (::Ice::Long) &ruminate_hit_breakpoint;
 
+#if 0
 	if( !gxx_call(ruminate->debugger = ruminate->factory->create(opts, cbid), error) )
 		goto error_factory_create;
+#else
+	if( !gxx_call(ruminate->debugger = ruminate->factory->create(opts, Ice::Identity()), error) )
+		goto error_factory_create;
+#endif
 
 	atexit(ruminate_destroy_atexit);
 
@@ -175,10 +193,16 @@ bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT 
 	return true;
 
 error_factory_create:
+#if 0
+error_init_callbacks:
+#endif
 error_checkedCast:
 error_communicator_stringToProxy:
 	g_free(proxy_str);
 error_ice_initialize:
+error_ice_assign_properties:
+error_ice_set_property:
+error_ice_create_properties:
 error_read_child_port:
 error_fork_child:
 	// TODO: Resource cleanup
@@ -237,6 +261,7 @@ RFrameList *ruminate_backtrace( GError **error ) RUMINATE_NOEXCEPT {
 
 G_END_DECLS
 
+#if 0
 class DebugeeImpl : public RuminateBackend::Debugee {
 public:
 	void stop( const Ice::Current & = Ice::Current() ) {
@@ -256,3 +281,4 @@ static Ice::Identity init_callbacks( Ice::CommunicatorPtr &communicator, Ruminat
 	proxy->ice_getConnection()->setAdapter(adapter);
 	return ident;
 }
+#endif

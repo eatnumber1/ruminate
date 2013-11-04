@@ -260,7 +260,7 @@ RType *r_type_pointer( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	rm = r_memory_new(ptrptr, rt->ptr, error);
 	if( rm == NULL ) goto err_r_memory_new;
 
-	G_STATIC_ASSERT(sizeof(void **) <= sizeof(::Ice::Long));
+	R_STATIC_ASSERT(sizeof(void **) <= sizeof(::Ice::Long));
 	if( !gxx_call(t = rt->type->getPointerType((::Ice::Long) ptrptr), error) )
 		goto err_getPointerType;
 	return r_type_new(t, rm, ptrptr, error);

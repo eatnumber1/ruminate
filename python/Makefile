@@ -1,7 +1,10 @@
 .PHONY: python/clean python/all python/install
 
 python/all: $(ICE_IN_PYDIR_PY_SOURCES) $(ICE_IN_PYDIR_PY_MODDIR) $(PYTHON_DBGSVR)
-	$(CHMOD) +x $(PYTHON_DBGSVR)
+
+$(PYTHON_DBGSVR): $(PYTHON_DBGSVR_INPUT)
+	$(subst_vars)
+	$(CHMOD) +x $(PYTHON_DBGSVR) || $(RM) $(PYTHON_DBGSVR)
 
 python/clean:
 	$(RM) $(PYTHON_OBJECTS) $(ICE_IN_PYDIR_PY_OBJECTS) $(ICE_IN_PYDIR_PY_SOURCES) $(PYTHON_DBGSVR)
