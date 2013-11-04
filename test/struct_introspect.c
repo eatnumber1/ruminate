@@ -27,7 +27,7 @@ void print_data( RType *type, const void *data ) {
 					RAggregateMember *memb = r_aggregate_type_member_at(agg, i, NULL);
 					printf("\t.%s = ", r_string_bytes(r_aggregate_member_name(memb, NULL)));
 					RTypeMember *tmemb = (RTypeMember *) memb;
-					off_t offset = r_type_member_offset(tmemb, NULL);
+					ptrdiff_t offset = r_type_member_offset(tmemb, NULL);
 					print_data(r_type_member_type(tmemb, NULL), data + offset);
 				}
 				printf("}\n");

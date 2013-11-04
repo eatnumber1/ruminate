@@ -78,7 +78,7 @@ RTypeMember *r_array_type_member_at( RArrayType *rat, size_t idx, GError **error
 	if( !init_members(rat, error) ) return NULL;
 	// TODO: vector access could throw
 	RuminateBackend::TypeMemberPrx tmp = rat->members.value[idx];
-	off_t offset;
+	ptrdiff_t offset;
 	if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
 	// TODO: Memoize RTypeMembers
 	RType *rt = (RType *) rat;

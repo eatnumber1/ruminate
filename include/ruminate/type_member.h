@@ -53,7 +53,7 @@ RType * RUMINATE_EXPORT r_type_member_type(
  * @see RArrayType
  * @see RAggregateType
  */
-off_t RUMINATE_EXPORT r_type_member_offset(
+ptrdiff_t RUMINATE_EXPORT r_type_member_offset(
 	RTypeMember *member /** [in] the type member to get the offset of */,
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;

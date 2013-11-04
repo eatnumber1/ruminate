@@ -130,12 +130,12 @@ void r_type_member_delete( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 	r_type_member_free(tm);
 }
 
-bool _r_type_member_offset( RuminateBackend::TypeMemberPrx &tmp, off_t *out, GError **error ) RUMINATE_NOEXCEPT {
-	G_STATIC_ASSERT(sizeof(off_t) >= sizeof(__typeof__(tmp->getOffsetInBytes())));
+bool _r_type_member_offset( RuminateBackend::TypeMemberPrx &tmp, ptrdiff_t *out, GError **error ) RUMINATE_NOEXCEPT {
+	G_STATIC_ASSERT(sizeof(ptrdiff_t) >= sizeof(__typeof__(tmp->getOffsetInBytes())));
 	g_assert(out != NULL);
 
 	// TODO: Error here if this type member has no offset (function arguments)
-	off_t off = 0;
+	ptrdiff_t off = 0;
 	if( !gxx_call(off = tmp->getOffsetInBytes(), error) )
 		return false;
 	*out = off;
@@ -159,8 +159,8 @@ RType *r_type_member_type( RTypeMember *tm, GError **error ) RUMINATE_NOEXCEPT {
 	return r_type_ref(tm->type);
 }
 
-off_t r_type_member_offset( RTypeMember *tm, GError **error ) RUMINATE_NOEXCEPT {
-	off_t out = 0;
+ptrdiff_t r_type_member_offset( RTypeMember *tm, GError **error ) RUMINATE_NOEXCEPT {
+	ptrdiff_t out = 0;
 	_r_type_member_offset(tm->member, &out, error);
 	return out;
 }

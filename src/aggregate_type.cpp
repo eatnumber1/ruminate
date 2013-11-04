@@ -131,7 +131,7 @@ RAggregateMember *r_aggregate_type_member_at( RAggregateType *rat, size_t i, GEr
 	if( !init_members(rat, error) ) return 0;
 	// TODO: vector access could throw
 	RuminateBackend::TypeMemberPrx tmp = rat->members[i];
-	off_t offset = 0;
+	ptrdiff_t offset = 0;
 	if( rat->id != R_AGGREGATE_TYPE_FUNCTION ) {
 		if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
 	}

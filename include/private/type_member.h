@@ -16,4 +16,4 @@ void r_type_member_free( RTypeMember * ) RUMINATE_NOEXCEPT;
 RTypeMember *r_type_member_new( RuminateBackend::TypeMemberPrx &, RType *, RMemory *, void *, GError ** ) RUMINATE_NOEXCEPT;
 void r_type_member_delete( RTypeMember * ) RUMINATE_NOEXCEPT;
 
-bool _r_type_member_offset( RuminateBackend::TypeMemberPrx &, off_t *, GError ** ) RUMINATE_NOEXCEPT;
+bool _r_type_member_offset( RuminateBackend::TypeMemberPrx &, ptrdiff_t *, GError ** ) RUMINATE_NOEXCEPT;

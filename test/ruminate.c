@@ -84,7 +84,7 @@ static bool _print_json_for_aggregate_member( RAggregateMember *member, void *da
 
 	r_string_unref(name);
 
-	off_t offset = r_type_member_offset(tmember, error);
+	ptrdiff_t offset = r_type_member_offset(tmember, error);
 	die_if_error(*error);
 	// TODO: Error checking
 
@@ -197,7 +197,7 @@ static bool _print_json_for_identified_union( RAggregateType *rt, void *data, GE
 	}
 
 	RType *union_value_type = NULL;
-	off_t union_value_off = 0;
+	ptrdiff_t union_value_off = 0;
 	{
 		RTypeMember *struct_memb = (RTypeMember *) r_aggregate_type_member_at(rt, 1, error);
 		die_if_error(*error);
