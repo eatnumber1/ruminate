@@ -54,11 +54,11 @@ size_t r_string_length( RString *rs ) RUMINATE_NOEXCEPT {
 }
 
 GQuark r_string_quark( RString *rs ) {
-	if( ret->quark.initialized ) return ret->quark.value;
+	if( rs->quark.initialized ) return rs->quark.value;
 
-	ret->quark.value = g_quark_from_string(rs->gstr->str);
-	ret->quark.initialized = true;
-	return ret->quark.value;
+	rs->quark.value = g_quark_from_string(rs->gstr->str);
+	rs->quark.initialized = true;
+	return rs->quark.value;
 }
 
 G_END_DECLS
