@@ -17,6 +17,7 @@ RString *r_string_new( const char *init, size_t len ) RUMINATE_NOEXCEPT {
 	new (ret) RString();
 	ret->gstr = g_string_new_len(init, len);
 	ret->refcnt = 1;
+	ret->quark.initialized = false;
 	return ret;
 }
 
@@ -40,6 +41,7 @@ void r_string_unref( RString *rs ) RUMINATE_NOEXCEPT {
 		g_string_free(rs->gstr, true);
 		rs->~RString();
 		g_slice_free(RString, rs);
+		// TODO: free ret->quark.value?
 	}
 }
 
@@ -49,6 +51,14 @@ const char *r_string_bytes( RString *rs ) RUMINATE_NOEXCEPT {
 
 size_t r_string_length( RString *rs ) RUMINATE_NOEXCEPT {
 	return rs->gstr->len;
+}
+
+GQuark r_string_quark( RString *rs ) {
+	if( ret->quark.initialized ) return ret->quark.value;
+
+	ret->quark.value = g_quark_from_string(rs->gstr->str);
+	ret->quark.initialized = true;
+	return ret->quark.value;
 }
 
 G_END_DECLS

@@ -48,4 +48,7 @@ size_t RUMINATE_EXPORT r_string_length(
 	RString *string /** [in] the string to get the length of */
 ) RUMINATE_NOEXCEPT;
 
+/// @todo document
+GQuark r_string_quark( RString * );
+
 G_END_DECLS

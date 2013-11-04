@@ -1,6 +1,10 @@
 struct RString {
 	GString *gstr;
 	gint refcnt;
+	struct {
+		GQuark value;
+		bool initialized;
+	} quark;
 };
 
 RString *r_string_new( const char *, gsize ) RUMINATE_NOEXCEPT;
