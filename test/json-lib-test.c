@@ -59,6 +59,6 @@ int main( int argc, char *argv[] ) {
 	JsonState *st = json_state_new();
 	json_state_add_serializer(st, g_quark_from_static_string("string"), &string_serializer);
 	json_state_add_serializer(st, g_quark_from_static_string("MyUnion"), &my_union_serializer);
-	json_dumpf(json_serialize_isomorphic(st, ruminate_get_type(foo, NULL), &foo, NULL), stdout, 0);
+	json_dumpf(json_serialize_bijective(st, ruminate_get_type(foo, NULL), &foo, NULL), stdout, 0);
 	printf("\n");
 }

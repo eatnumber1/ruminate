@@ -42,7 +42,7 @@ RFrameList * RUMINATE_EXPORT ruminate_backtrace(
 ) RUMINATE_NOEXCEPT;
 
 /// @todo document
-GSList * RUMINATE_EXPORT ruminate_get_types_by_name(
+GPtrArray * RUMINATE_EXPORT ruminate_get_types_by_name(
 	const char *type_name,
 	GError **error
 ) RUMINATE_NOEXCEPT;

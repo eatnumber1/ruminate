@@ -176,18 +176,6 @@ class TypeImpl(Type):
 					)
 				return ret
 
-	def getArguments(self, current = None):
-		atl = self.sbtype.GetFunctionArgumentTypes()
-		ret = []
-		for idx in range(atl.GetSize()):
-			ret.append(
-				self.factory.proxy(
-					sbtype = atl.GetTypeAtIndex(idx),
-					current = current
-				)
-			)
-		return ret
-
 	def getReturnType(self, current = None):
 		return self.factory.proxy(
 			current = current,

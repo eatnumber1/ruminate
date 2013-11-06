@@ -8,7 +8,7 @@
 module RuminateBackend {
 	interface Debugger {
 		Type *getTypeByVariableName( string variable, long tid ) throws RuminateException;
-		Type *getTypeByName( string name, optional(1) string modname, optional(2) string cuname ) throws RuminateException;
+		TypeList getTypesByName( string name ) throws RuminateException;
 		FrameList getBacktrace( long tid ) throws RuminateException;
 		string getFunctionName( long addr ) throws RuminateException;
 	};

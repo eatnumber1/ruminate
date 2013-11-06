@@ -60,7 +60,6 @@ class DebuggerImpl(Debugger):
 				unix_signals.SetShouldStop(sig, False)
 				unix_signals.SetShouldNotify(sig, False)
 
-			## A temporary hack since the above is racy.
 			#unix_signals = validate(process.GetUnixSignals())
 			#for sig in unix_signals.signals:
 			#	self.debugger.HandleCommand("process handle -n false -p true -s false " + unix_signals.GetSignalAsCString(sig))
@@ -106,16 +105,16 @@ class DebuggerImpl(Debugger):
 				frame_list.append(frame)
 			return frame_list
 
-	#def getTypeByName(self, name, modname, cuname, current):
-	#	if modname == Ice.None:
-	#		ret = []
-	#		for type in self.target.FindTypes(name):
-	#			ret.append(
-	#				self.type_factory.proxy(
-	#					sbtype = sbframe.function.type,
-	#					current = current
-	#				)
-	#			)
+	def getTypesByName(self, name, current):
+		ret = []
+		for type in self.target.FindTypes(name):
+			ret.append(
+				self.type_factory.proxy(
+					sbtype = sbframe.function.type,
+					current = current
+				)
+			)
+		return ret
 
 	def getFunctionName(self, addr, current):
 		return lldb.SBAddress(addr, self.target).function.name

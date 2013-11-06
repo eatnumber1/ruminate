@@ -39,7 +39,6 @@ module RuminateBackend {
 		idempotent long getArrayLength();
 
 		TypeMemberList getMembers( optional(1) long tid );
-		TypeList getArguments();
 
 		string getName(); // This is cached in the C++ API layer
 		idempotent long getSize();

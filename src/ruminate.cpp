@@ -252,4 +252,22 @@ RString *ruminate_get_function_name( void *addr, GError **error ) RUMINATE_NOEXC
 	return r_string_new_cxx(name);
 }
 
+GPtrArray *ruminate_get_types_by_name( const char *name, GError **error ) RUMINATE_NOEXCEPT {
+	RuminateBackend::TypeList types;
+	if( !gxx_call(types = ruminate->debugger->getTypesByName(name), error) )
+		return NULL;
+
+	GPtrArray *ret = g_ptr_array_new_full(types.size(), (GDestroyNotify) r_type_unref);
+	for( RuminateBackend::TypeList::iterator t = types.begin(); t != types.end(); t++ ) {
+		RType *type = r_type_new(*t, error);
+		if( type == NULL ) goto error_type_new;
+		g_ptr_array_add(ret, type);
+	}
+
+	return ret;
+error_type_new:
+	g_ptr_array_unref(ret);
+	return NULL;
+}
+
 G_END_DECLS
