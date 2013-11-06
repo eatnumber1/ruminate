@@ -29,15 +29,13 @@ class SBTypeEnumMemberAdapter(TypeMember):
 			current.adapter.addWithUUID(SBTypeEnumMemberAdapter(**kwargs))
 		)
 
-	def __init__(self, sbtypemember, base_address, type_factory):
+	def __init__(self, sbtypemember, type_factory):
 		self.sbtypemember = sbtypemember
 		self.type_factory = type_factory
-		self.address = base_address
 
 	def getType(self, current = None):
 		return self.type_factory.proxy(
 			sbtype = self.sbtypemember.type,
-			address = self.address,
 			current = current
 		)
 
@@ -58,15 +56,13 @@ class SBTypeMemberAdapter(TypeMember):
 			current.adapter.addWithUUID(SBTypeMemberAdapter(**kwargs))
 		)
 
-	def __init__(self, sbtypemember, base_address, type_factory):
+	def __init__(self, sbtypemember, type_factory):
 		self.sbtypemember = sbtypemember
 		self.type_factory = type_factory
-		self.address = base_address + self.getOffsetInBytes()
 
 	def getType(self, current = None):
 		return self.type_factory.proxy(
 			sbtype = self.sbtypemember.type,
-			address = self.address,
 			current = current
 		)
 
@@ -93,16 +89,14 @@ class SBTypeAdapter(TypeMember):
 			current.adapter.addWithUUID(SBTypeAdapter(**kwargs))
 		)
 
-	def __init__(self, sbtype, base_address, address, type_factory):
+	def __init__(self, sbtype, type_factory, offset):
 		self.type_factory = type_factory
 		self.sbtype = sbtype
-		self.offset = address - base_address
-		self.address = address
+		self.offset = offset
 
 	def getType(self, current = None):
 		return self.type_factory.proxy(
 			sbtype = self.sbtype,
-			address = self.address,
 			current = current
 		)
 

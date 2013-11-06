@@ -23,7 +23,6 @@
 
 #include "private/common.h"
 #include "private/gettid.h"
-#include "private/memory.h"
 #include "private/string.h"
 #include "private/type_member.h"
 #include "private/aggregate_member.h"
@@ -59,29 +58,9 @@ RType *r_function_type_return_type( RFunctionType *rft, GError **error ) RUMINAT
 	if( !gxx_call(t = rt->type->getReturnType(), error) )
 		return NULL;
 
-	RMemory *rm = r_memory_new(NULL, error);
-	if( rm == NULL ) return NULL;
-
-	RType *ret = r_type_new(t, rm, NULL, error);
-
-	r_memory_unref(rm);
+	RType *ret = r_type_new(t, error);
 
 	return ret;
-}
-
-RString *r_function_type_name( RFunctionType *rft, GError **error ) RUMINATE_NOEXCEPT {
-	if( rft->name == NULL ) {
-		std::string name;
-		RType *rt = (RType *) rft;
-		Ice::AsyncResultPtr arp;
-		if( !gxx_call(arp = rt->type->begin_getName(gettid()), error) )
-			return NULL;
-		ruminate_hit_breakpoint();
-		if( !gxx_call(name = rt->type->end_getName(arp), error) )
-			return NULL;
-		rft->name = r_string_new(name.c_str());
-	}
-	return r_string_ref(rft->name);
 }
 
 G_END_DECLS

@@ -51,4 +51,10 @@ size_t RUMINATE_EXPORT r_string_length(
 /// @todo document
 GQuark RUMINATE_EXPORT r_string_quark( RString * ) RUMINATE_NOEXCEPT;
 
+/// @todo document
+RString * RUMINATE_EXPORT r_string_new_len( const char *, gsize ) RUMINATE_NOEXCEPT;
+
+/// @todo document
+RString * RUMINATE_EXPORT r_string_new( const char * ) RUMINATE_NOEXCEPT;
+
 G_END_DECLS

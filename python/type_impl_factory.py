@@ -4,7 +4,6 @@ class TypeImplFactory(object):
 	def instance(self, **kwargs):
 		return TypeImpl(
 			kwargs["sbtype"] if "sbtype" in kwargs else self.sbtype,
-			kwargs["address"] if "address" in kwargs else self.address,
 			kwargs["thread_stop"] if "thread_stop" in kwargs else self.thread_stop,
 			kwargs["debugger"] if "debugger" in kwargs else self.debugger
 		)

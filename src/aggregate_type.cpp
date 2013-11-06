@@ -23,7 +23,6 @@
 
 #include "private/common.h"
 #include "private/gettid.h"
-#include "private/memory.h"
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/aggregate_member.h"
@@ -131,13 +130,9 @@ RAggregateMember *r_aggregate_type_member_at( RAggregateType *rat, size_t i, GEr
 	if( !init_members(rat, error) ) return 0;
 	// TODO: vector access could throw
 	RuminateBackend::TypeMemberPrx tmp = rat->members[i];
-	ptrdiff_t offset = 0;
-	if( rat->id != R_AGGREGATE_TYPE_FUNCTION ) {
-		if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
-	}
 	// TODO: Memoize RAggregateMembers
 	RType *rt = (RType *) rat;
-	return (RAggregateMember *) r_type_member_new(tmp, rt, rt->ptr, ((uint8_t *) rt->cur) + offset, error);
+	return (RAggregateMember *) r_type_member_new(tmp, rt, error);
 }
 
 G_END_DECLS

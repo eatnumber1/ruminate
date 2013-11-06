@@ -23,5 +23,6 @@ void json_state_add_serializer( JsonState *, GQuark, JsonSerializer * );
 void json_state_remove_serializer( JsonState *, GQuark );
 
 json_t *json_serialize( JsonState *, RType *, void *, GError ** );
+json_t *json_serialize_bijective( JsonState *, RType *, void *, GError ** );
 
 #endif

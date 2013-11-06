@@ -29,11 +29,6 @@ bool RUMINATE_EXPORT ruminate_init(
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
-/// @private
-bool RUMINATE_EXPORT ruminate_begin_get_type_by_variable_name( const char *, GError ** ) RUMINATE_NOEXCEPT;
-/// @private
-RType * RUMINATE_EXPORT ruminate_end_get_type_by_variable_name( void *, GError ** ) RUMINATE_NOEXCEPT;
-
 /** Generate a backtrace.
  *
  * This function generates a backtrace of the caller's call stack.
@@ -46,9 +41,26 @@ RFrameList * RUMINATE_EXPORT ruminate_backtrace(
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
-/// @private
-__attribute__((noinline))
-void RUMINATE_EXPORT ruminate_hit_breakpoint() RUMINATE_NOEXCEPT;
+/// @todo document
+GSList * RUMINATE_EXPORT ruminate_get_types_by_name(
+	const char *type_name,
+	GError **error
+) RUMINATE_NOEXCEPT;
+
+/// @todo document
+RType * RUMINATE_EXPORT ruminate_get_type_by_variable_name(
+	const char *,
+	GError **
+) RUMINATE_NOEXCEPT;
+
+/** Get the name of a function by address.
+ *
+ * @return A RString containing the name of the function.
+ */
+RString * RUMINATE_EXPORT ruminate_get_function_name(
+	void *addr /** [in] the address of the function to get the name of */,
+	GError **error /** [out] see errors.h */
+) RUMINATE_NOEXCEPT;
 
 G_END_DECLS
 
@@ -69,15 +81,8 @@ G_END_DECLS
 	_Pragma("clang diagnostic push") \
 	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
 	({ \
-		__typeof__(expr) *_expr = g_malloc(sizeof(__typeof__(expr))); \
-		*_expr = (expr); \
-		RType *ret; \
-		if( !ruminate_begin_get_type_by_variable_name("_expr", error) ) { \
-			ret = NULL; \
-		} else { \
-			ruminate_hit_breakpoint(); \
-			ret = ruminate_end_get_type_by_variable_name(_expr, error); \
-		} \
-		ret; \
+		__typeof__(expr) _expr = (expr); \
+		(void) _expr; \
+		ruminate_get_type_by_variable_name("_expr", error); \
 	}) \
 	_Pragma("clang diagnostic pop")

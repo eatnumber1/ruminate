@@ -22,7 +22,6 @@
 
 #include "private/common.h"
 #include "private/string.h"
-#include "private/memory.h"
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/aggregate_member.h"

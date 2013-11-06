@@ -5,6 +5,8 @@
 #include <stdint.h>
 
 #include <Ice/Ice.h>
+#include "ice/debugger_factory.h"
+#include "ice/debugger.h"
 #include "ice/type.h"
 
 #include "private/glib.h"
@@ -20,10 +22,10 @@
 
 #include "private/gettid.h"
 #include "private/common.h"
-#include "private/memory.h"
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/array_type.h"
+#include "private/ruminate.h"
 
 bool r_array_type_init( RArrayType *rat, GError ** ) RUMINATE_NOEXCEPT {
 	rat->members.valid = false;
@@ -78,11 +80,8 @@ RTypeMember *r_array_type_member_at( RArrayType *rat, size_t idx, GError **error
 	if( !init_members(rat, error) ) return NULL;
 	// TODO: vector access could throw
 	RuminateBackend::TypeMemberPrx tmp = rat->members.value[idx];
-	ptrdiff_t offset;
-	if( !_r_type_member_offset(tmp, &offset, error) ) return NULL;
 	// TODO: Memoize RTypeMembers
-	RType *rt = (RType *) rat;
-	return r_type_member_new(tmp, (RType *) rat, rt->ptr, ((uint8_t *) rt->cur) + offset, error);
+	return r_type_member_new(tmp, (RType *) rat, error);
 }
 
 G_END_DECLS

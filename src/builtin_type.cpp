@@ -15,7 +15,6 @@
 #include "ruminate/builtin_type.h"
 
 #include "private/common.h"
-#include "private/memory.h"
 #include "private/type.h"
 #include "private/builtin_type.h"
 

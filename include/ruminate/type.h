@@ -82,4 +82,7 @@ RType * RUMINATE_EXPORT r_type_pointer(
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
+/// @todo Document this
+size_t RUMINATE_EXPORT r_type_size( RType *, GError **error ) RUMINATE_NOEXCEPT;
+
 G_END_DECLS

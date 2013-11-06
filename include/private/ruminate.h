@@ -6,3 +6,6 @@ typedef struct {
 	Ice::AsyncResultPtr arp;
 	GPid child_pid;
 } Ruminate;
+
+__attribute__((noinline))
+void ruminate_hit_breakpoint() RUMINATE_NOEXCEPT;

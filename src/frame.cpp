@@ -19,7 +19,6 @@
 
 #include "private/common.h"
 #include "private/string.h"
-#include "private/memory.h"
 #include "private/type.h"
 #include "private/frame.h"
 
@@ -96,21 +95,21 @@ void r_frame_unref( RFrame *frame ) RUMINATE_NOEXCEPT {
 
 RString *r_frame_function_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
 	if( rf->function_name == NULL )
-		rf->function_name = r_string_new(rf->frame.functionName);
+		rf->function_name = r_string_new_cxx(rf->frame.functionName);
 
 	return r_string_ref(rf->function_name);
 }
 
 RString *r_frame_module_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
 	if( rf->module_name == NULL )
-		rf->module_name = r_string_new(rf->frame.moduleName);
+		rf->module_name = r_string_new_cxx(rf->frame.moduleName);
 
 	return r_string_ref(rf->module_name);
 }
 
 RString *r_frame_compile_unit_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
 	if( rf->compile_unit_name == NULL )
-		rf->compile_unit_name = r_string_new(rf->frame.compileUnitName);
+		rf->compile_unit_name = r_string_new_cxx(rf->frame.compileUnitName);
 
 	return r_string_ref(rf->compile_unit_name);
 }
@@ -118,7 +117,7 @@ RString *r_frame_compile_unit_name( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
 RType *r_frame_function_type( RFrame *rf, GError **err ) RUMINATE_NOEXCEPT {
 	if( rf->functionType != NULL ) return r_type_ref(rf->functionType);
 	// TODO: Maybe retrieve the fp from the SBValue?
-	rf->functionType = r_type_new(rf->frame.functionType, NULL, NULL, err);
+	rf->functionType = r_type_new(rf->frame.functionType, err);
 	return rf->functionType;
 }
 

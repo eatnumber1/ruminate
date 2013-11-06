@@ -15,7 +15,6 @@
 #include "ruminate/pointer_type.h"
 
 #include "private/common.h"
-#include "private/memory.h"
 #include "private/type.h"
 #include "private/pointer_type.h"
 
@@ -39,16 +38,11 @@ void r_pointer_type_free( RPointerType *rpt ) RUMINATE_NOEXCEPT {
 G_BEGIN_DECLS
 
 RType *r_pointer_type_pointee( RPointerType *rpt, GError **error ) RUMINATE_NOEXCEPT {
-	RType *rt = (RType *) rpt;
-	void *ptr = *((void **) rt->cur);
 	RuminateBackend::TypePrx t;
-	R_STATIC_ASSERT(sizeof(ptr) <= sizeof(::Ice::Long));
-	if( !gxx_call(t = ((RType *) rpt)->type->getPointeeType((::Ice::Long) ptr), error) )
+	if( !gxx_call(t = ((RType *) rpt)->type->getPointeeType(), error) )
 		return NULL;
 
-	// TODO: rt->ptr->next might be a valid RMemory for this pointer.
-	//       If so, we could discard rt->ptr
-	return r_type_new(t, rt->ptr, ptr, error);
+	return r_type_new(t, error);
 }
 
 G_END_DECLS

@@ -12,7 +12,13 @@
 
 #include "private/string.h"
 
-RString *r_string_new( const char *init, size_t len ) RUMINATE_NOEXCEPT {
+RString *r_string_new_cxx( const std::string &init ) RUMINATE_NOEXCEPT {
+	return r_string_new_len(init.c_str(), init.size());
+}
+
+G_BEGIN_DECLS
+
+RString *r_string_new_len( const char *init, size_t len ) RUMINATE_NOEXCEPT {
 	RString *ret = g_slice_new(RString);
 	new (ret) RString();
 	ret->gstr = g_string_new_len(init, len);
@@ -22,14 +28,8 @@ RString *r_string_new( const char *init, size_t len ) RUMINATE_NOEXCEPT {
 }
 
 RString *r_string_new( const char *init ) RUMINATE_NOEXCEPT {
-	return r_string_new(init, strlen(init));
+	return r_string_new_len(init, strlen(init));
 }
-
-RString *r_string_new( const std::string &init ) RUMINATE_NOEXCEPT {
-	return r_string_new(init.c_str(), init.size());
-}
-
-G_BEGIN_DECLS
 
 RString *r_string_ref( RString *rs ) RUMINATE_NOEXCEPT {
 	g_atomic_int_inc(&rs->refcnt);

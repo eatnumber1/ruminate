@@ -13,10 +13,9 @@ import threading
 import sys # For debugging only
 
 class DebuggerImpl(Debugger):
-	def __init__(self, options, shutdown, debugee):
+	def __init__(self, options, shutdown):
 		self.debugger = validate(SBDebugger.Create())
 		self.debugger.SetAsync(True)
-		self.debugee = debugee
 
 		#self.debugger.SetLoggingCallback(lambda msg: sys.stdout.write(msg))
 		#self.debugger.EnableLog("lldb", ["all"])
@@ -82,13 +81,12 @@ class DebuggerImpl(Debugger):
 
 	def getTypeByVariableName(self, variable, tid, current):
 		with StoppedThread(self.em, self.process, tid) as thread:
-			frame = validate(thread.frame[1])
+			frame = validate(thread.frame[2])
 			value = validate(frame.FindVariable(variable))
 			t = validate(value.type)
 			return self.type_factory.proxy(
 				sbtype = t,
-				current = current,
-				address = value.address_of.unsigned
+				current = current
 			)
 
 	def getBacktrace(self, tid, current):
@@ -102,20 +100,35 @@ class DebuggerImpl(Debugger):
 				frame.compileUnitName = sbframe.compile_unit.file.basename
 				frame.functionType = self.type_factory.proxy(
 					sbtype = sbframe.function.type,
-					address = sbframe.function.addr.load_addr,
 					current = current
 				)
 				frame.line = sbframe.line_entry.line
 				frame_list.append(frame)
-
 			return frame_list
 
-	def createSBValueFor(self, sbtype, address):
+	#def getTypeByName(self, name, modname, cuname, current):
+	#	if modname == Ice.None:
+	#		ret = []
+	#		for type in self.target.FindTypes(name):
+	#			ret.append(
+	#				self.type_factory.proxy(
+	#					sbtype = sbframe.function.type,
+	#					current = current
+	#				)
+	#			)
+
+	def getFunctionName(self, addr, current):
+		return lldb.SBAddress(addr, self.target).function.name
+
+	def getArrayMemberTypeAndLength(self, sbtype):
+		ptnam = sbtype.GetPointerType().name
 		# TODO: Check for errors here
-		return self.target.EvaluateExpression(
-			"(%s) 0x%x" % (sbtype.GetPointerType().name, address),
+		array = self.target.EvaluateExpression(
+			(
+				"char a[sizeof((*((%s) NULL))[0])];"
+				"__typeof__(&a) ap = &a;"
+				"(%s) ap"
+			) % (ptnam, ptnam),
 			SBExpressionOptions()
 		).Dereference()
-
-	def createSBAddressFor(self, address):
-		return lldb.SBAddress(address, self.target)
+		return (array.GetChildAtIndex(0, lldb.eDynamicDontRunTarget, False).type, array.num_children)

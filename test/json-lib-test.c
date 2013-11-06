@@ -24,12 +24,6 @@ struct MyStruct {
 	char a[3];
 };
 
-void die_if_error( GError *err ) {
-	if( err == NULL ) return;
-	fprintf(stderr, "%s\n", err->message);
-	exit(EXIT_FAILURE);
-}
-
 static json_t *serialize_my_union( JsonState *js, RType *rt, void *value, void *data, GError **error ) {
 	(void) js, (void) rt, (void) data, (void) error;
 	char v[] = { *((char *) value), '\0' };
@@ -50,9 +44,7 @@ static JsonSerializer string_serializer = {
 };
 
 int main( int argc, char *argv[] ) {
-	GError *err = NULL;
-	ruminate_init(&argc, argv, &err);
-	die_if_error(err);
+	ruminate_init(&argc, argv, NULL);
 	int ipt = 2;
 	struct MyStruct foo = {
 		.i = 1,
@@ -64,13 +56,9 @@ int main( int argc, char *argv[] ) {
 		.p = &ipt,
 		.a = { 1, 2, 3 }
 	};
-	RType *typ = ruminate_get_type(foo, &err);
-	die_if_error(err);
 	JsonState *st = json_state_new();
 	json_state_add_serializer(st, g_quark_from_static_string("string"), &string_serializer);
 	json_state_add_serializer(st, g_quark_from_static_string("MyUnion"), &my_union_serializer);
-	json_t *ser = json_serialize(st, typ, &foo, &err);
-	die_if_error(err);
-	json_dumpf(ser, stdout, 0);
+	json_dumpf(json_serialize_isomorphic(st, ruminate_get_type(foo, NULL), &foo, NULL), stdout, 0);
 	printf("\n");
 }

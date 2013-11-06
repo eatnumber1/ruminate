@@ -1,6 +1,4 @@
-.PHONY: doc/doc doc/doc
-
-doc/all: doc/doc
+.PHONY: doc/html doc/doc
 
 doc/doc: doc/html
 

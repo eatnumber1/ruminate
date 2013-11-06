@@ -15,7 +15,6 @@
 #include "ruminate/typedef_type.h"
 
 #include "private/common.h"
-#include "private/memory.h"
 #include "private/type.h"
 #include "private/typedef_type.h"
 
@@ -43,8 +42,7 @@ RType *r_typedef_type_canonical( RTypedefType *rtt, GError **error ) RUMINATE_NO
 	if( !gxx_call(t = ((RType *) rtt)->type->getCanonicalType(), error) )
 		return NULL;
 
-	RType *rt = (RType *) rtt;
-	return r_type_new(t, rt->ptr, rt->cur, error);
+	return r_type_new(t, error);
 }
 
 G_END_DECLS

@@ -31,15 +31,17 @@ module RuminateBackend {
 		TypeId getId();
 
 		Type *getBuiltinType();
-		Type *getPointeeType( long address );
-		Type *getPointerType( long address );
+		Type *getPointeeType();
+		Type *getPointerType();
 		Type *getCanonicalType();
 		Type *getReturnType();
+		Type *getArrayMemberType();
+		idempotent long getArrayLength();
 
 		TypeMemberList getMembers( optional(1) long tid );
 		TypeList getArguments();
 
-		string getName( optional(1) long tid ); // This is cached in the C++ API layer
+		string getName(); // This is cached in the C++ API layer
 		idempotent long getSize();
 
 		idempotent bool isComplete();

@@ -11,6 +11,7 @@
 #define json_boolean(val) ((val) ? json_true() : json_false())
 #endif
 
+__attribute__((visibility("default")))
 JsonState *json_state_new() {
 	JsonState *ret = g_slice_new(JsonState);
 	ret->refcnt = 1;
@@ -18,11 +19,13 @@ JsonState *json_state_new() {
 	return ret;
 }
 
+__attribute__((visibility("default")))
 JsonState *json_state_ref( JsonState *js ) {
 	g_atomic_int_inc(&js->refcnt);
 	return js;
 }
 
+__attribute__((visibility("default")))
 void json_state_unref( JsonState *js ) {
 	if( g_atomic_int_dec_and_test(&js->refcnt) ) {
 		g_datalist_clear(&js->handlers);
@@ -30,10 +33,12 @@ void json_state_unref( JsonState *js ) {
 	}
 }
 
+__attribute__((visibility("default")))
 void json_state_add_serializer( JsonState *js, GQuark id, JsonSerializer *ser ) {
 	g_datalist_id_set_data(&js->handlers, id, ser);
 }
 
+__attribute__((visibility("default")))
 void json_state_remove_serializer( JsonState *js, GQuark id ) {
 	g_datalist_id_remove_data(&js->handlers, id);
 }
@@ -307,9 +312,12 @@ error_array_size:
 	return NULL;
 }
 
+__attribute__((visibility("default")))
 json_t *json_serialize( JsonState *js, RType *rt, void *value, GError **error ) {
 	RTypeId id = r_type_id(rt, error);
 	if( id == R_TYPE_UNKNOWN ) return NULL;
+
+	if( value == NULL ) return json_null();
 
 	RString *name = r_type_name(rt, error);
 	GQuark typeid = r_string_quark(name);
@@ -336,6 +344,12 @@ json_t *json_serialize( JsonState *js, RType *rt, void *value, GError **error ) 
 		}
 		case R_TYPE_ARRAY:
 		    return json_serialize_array(js, (RArrayType *) rt, value, error);
+		case R_TYPE_TYPEDEF: {
+			RType *canonical = r_typedef_type_canonical((RTypedefType *) rt, error);
+			json_t *ret = json_serialize(js, canonical, value, error);
+			r_type_unref(canonical);
+			return ret;
+		}
 		default:
 			// TODO: Remove this
 			g_assert_not_reached();

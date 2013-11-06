@@ -21,7 +21,6 @@
 
 #include "private/common.h"
 #include "private/string.h"
-#include "private/memory.h"
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/aggregate_member.h"
@@ -114,7 +113,7 @@ RString *r_aggregate_member_name( RAggregateMember *rm, GError **error ) RUMINAT
 		if( !gxx_call(name = ((RTypeMember *) rm)->member->getName(), error) )
 			return NULL;
 
-		rm->name = r_string_new(name.c_str());
+		rm->name = r_string_new_cxx(name.c_str());
 	}
 
 	return r_string_ref(rm->name);

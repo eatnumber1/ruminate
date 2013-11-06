@@ -9,16 +9,15 @@ import lldb
 import lldb_utils
 
 class TypeImpl(Type):
-	def __init__(self, sbtype, address, thread_stop, debugger):
+	def __init__(self, sbtype, thread_stop, debugger):
 		from type_impl_factory import TypeImplFactory
 		self.factory = TypeImplFactory()
 		self.factory.sbtype = sbtype
-		self.factory.address = address
 		self.factory.thread_stop = thread_stop
 		self.factory.debugger = debugger
 
+		self.array_info = None
 		self.debugger = debugger
-		self.address = address
 		self.sbtype = sbtype
 		self.thread_stop = thread_stop
 		if sbtype.type == lldb.eTypeClassBuiltin:
@@ -83,11 +82,7 @@ class TypeImpl(Type):
 		return self.id
 
 	def getName(self, tid, current = None):
-		with self.thread_stop.produce(tid):
-			if self.id == TypeId.TypeIdFunction:
-				return self.debugger.createSBAddressFor(self.address).function.name
-			else:
-				return self.sbtype.name
+		return self.sbtype.name
 
 	def getBuiltinType(self, current = None):
 		return self.factory.proxy(sbtype = self.sbtype.GetBasicType(self.sbtype.GetBasicType()), current = current)
@@ -95,11 +90,11 @@ class TypeImpl(Type):
 	def getSize(self, current = None):
 		return self.sbtype.GetByteSize()
 
-	def getPointeeType(self, address, current = None):
-		return self.factory.proxy(sbtype = self.sbtype.GetPointeeType(), address = address, current = current)
+	def getPointeeType(self, current = None):
+		return self.factory.proxy(sbtype = self.sbtype.GetPointeeType(), current = current)
 
-	def getPointerType(self, address, current = None):
-		return self.factory.proxy(sbtype = self.sbtype.GetPointerType(), address = address, current = current)
+	def getPointerType(self, current = None):
+		return self.factory.proxy(sbtype = self.sbtype.GetPointerType(), current = current)
 
 	def isComplete(self, current = None):
 		return self.sbtype.IsTypeComplete()
@@ -110,22 +105,40 @@ class TypeImpl(Type):
 			return None
 		return self.factory.proxy(sbtype = canon, current = current)
 
+	def getArrayMemberType(self, current = None):
+		sbtype = None
+		if self.array_info == None:
+			self.array_info = self.debugger.getArrayMemberTypeAndLength(self.sbtype)
+		sbtype = self.array_info[0];
+		return self.factory.proxy(
+			sbtype = sbtype,
+			current = current
+		)
+
+	def getArrayLength(self, current = None):
+		sbtype = None
+		if self.array_info == None:
+			self.array_info = self.debugger.getArrayMemberTypeAndLength(self.sbtype)
+		return self.array_info[1];
+
 	def getMembers(self, tid, current = None):
 		with self.thread_stop.produce(tid):
 			if self.id == TypeId.TypeIdArray:
+				# TODO: Stop using this and use getArrayMemberType and getArrayLength instead.
 				ret = []
-				array = self.debugger.createSBValueFor(self.sbtype, self.address)
-				for index in range(0, array.num_children):
-					child = array.GetChildAtIndex(index, lldb.eDynamicCanRunTarget, False)
+				child_type, num_children = self.debugger.getArrayMemberTypeAndLength(self.sbtype)
+				offset = 0
+				offset_incr = child_type.size
+				for index in range(0, num_children):
 					ret.append(
 						type_member_impl.SBTypeAdapter.proxyFor(
-							sbtype = child.type,
-							base_address = self.address,
-							address = child.address_of.unsigned,
+							sbtype = child_type,
 							type_factory = self.factory,
+							offset = offset,
 							current = current
 						)
 					)
+					offset += offset_incr
 				return ret
 			elif self.id == TypeId.TypeIdFunction:
 				ret = []
@@ -146,7 +159,6 @@ class TypeImpl(Type):
 					ret.append(
 						type_member_impl.SBTypeEnumMemberAdapter.proxyFor(
 							sbtypemember = enum_member,
-							base_address = self.address,
 							type_factory = self.factory,
 							current = current
 						)
@@ -158,7 +170,6 @@ class TypeImpl(Type):
 					ret.append(
 						type_member_impl.SBTypeMemberAdapter.proxyFor(
 							sbtypemember = field,
-							base_address = self.address,
 							type_factory = self.factory,
 							current = current
 						)
@@ -172,8 +183,7 @@ class TypeImpl(Type):
 			ret.append(
 				self.factory.proxy(
 					sbtype = atl.GetTypeAtIndex(idx),
-					current = current,
-					address = None
+					current = current
 				)
 			)
 		return ret
@@ -181,8 +191,7 @@ class TypeImpl(Type):
 	def getReturnType(self, current = None):
 		return self.factory.proxy(
 			current = current,
-			sbtype = self.sbtype.GetFunctionReturnType(),
-			address = None,
+			sbtype = self.sbtype.GetFunctionReturnType()
 		)
 
 	def isSigned(self, current = None):

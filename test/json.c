@@ -317,15 +317,11 @@ static bool print_function_type( RFunctionType *rft, GError **error ) {
 	die_if_error(*error);
 	// TODO: Error checking
 
-	RString *rfname = r_function_type_name(rft, error);
-	die_if_error(*error);
-
 	r_type_unref(rtype);
 
-	printf("%s %s(", r_string_bytes(rtname), r_string_bytes(rfname));
+	printf("%s (", r_string_bytes(rtname));
 
 	r_string_unref(rtname);
-	r_string_unref(rfname);
 
 	size_t narguments = r_aggregate_type_nmembers(rrt, error);
 	die_if_error(*error);
@@ -509,5 +505,14 @@ int main( int argc, char *argv[] ) {
 		r_type_unref(type);
 
 		printf("\n");
+	}
+
+	{
+		RString *fn = ruminate_get_function_name((void *) &print_function_type, &err);
+		die_if_error(err);
+
+		printf("%s\n", r_string_bytes(fn));
+
+		r_string_unref(fn);
 	}
 }

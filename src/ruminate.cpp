@@ -15,7 +15,6 @@
 #include <Ice/Ice.h>
 #include "ice/debugger_factory.h"
 #include "ice/debugger.h"
-#include "ice/debugee.h"
 #include "ice/frame.h"
 #include "ice/type.h"
 
@@ -30,26 +29,22 @@
 #include "ruminate/ruminate.h"
 
 #include "private/common.h"
+#include "private/string.h"
 #include "private/errors.h"
 #include "private/gettid.h"
-#include "private/memory.h"
 #include "private/type.h"
 #include "private/frame.h"
 #include "private/ruminate.h"
 
 static Ruminate *ruminate;
 
-#if 0
-static Ice::Identity init_callbacks( Ice::CommunicatorPtr &, RuminateBackend::DebuggerFactoryPrx & );
-#endif
-
-G_BEGIN_DECLS
-
 __attribute__((noinline))
 void ruminate_hit_breakpoint() RUMINATE_NOEXCEPT {
 	// We try really hard to not be optimized away.
 	asm("");
 }
+
+G_BEGIN_DECLS
 
 static gint fork_child( GError **err ) RUMINATE_NOEXCEPT {
 	size_t len = strlen(RUMINATE_DEBUGGER_CONTROLLER_PATH) + 1;
@@ -223,33 +218,6 @@ bool ruminate_destroy( GError **error ) RUMINATE_NOEXCEPT {
 	return true;
 }
 
-
-bool ruminate_begin_get_type_by_variable_name( const char *varname, GError **error ) RUMINATE_NOEXCEPT {
-	g_assert(ruminate->arp == 0);
-	return gxx_call(ruminate->arp = ruminate->debugger->begin_getTypeByVariableName(varname, gettid()), error);
-}
-
-RType *ruminate_end_get_type_by_variable_name( void *mem, GError **error ) RUMINATE_NOEXCEPT {
-	g_assert(ruminate->arp != 0);
-	RuminateBackend::TypePrx t;
-	if( !gxx_call(t = ruminate->debugger->end_getTypeByVariableName(ruminate->arp), error) ) {
-		// TODO: Cleanup
-		return NULL;
-	}
-	ruminate->arp = 0;
-	RMemory *rmem = r_memory_new(mem, error);
-	if( rmem == NULL ) {
-		// TODO: Cleanup
-		return NULL;
-	}
-	// TODO: Type check
-	RPointerType *pt = (RPointerType *) r_type_new(t, rmem, &mem, error);
-	if( pt == NULL ) return NULL;
-	RType *ret = r_pointer_type_pointee(pt, error);
-	r_type_unref((RType *) pt);
-	return ret;
-}
-
 RFrameList *ruminate_backtrace( GError **error ) RUMINATE_NOEXCEPT {
 	Ice::AsyncResultPtr arp;
 	if( !gxx_call(arp = ruminate->debugger->begin_getBacktrace(gettid()), error) )
@@ -259,26 +227,29 @@ RFrameList *ruminate_backtrace( GError **error ) RUMINATE_NOEXCEPT {
 	return r_frame_list_new(fl, error);
 }
 
-G_END_DECLS
+RType *ruminate_get_type_by_variable_name( const char *varname, GError **error ) RUMINATE_NOEXCEPT {
+	g_assert(ruminate->arp == 0);
+	if( !gxx_call(ruminate->arp = ruminate->debugger->begin_getTypeByVariableName(varname, gettid()), error) )
+		return NULL;
 
-#if 0
-class DebugeeImpl : public RuminateBackend::Debugee {
-public:
-	void stop( const Ice::Current & = Ice::Current() ) {
-		fprintf(stderr, "Hello World!\n");
-		ruminate_hit_breakpoint();
+	ruminate_hit_breakpoint();
+
+	RuminateBackend::TypePrx t;
+	if( !gxx_call(t = ruminate->debugger->end_getTypeByVariableName(ruminate->arp), error) ) {
+		// TODO: Cleanup
+		return NULL;
 	}
-};
-
-static Ice::Identity init_callbacks( Ice::CommunicatorPtr &communicator, RuminateBackend::DebuggerFactoryPrx &proxy ) {
-	Ice::ObjectAdapterPtr adapter = communicator->createObjectAdapter("");
-	Ice::Identity ident;
-	ident.name = IceUtil::generateUUID();
-	ident.category = "";
-	RuminateBackend::DebugeePtr cb = new DebugeeImpl();
-	adapter->add(cb, ident);
-	adapter->activate();
-	proxy->ice_getConnection()->setAdapter(adapter);
-	return ident;
+	ruminate->arp = 0;
+	// TODO: Type check
+	return r_type_new(t, error);
 }
-#endif
+
+RString *ruminate_get_function_name( void *addr, GError **error ) RUMINATE_NOEXCEPT {
+	std::string name;
+	if( !gxx_call(name = ruminate->debugger->getFunctionName((::Ice::Long) addr), error) )
+		return NULL;
+
+	return r_string_new_cxx(name);
+}
+
+G_END_DECLS

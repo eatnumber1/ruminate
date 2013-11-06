@@ -4,8 +4,7 @@ ICE_SOURCES := \
 	debugger_factory.ice \
 	exceptions.ice \
 	type_member.ice \
-	frame.ice \
-	debugee.ice
+	frame.ice
 ICE_SOURCES := $(ICE_SOURCES:%=$(CURDIR)/%)
 
 ICE_CPP_DEPS := $(ICE_SOURCES:.ice=.cpp.d)

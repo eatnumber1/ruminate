@@ -1,5 +1,4 @@
 PYTHON_SOURCES := \
-	array_member_impl.py \
 	debugger_factory_impl.py \
 	debugger_impl.py \
 	lldb_em.py \

@@ -17,13 +17,12 @@
 #include "ruminate/aggregate_member.h"
 
 #include "private/common.h"
-#include "private/memory.h"
 #include "private/string.h"
 #include "private/type.h"
 #include "private/type_member.h"
 #include "private/aggregate_member.h"
 
-bool r_type_member_init( RTypeMember *tm, RType *container, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
+bool r_type_member_init( RTypeMember *tm, RType *container, GError **error ) RUMINATE_NOEXCEPT {
 	switch( container->type_id ) {
 		case RuminateBackend::TypeIdArray:
 			tm->id = R_TYPE_MEMBER_ARRAY;
@@ -39,8 +38,6 @@ bool r_type_member_init( RTypeMember *tm, RType *container, RMemory *rv, void *c
 	}
 
 	tm->refcnt = 1;
-	tm->ptr = r_memory_ref(rv);
-	tm->cur = cur;
 	tm->type = NULL;
 
 	switch( tm->id ) {
@@ -57,7 +54,6 @@ bool r_type_member_init( RTypeMember *tm, RType *container, RMemory *rv, void *c
 	return true;
 
 err_child_init:
-	r_memory_unref(rv);
 	return false;
 }
 
@@ -72,9 +68,6 @@ void r_type_member_destroy( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 	}
 	if( tm->type != NULL ) r_type_unref(tm->type);
 	tm->type = NULL;
-	r_memory_unref(tm->ptr);
-	tm->ptr = NULL;
-	tm->cur = NULL;
 }
 
 RTypeMember *r_type_member_alloc( RType *container, GError **error ) RUMINATE_NOEXCEPT {
@@ -110,13 +103,13 @@ void r_type_member_free( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 	}
 }
 
-RTypeMember *r_type_member_new( RuminateBackend::TypeMemberPrx &member, RType *container, RMemory *rv, void *cur, GError **error ) RUMINATE_NOEXCEPT {
+RTypeMember *r_type_member_new( RuminateBackend::TypeMemberPrx &member, RType *container, GError **error ) RUMINATE_NOEXCEPT {
 	RTypeMember *tm = r_type_member_alloc(container, error);
 	if( tm == NULL ) goto error_r_type_member_alloc;
 
 	tm->member = member;
 
-	if( !r_type_member_init(tm, container, rv, cur, error) ) goto error_r_type_member_init;
+	if( !r_type_member_init(tm, container, error) ) goto error_r_type_member_init;
 	return tm;
 
 error_r_type_member_init:
@@ -128,18 +121,6 @@ error_r_type_member_alloc:
 void r_type_member_delete( RTypeMember *tm ) RUMINATE_NOEXCEPT {
 	r_type_member_destroy(tm);
 	r_type_member_free(tm);
-}
-
-bool _r_type_member_offset( RuminateBackend::TypeMemberPrx &tmp, ptrdiff_t *out, GError **error ) RUMINATE_NOEXCEPT {
-	R_STATIC_ASSERT(sizeof(ptrdiff_t) >= sizeof(__typeof__(tmp->getOffsetInBytes())));
-	g_assert(out != NULL);
-
-	// TODO: Error here if this type member has no offset (function arguments)
-	ptrdiff_t off = 0;
-	if( !gxx_call(off = tmp->getOffsetInBytes(), error) )
-		return false;
-	*out = off;
-	return true;
 }
 
 G_BEGIN_DECLS
@@ -155,14 +136,18 @@ RType *r_type_member_type( RTypeMember *tm, GError **error ) RUMINATE_NOEXCEPT {
 	if( !gxx_call(t = tm->member->getType(), error) )
 		return NULL;
 
-	tm->type = r_type_new(t, tm->ptr, tm->cur, error);
+	tm->type = r_type_new(t, error);
 	return r_type_ref(tm->type);
 }
 
 ptrdiff_t r_type_member_offset( RTypeMember *tm, GError **error ) RUMINATE_NOEXCEPT {
-	ptrdiff_t out = 0;
-	_r_type_member_offset(tm->member, &out, error);
-	return out;
+	R_STATIC_ASSERT(sizeof(ptrdiff_t) >= sizeof(__typeof__(tm->member->getOffsetInBytes())));
+
+	// TODO: Error here if this type member has no offset (function arguments)
+	ptrdiff_t off = 0;
+	if( !gxx_call(off = tm->member->getOffsetInBytes(), error) )
+		return 0;
+	return off;
 }
 
 RTypeMember *r_type_member_ref( RTypeMember *tm ) RUMINATE_NOEXCEPT {
