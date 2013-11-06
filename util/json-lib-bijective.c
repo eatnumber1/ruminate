@@ -2,10 +2,12 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include <glib.h>
 #include <jansson.h>
 #include <ruminate.h>
+#include <talloc.h>
 
 #include "json-lib.h"
 
@@ -314,8 +316,12 @@ error_array_member_at:
 		goto error_in_loop;
 	}
 
+	size_t array_size = r_type_size((RType *) rat, &err);
+	if( err != NULL ) goto error_type_size;
+
 	return array;
 
+error_type_size:
 error_in_loop:
 	json_decref(array);
 error_array_size:
@@ -369,12 +375,40 @@ json_t *json_serialize_bijective( JsonState *js, RType *rt, void *value, GError 
 	g_assert_not_reached();
 }
 
-#if 0
-static void *json_deserialize_string( JsonState *js, json_t *json, GError **error ) {
+// deserialization
+
+typedef struct Deserialized {
+	size_t size;
+	void *value;
+} Deserialized;
+
+static void *json_deserialize_string( JsonState *js, TALLOC_CTX *ctx, json_t *json, void *out, GError **error ) {
+	const char *str = json_string_value(json);
+	if( out == NULL ) return talloc_strdup(ctx, str);
+
+	strcpy((char *) out, str);
+	return out;
 }
 
-__attribute__((visibility("default")))
-void *json_deserialize_bijective( JsonState *js, json_t *json, GError **error ) {
+static void *json_deserialize_object( JsonState *js, TALLOC_CTX *ctx, json_t *json, void *out, GError **error ) {
+}
+
+static void *json_deserialize_array( JsonState *js, TALLOC_CTX *ctx, json_t *json, void *out, GError **error ) {
+	json_t *ary = json_object_get(json, "value");
+	// TODO: Typecheck
+	size_t size = json_integer_value(json_object_get(json, "size"));
+
+	if( out == NULL ) out = talloc_new(ctx);
+
+	ptrdiff_t skip = 0;
+	for( size_t i = 0; i < json_array_size(ary); i++ ) {
+		json_t *elem = json_array_get(ary, i);
+		// TODO: Check for errors
+		json_deserialize_bijective_rec(js, out, json, out + skip, error);
+	}
+}
+
+static void *json_deserialize_bijective_rec( JsonState *js, TALLOC_CTX *ctx, json_t *json, GError **error ) {
 	switch( json_typeof(json) ) {
 		case JSON_OBJECT:
 			return 
@@ -383,4 +417,8 @@ void *json_deserialize_bijective( JsonState *js, json_t *json, GError **error ) 
 			return json_deserialize_string(js, json, error);
 	}
 }
-#endif
+
+__attribute__((visibility("default")))
+void *json_deserialize_bijective( JsonState *js, json_t *json, GError **error ) {
+	return json_deserialize_bijective_rec(js, NULL, json, error);
+}

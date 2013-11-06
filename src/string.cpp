@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <exception>
 #include <sstream>
 #include <new>

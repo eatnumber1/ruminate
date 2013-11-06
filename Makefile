@@ -16,7 +16,7 @@ CP ?= cp
 PYTHON ?= python
 CHMOD ?= chmod
 
-SUBDIRS := ice include src test doc include/ruminate python
+SUBDIRS := ice include src test doc include/ruminate python util
 
 CSCOPE_FILES := cscope.out cscope.po.out cscope.in.out
 
@@ -58,8 +58,9 @@ ALL_TARGETS := $(SUBDIRS:=/all)
 INSTALL_TARGETS := $(SUBDIRS:=/install)
 TEST_TARGETS := $(SUBDIRS:=/test)
 DOC_TARGETS := $(SUBDIRS:=/doc)
+UTIL_TARGETS := $(SUBDIRS:=/util)
 
-.PHONY: all clean depclean cscope pristine cscope-clean install test doc
+.PHONY: all clean depclean cscope pristine cscope-clean install test doc util
 .DEFAULT_GOAL: all
 
 all: $(ALL_TARGETS)
@@ -68,6 +69,7 @@ pristine: depclean cscope-clean
 install: $(INSTALL_TARGETS)
 test: $(TEST_TARGETS)
 doc: $(DOC_TARGETS)
+util: $(UTIL_TARGETS)
 
 clean: $(CLEAN_TARGETS)
 	$(RM) $(SLICE2PY_LOCKFILE)
@@ -85,6 +87,7 @@ $(ALL_TARGETS):
 $(INSTALL_TARGETS):
 $(TEST_TARGETS):
 $(DOC_TARGETS):
+$(UTIL_TARGETS):
 
 define variableRule
  CURDIR := $$(TOPDIR)/$$$(1)
@@ -114,6 +117,7 @@ define subdirRule
  $$$(1)/depclean: CURDIR := $$(CURDIR)
  $$$(1)/install: CURDIR := $$(CURDIR)
  $$$(1)/doc: CURDIR := $$(CURDIR)
+ $$$(1)/util: CURDIR := $$(CURDIR)
  $$$(1)/test: CURDIR := $$(CURDIR)
  include $$(CURDIR)/Makefile
 endef
