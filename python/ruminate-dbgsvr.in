@@ -9,7 +9,10 @@ except ImportError:
 
 import os, struct, Ice, site
 
-sys.path.insert(0, "@CMAKE_INSTALL_PREFIX@/lib/python%d.%d/site-packages" % (sys.version_info.major, sys.version_info.minor))
+path_addition = "@CMAKE_INSTALL_PREFIX@/lib/python%d.%d/site-packages" % (sys.version_info.major, sys.version_info.minor)
+if "RUMINATE_DEBUGGER_CONTROLLER" in os.environ:
+	path_addition = os.environ["RUMINATE_DEBUGGER_CONTROLLER"]
+sys.path.insert(0, path_addition)
 
 from RuminateBackend import *
 from debugger_factory_impl import *

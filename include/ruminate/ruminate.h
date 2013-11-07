@@ -22,6 +22,7 @@ bool RUMINATE_EXPORT ruminate_destroy(
  * This must be called before any other ruminate functions.
  *
  * @return Whether or not an error occurred.
+ * @todo Ruminate takes no arguments. Remove \a args and \a arglen
  */
 bool RUMINATE_EXPORT ruminate_init(
 	int *arglen /** [in,out] a pointer to the number of arguments */,

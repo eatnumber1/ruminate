@@ -49,14 +49,24 @@ void ruminate_hit_breakpoint() RUMINATE_NOEXCEPT {
 G_BEGIN_DECLS
 
 static gint fork_child( GError **err ) RUMINATE_NOEXCEPT {
-	size_t len = strlen(RUMINATE_DEBUGGER_CONTROLLER_PATH) + 1;
+	const char *controller_path = g_getenv("RUMINATE_DEBUGGER_CONTROLLER");
+	size_t len;
+	if( controller_path == NULL ) {
+		len = strlen(RUMINATE_DEBUGGER_CONTROLLER_PATH) + 1;
+	} else {
+		len = strlen(controller_path) + 1;
+	}
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wvla-extension"
-	char controller_path[len];
+	char controller_path_ary[len];
 #pragma clang diagnostic pop
-	memcpy(controller_path, RUMINATE_DEBUGGER_CONTROLLER_PATH, len);
+	if( controller_path == NULL ) {
+		memcpy(controller_path_ary, RUMINATE_DEBUGGER_CONTROLLER_PATH, len);
+	} else {
+		memcpy(controller_path_ary, controller_path, len);
+	}
 	char *argv[] = {
-		controller_path,
+		controller_path_ary,
 		NULL
 	};
 	gint child_stdout;

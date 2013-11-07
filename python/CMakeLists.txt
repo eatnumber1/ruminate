@@ -27,9 +27,12 @@ endforeach(python_file_src ${PYTHON_FILES})
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/ruminate-dbgsvr.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/ruminate-dbgsvr"
+	@ONLY
 )
 
 list(APPEND PYTHON_COPIED_FILES "${CMAKE_CURRENT_BINARY_DIR}/ruminate-dbgsvr")
+
+add_custom_target(copy_py_files DEPENDS copy_ice_py ${PYTHON_COPIED_FILES})
 
 find_program(PYTHON python)
 
@@ -40,13 +43,13 @@ endif(NOT PYTHON)
 set(SETUP_PY "${CMAKE_CURRENT_BINARY_DIR}/setup.py")
 set(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/build/timestamp")
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in" ${SETUP_PY})
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in" ${SETUP_PY} @ONLY)
 
 add_custom_command(
 	OUTPUT ${OUTPUT}
 	COMMAND ${PYTHON} ${SETUP_PY} -q build
 	COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
-	DEPENDS generate_ice_py
+	DEPENDS copy_py_files
 )
 
 add_custom_target(build_ruminate_backend ALL DEPENDS ${OUTPUT})

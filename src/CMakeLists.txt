@@ -14,9 +14,12 @@ include_directories(
 )
 link_directories(${ICE_LIBRARY_DIR})
 
-add_library(ruminate
+set(c_sources
 	gettid.c
 	errors.c
+)
+
+set(cxx_sources
 	common.cpp
 	string.cpp
 	type.cpp
@@ -31,9 +34,16 @@ add_library(ruminate
 	type_member.cpp
 	frame.cpp
 	ruminate.cpp
+)
+
+add_library(ruminate
+	${c_sources}
+	${cxx_sources}
 	${SLICE2CPP_OUTPUT_FILES}
 )
 
+set_source_files_properties(${c_sources} PROPERTIES COMPILE_FLAGS -std=c99)
+set_source_files_properties(${cxx_sources} ${SLICE2CPP_OUTPUT_FILES} PROPERTIES COMPILE_FLAGS -std=c++98)
 set_source_files_properties(${SLICE2CPP_OUTPUT_FILES} PROPERTIES GENERATED 1)
 add_dependencies(ruminate generate_ice_cpp)
 

@@ -1,7 +1,6 @@
 from __future__ import nested_scopes, with_statement, print_function
 
 from RuminateBackend import *
-from array_member_impl import *
 from stopped_thread import *
 import type_member_impl
 
