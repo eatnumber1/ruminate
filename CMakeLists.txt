@@ -15,12 +15,10 @@ OPTION(BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 find_package(GLIB2 REQUIRED)
 find_package(Ice REQUIRED)
 
-include_directories(
-	${GLIB2_INCLUDE_DIRS}
-)
-
 add_subdirectory(ice)
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(python)
 add_subdirectory(test)
+add_subdirectory(util)
+add_subdirectory(doc)

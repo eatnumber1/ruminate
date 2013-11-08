@@ -4,8 +4,7 @@
 #include <glib.h>
 #include <ruminate.h>
 #include <jansson.h>
-
-#include "json-lib.h"
+#include <ruminate-jansson.h>
 
 typedef char *string;
 

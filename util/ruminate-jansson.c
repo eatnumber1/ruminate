@@ -1,81 +1,81 @@
-// TODO: This code is very duplicated with json-lib.c. Dedup
-
 #include <stddef.h>
 #include <stdbool.h>
-#include <string.h>
 
 #include <glib.h>
 #include <jansson.h>
 #include <ruminate.h>
-#include <talloc.h>
 
-#include "json-lib.h"
+#include "ruminate-jansson.h"
 
 #if JANSSON_MAJOR_VERSION <= 2 && JANSSON_MINOR_VERSION < 4
 #define json_boolean(val) ((val) ? json_true() : json_false())
 #endif
 
-static json_t *construct_json_from_type( RType *type, json_t *value, GError **error ) {
-	RString *name = r_type_name(type, error);
-	if( name == NULL ) return NULL;
-
-	json_t *container = json_object();
-	/* TODO: Check for error */
-	json_object_set_new_nocheck(container, "type", json_string(r_string_bytes(name)));
-	json_object_set_new_nocheck(container, "value", value);
-
-	r_string_unref(name);
-	return container;
+__attribute__((visibility("default")))
+JsonState *json_state_new() {
+	JsonState *ret = g_slice_new(JsonState);
+	ret->refcnt = 1;
+	g_datalist_init(&ret->handlers);
+	return ret;
 }
 
-#define construct_json_from_value(type, value, json_func, error) \
-	_Pragma("clang diagnostic push") \
-	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
-	({ \
-		json_t *ret = NULL; \
-		type v = (value); \
-		(void) v; \
-		RType *value_type = ruminate_get_type_by_variable_name("v", error); \
-		if( value_type != NULL ) { \
-			ret = construct_json_from_type(value_type, (json_func(v)), error); \
-			r_type_unref(value_type); \
-		} \
-		ret; \
-	}) \
-	_Pragma("clang diagnostic pop")
+__attribute__((visibility("default")))
+JsonState *json_state_ref( JsonState *js ) {
+	g_atomic_int_inc(&js->refcnt);
+	return js;
+}
+
+__attribute__((visibility("default")))
+void json_state_unref( JsonState *js ) {
+	if( g_atomic_int_dec_and_test(&js->refcnt) ) {
+		g_datalist_clear(&js->handlers);
+		g_slice_free(JsonState, js);
+	}
+}
+
+__attribute__((visibility("default")))
+void json_state_add_serializer( JsonState *js, GQuark id, JsonSerializer *ser ) {
+	g_datalist_id_set_data(&js->handlers, id, ser);
+}
+
+__attribute__((visibility("default")))
+void json_state_remove_serializer( JsonState *js, GQuark id ) {
+	g_datalist_id_remove_data(&js->handlers, id);
+}
 
 static json_t *json_serialize_builtin( JsonState *js, RBuiltinType *rbt, void *value, GError **error ) {
 	(void) js;
-
 	RBuiltinTypeId id = r_builtin_type_id(rbt, error);
 	if( id == R_BUILTIN_TYPE_UNKNOWN ) return NULL;
 
 	switch( id ) {
 		case R_BUILTIN_TYPE_INT:
-			return construct_json_from_value(int, *((int *) value), json_integer, error);
+			return json_integer(*((int *) value));
 		case R_BUILTIN_TYPE_LONG:
-			return construct_json_from_value(long, *((long *) value), json_integer, error);
+			return json_integer(*((long *) value));
 		case R_BUILTIN_TYPE_SHORT:
-			return construct_json_from_value(short, *((short *) value), json_integer, error);
+			return json_integer(*((short *) value));
 		case R_BUILTIN_TYPE_CHAR:
-			return construct_json_from_value(char, *((char *) value), json_integer, error);
+			return json_integer(*((char *) value));
 		case R_BUILTIN_TYPE_DOUBLE:
-			return construct_json_from_value(double, *((double *) value), json_real, error);
+			return json_real(*((double *) value));
 		case R_BUILTIN_TYPE_BOOL:
-			return construct_json_from_value(bool, *((bool *) value), json_boolean, error);
+			return json_boolean(*((bool *) value));
 		case R_BUILTIN_TYPE_VOID:
 			// TODO: Error here
 			g_assert_not_reached();
 		case R_BUILTIN_TYPE_UNKNOWN:
 			g_assert_not_reached();
 	}
+
+	g_assert_not_reached();
 }
 
 static bool json_serialize_struct_member( JsonState *js, RAggregateMember *ram, void *value, json_t *obj, GError **error ) {
 	GError *err = NULL;
 
 	RType *rt = r_type_member_type((RTypeMember *) ram, &err);
-	if( rt == NULL ) goto error_tm_type;
+	if( rt == NULL ) goto error_tm_type;;
 
 	json_t *obj_memb = json_serialize_bijective(js, rt, value, &err);
 	if( err != NULL ) goto error_js_ser;
@@ -138,13 +138,13 @@ error_agg_memb_at:
 		goto error_in_loop;
 	}
 
-	if( !did_insert ) return NULL;
+	if( did_insert ) {
+		return obj;
+	} else {
+		json_decref(obj);
+		return NULL;
+	}
 
-	json_t *container = construct_json_from_type((RType *) rat, obj, error);
-	if( container == NULL ) goto error_cons_js;
-
-	return container;
-error_cons_js:
 error_in_loop:
 error_agg_nmembers:
 		json_decref(obj);
@@ -160,7 +160,6 @@ static json_t *json_serialize_enum( JsonState *js, RAggregateType *rat, void *va
 	if( err != NULL ) goto error_agg_nmembers;
 
 	json_int_t val;
-	RString *name = NULL;
 
 	size_t i;
 	for( i = 0; i < members; i++ ) {
@@ -214,14 +213,7 @@ static json_t *json_serialize_enum( JsonState *js, RAggregateType *rat, void *va
 			
 			if( (uintmax_t) val == real_val ) vals_are_equal = true;
 		}
-		if( vals_are_equal ) {
-			name = r_aggregate_member_name((RAggregateMember *) memb, &err);
-			if( name == NULL ) {
-				// TODO: Error check
-				g_assert_not_reached();
-			}
-			break;
-		}
+		if( vals_are_equal ) break;
 
 		r_type_unref((RType *) rbt);
 		r_type_member_unref((RTypeMember *) memb);
@@ -242,13 +234,8 @@ error_agg_memb_at:
 		g_assert_not_reached();
 	}
 
-	json_t *container = construct_json_from_type((RType *) rat, json_integer(val), error);
-	if( container == NULL ) goto error_cons_js;
-	json_object_set_new_nocheck(container, "name", json_string(r_string_bytes(name)));
+	return json_integer(val);
 
-	return container;
-
-error_cons_js:
 error_in_loop:
 error_agg_nmembers:
 	g_propagate_error(error, err);
@@ -316,12 +303,8 @@ error_array_member_at:
 		goto error_in_loop;
 	}
 
-	size_t array_size = r_type_size((RType *) rat, &err);
-	if( err != NULL ) goto error_type_size;
-
 	return array;
 
-error_type_size:
 error_in_loop:
 	json_decref(array);
 error_array_size:
@@ -373,52 +356,4 @@ json_t *json_serialize_bijective( JsonState *js, RType *rt, void *value, GError 
 	}
 
 	g_assert_not_reached();
-}
-
-// deserialization
-
-typedef struct Deserialized {
-	size_t size;
-	void *value;
-} Deserialized;
-
-static void *json_deserialize_string( JsonState *js, TALLOC_CTX *ctx, json_t *json, void *out, GError **error ) {
-	const char *str = json_string_value(json);
-	if( out == NULL ) return talloc_strdup(ctx, str);
-
-	strcpy((char *) out, str);
-	return out;
-}
-
-static void *json_deserialize_object( JsonState *js, TALLOC_CTX *ctx, json_t *json, void *out, GError **error ) {
-}
-
-static void *json_deserialize_array( JsonState *js, TALLOC_CTX *ctx, json_t *json, void *out, GError **error ) {
-	json_t *ary = json_object_get(json, "value");
-	// TODO: Typecheck
-	size_t size = json_integer_value(json_object_get(json, "size"));
-
-	if( out == NULL ) out = talloc_new(ctx);
-
-	ptrdiff_t skip = 0;
-	for( size_t i = 0; i < json_array_size(ary); i++ ) {
-		json_t *elem = json_array_get(ary, i);
-		// TODO: Check for errors
-		json_deserialize_bijective_rec(js, out, json, out + skip, error);
-	}
-}
-
-static void *json_deserialize_bijective_rec( JsonState *js, TALLOC_CTX *ctx, json_t *json, GError **error ) {
-	switch( json_typeof(json) ) {
-		case JSON_OBJECT:
-			return 
-		case JSON_ARRAY:
-		case JSON_STRING:
-			return json_deserialize_string(js, json, error);
-	}
-}
-
-__attribute__((visibility("default")))
-void *json_deserialize_bijective( JsonState *js, json_t *json, GError **error ) {
-	return json_deserialize_bijective_rec(js, NULL, json, error);
 }

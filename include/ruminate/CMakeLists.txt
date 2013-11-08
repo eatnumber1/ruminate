@@ -17,3 +17,9 @@ set(HEADERS
 )
 
 install(FILES ${HEADERS} DESTINATION include/ruminate)
+
+foreach(header ${HEADERS})
+	list(APPEND PUBLIC_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/${header}")
+endforeach(header ${HEADERS})
+
+set(PUBLIC_HEADERS ${PUBLIC_HEADERS} PARENT_SCOPE)
