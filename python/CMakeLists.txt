@@ -11,7 +11,7 @@ set(PYTHON_FILES
 
 foreach(python_file_src ${PYTHON_FILES})
 	get_filename_component(python_file_name "${python_file_src}" NAME)
-	set(python_file_dest ${CMAKE_CURRENT_BINARY_DIR}/${python_file_name})
+	set(python_file_dest "${CMAKE_CURRENT_BINARY_DIR}/${python_file_name}")
 
 	add_custom_command(
 		OUTPUT "${python_file_dest}"
@@ -24,13 +24,15 @@ foreach(python_file_src ${PYTHON_FILES})
 	list(APPEND PYTHON_COPIED_FILES "${python_file_dest}")
 endforeach(python_file_src ${PYTHON_FILES})
 
+set(DEBUGSVR "${CMAKE_CURRENT_BINARY_DIR}/ruminate-dbgsvr")
+
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/ruminate-dbgsvr.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/ruminate-dbgsvr"
+	"${DEBUGSVR}"
 	@ONLY
 )
 
-list(APPEND PYTHON_COPIED_FILES "${CMAKE_CURRENT_BINARY_DIR}/ruminate-dbgsvr")
+list(APPEND PYTHON_COPIED_FILES "${DBGSVR}")
 
 add_custom_target(copy_py_files DEPENDS copy_ice_py ${PYTHON_COPIED_FILES})
 

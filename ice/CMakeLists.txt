@@ -17,59 +17,50 @@ set(SLICE_PY_MODULE_COPIED "${RUMINATE_BINARY_DIR}/python/${SLICE_PY_MODULE_NAME
 get_filename_component(SLICE_PY_MODULE_DIR "${SLICE_PY_MODULE}" PATH)
 get_filename_component(SLICE_PY_MODULE_COPIED_DIR "${SLICE_PY_MODULE_COPIED}" PATH)
 
+add_custom_target(generate_nothing)
+set(PREVIOUS_SLICE2PY_OUTPUT_TARGET generate_nothing)
+
 foreach(slice_file_with_extension ${SLICE_FILES})
-	get_filename_component(slice_file "${slice_file_with_extension}" NAME_WE)
-	set(GENERATED_CPP_FILE "${CMAKE_CURRENT_BINARY_DIR}/${slice_file}.cpp")
-	set(GENERATED_H_FILE "${CMAKE_CURRENT_BINARY_DIR}/${slice_file}.h")
-	set(GENERATED_PY_FILE "${CMAKE_CURRENT_BINARY_DIR}/${slice_file}_ice.py")
-	set(COPIED_PY_FILE "${RUMINATE_BINARY_DIR}/python/${slice_file}_ice.py")
+	set(slice_file "${CMAKE_CURRENT_SOURCE_DIR}/${slice_file_with_extension}")
+	get_filename_component(slice_file_name "${slice_file_with_extension}" NAME_WE)
+	set(GENERATED_CPP_FILE "${CMAKE_CURRENT_BINARY_DIR}/${slice_file_name}.cpp")
+	set(GENERATED_H_FILE "${CMAKE_CURRENT_BINARY_DIR}/${slice_file_name}.h")
+	set(GENERATED_PY_FILE "${CMAKE_CURRENT_BINARY_DIR}/${slice_file_name}_ice.py")
+	set(COPIED_PY_FILE "${RUMINATE_BINARY_DIR}/python/${slice_file_name}_ice.py")
 
 	add_custom_command(
-		OUTPUT ${GENERATED_CPP_FILE} ${GENERATED_H_FILE}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND ${ICE_SLICE2CPP}
-		ARGS -I ${ICE_SLICE_DIR} ${SLICE_OPTIONS} -I ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${slice_file}.ice
+		OUTPUT "${GENERATED_CPP_FILE}" "${GENERATED_H_FILE}"
+		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+		COMMAND "${ICE_SLICE2CPP}"
+		ARGS -I "${ICE_SLICE_DIR}" ${SLICE_OPTIONS} -I "${CMAKE_CURRENT_SOURCE_DIR}" "${slice_file}"
 		COMMENT "Compiling ${slice_file_with_extension} to c++"
-		MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${slice_file}.ice
+		MAIN_DEPENDENCY "${slice_file}"
 	)
 
 	add_custom_command(
-		OUTPUT ${GENERATED_PY_FILE}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND ${ICE_SLICE2PY}
-		ARGS -I ${ICE_SLICE_DIR} ${SLICE_OPTIONS} -I ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${slice_file}.ice
+		OUTPUT "${GENERATED_PY_FILE}"
+		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+		COMMAND "${ICE_SLICE2PY}"
+		ARGS -I "${ICE_SLICE_DIR}" ${SLICE_OPTIONS} -I "${CMAKE_CURRENT_SOURCE_DIR}" "${slice_file}"
 		COMMENT "Compiling ${slice_file_with_extension} to python"
-		MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${slice_file}.ice
+		MAIN_DEPENDENCY "${slice_file}"
+		DEPENDS "${PREVIOUS_SLICE2PY_OUTPUT_TARGET}"
 	)
 
 	add_custom_command(
-		OUTPUT ${GENERATED_PY_FILE}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND ${ICE_SLICE2PY}
-		ARGS -I ${ICE_SLICE_DIR} ${SLICE_OPTIONS} -I ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${slice_file}.ice
-		COMMENT "Compiling ${slice_file_with_extension} to python"
-		MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${slice_file}.ice
+		OUTPUT "${COPIED_PY_FILE}"
+		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+		COMMAND "${CMAKE_COMMAND}"
+		ARGS -E copy "${GENERATED_PY_FILE}" "${COPIED_PY_FILE}"
+		MAIN_DEPENDENCY "${GENERATED_PY_FILE}"
 	)
 
-	add_custom_command(
-		OUTPUT ${COPIED_PY_FILE}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND ${CMAKE_COMMAND}
-		ARGS -E copy ${GENERATED_PY_FILE} ${COPIED_PY_FILE}
-		MAIN_DEPENDENCY ${GENERATED_PY_FILE}
-	)
+	set(SLICE2PY_OUTPUT_TARGET "generate_${slice_file_name}")
+	add_custom_target("${SLICE2PY_OUTPUT_TARGET}" DEPENDS "${GENERATED_PY_FILE}")
 
-	get_filename_component(slice_file_name "${slice_file_with_extension}" NAME)
+	set(SLICE2PY_COPIED_TARGET "copy_${slice_file_name}")
+	add_custom_target("${SLICE2PY_COPIED_TARGET}" DEPENDS "${SLICE2PY_OUTPUT_TARGET}" "${COPIED_PY_FILE}")
 
-	set(SLICE2PY_OUTPUT_TARGET generate_${slice_file_name})
-	if(PREVIOUS_SLICE2PY_OUTPUT_TARGET)
-		add_custom_target(${SLICE2PY_OUTPUT_TARGET} DEPENDS ${PREVIOUS_SLICE2PY_OUTPUT_TARGET} ${GENERATED_PY_FILE})
-	else(PREVIOUS_SLICE2PY_OUTPUT_TARGET)
-		add_custom_target(${SLICE2PY_OUTPUT_TARGET} DEPENDS ${GENERATED_PY_FILE})
-	endif(PREVIOUS_SLICE2PY_OUTPUT_TARGET)
-
-	set(SLICE2PY_COPIED_TARGET copy_${slice_file_name})
-	add_custom_target(${SLICE2PY_COPIED_TARGET} DEPENDS ${SLICE2PY_OUTPUT_TARGET} ${COPIED_PY_FILE})
 	set(PREVIOUS_SLICE2PY_OUTPUT_TARGET "${SLICE2PY_OUTPUT_TARGET}")
 
 	list(APPEND SLICE2CPP_OUTPUT_FILES "${GENERATED_CPP_FILE}" "${GENERATED_H_FILE}")
