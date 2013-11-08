@@ -1,8 +1,15 @@
-find_package(Doxygen)
+option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
 
-if(DOXYGEN_FOUND)
+if(BUILD_DOCUMENTATION)
+	find_package(Doxygen)
+
+	if(NOT DOXYGEN_FOUND)
+		message(FATAL_ERROR
+			"Doxygen is needed to build the documentation. Please install it correctly"
+		)
+	endif(NOT DOXYGEN_FOUND)
+
 	set(DOXYFILE "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
-	set(DOXYOUT "${CMAKE_CURRENT_BINARY_DIR}/html")
 	string(REPLACE ";" " " DOXYGEN_INPUTS "${PUBLIC_HEADERS}")
 
 	configure_file(
@@ -11,13 +18,10 @@ if(DOXYGEN_FOUND)
 		@ONLY
 	)
 
-	add_custom_command(
-		OUTPUT "${DOXYOUT}"
+	add_custom_target(docs
+		"${DOXYGEN_EXECUTABLE}" "${DOXYFILE}"
+		DEPENDS ${PUBLIC_HEADERS} "${DOXYFILE}"
 		WORKING_DIRECTORY "${RUMINATE_SOURCE_DIR}"
 		COMMENT "Building documentation"
-		COMMAND "${DOXYGEN_EXECUTABLE}" "${DOXYFILE}"
-		DEPENDS ${PUBLIC_HEADERS} ${DOXYFILE}
 	)
-
-	add_custom_target(build_doc ALL DEPENDS "${DOXYOUT}")
-endif(DOXYGEN_FOUND)
+endif(BUILD_DOCUMENTATION)
