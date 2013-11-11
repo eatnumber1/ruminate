@@ -8,7 +8,7 @@ set(HEADERS
 	ruminate.h
 )
 
-install(FILES ${PUBLIC_HEADERS} DESTINATION include)
+install(FILES ${HEADERS} DESTINATION include)
 
 add_subdirectory(ruminate)
 
