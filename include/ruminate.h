@@ -32,6 +32,7 @@ G_BEGIN_DECLS
 #include <ruminate/function_type.h>
 
 #include <ruminate/frame.h>
+#include <ruminate/memory.h>
 #include <ruminate/ruminate.h>
 
 G_END_DECLS

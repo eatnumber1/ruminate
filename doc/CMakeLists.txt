@@ -5,7 +5,7 @@ if(BUILD_DOCUMENTATION)
 
 	if(NOT DOXYGEN_FOUND)
 		message(FATAL_ERROR
-			"Doxygen is needed to build the documentation. Please install it correctly"
+			"Doxygen not found"
 		)
 	endif(NOT DOXYGEN_FOUND)
 

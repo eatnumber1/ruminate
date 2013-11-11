@@ -2,7 +2,7 @@
 	_Pragma("clang diagnostic push") \
 	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
 	({ \
-		bool ret = true; \
+		bool _ret = true; \
 		try { \
 			body; \
 		} catch( Ice::Exception &ex ) { \
@@ -16,7 +16,7 @@
 				"%s", \
 				ss.str().c_str() \
 			); \
-			ret = false; \
+			_ret = false; \
 		} catch( std::exception &ex ) { \
 			g_set_error( \
 				error, \
@@ -25,7 +25,7 @@
 				"%s", \
 				ex.what() \
 			); \
-			ret = false; \
+			_ret = false; \
 		} catch(...) { \
 			g_set_error_literal( \
 				error, \
@@ -33,8 +33,8 @@
 				RUMINATE_ERROR_UNSPEC, \
 				"Unspecified error" \
 			); \
-			ret = false; \
+			_ret = false; \
 		} \
-		ret; \
+		_ret; \
 	}) \
 	_Pragma("clang diagnostic pop")

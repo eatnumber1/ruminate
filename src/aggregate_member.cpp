@@ -7,10 +7,7 @@
 
 #include <stdint.h>
 
-#include <Ice/Ice.h>
-#include "ice/type.h"
-#include "ice/type_member.h"
-
+#include "private/ice.h"
 #include "private/glib.h"
 
 #include "ruminate/common.h"

@@ -7,10 +7,7 @@
 
 #include <stdint.h>
 
-#include <Ice/Ice.h>
-#include "ice/type.h"
-#include "ice/type_member.h"
-
+#include "private/ice.h"
 #include "private/glib.h"
 
 #include "ruminate/common.h"
@@ -92,7 +89,7 @@ void r_enum_member_free( REnumMember *em ) RUMINATE_NOEXCEPT {
 
 G_BEGIN_DECLS
 
-uintmax_t r_enum_member_value_signed( REnumMember *em, GError **error ) RUMINATE_NOEXCEPT {
+intmax_t r_enum_member_value_signed( REnumMember *em, GError **error ) RUMINATE_NOEXCEPT {
 	if( !ensure_value_init(em, error) ) return 0;
 	if( em->value.type != ENUM_MEMBER_VALUE_TYPE_SIGNED ) {
 		// TODO: Error here.
@@ -101,7 +98,7 @@ uintmax_t r_enum_member_value_signed( REnumMember *em, GError **error ) RUMINATE
 	return em->value.signd;
 }
 
-intmax_t r_enum_member_value_unsigned( REnumMember *em, GError **error ) RUMINATE_NOEXCEPT {
+uintmax_t r_enum_member_value_unsigned( REnumMember *em, GError **error ) RUMINATE_NOEXCEPT {
 	if( !ensure_value_init(em, error) ) return 0;
 	if( em->value.type != ENUM_MEMBER_VALUE_TYPE_UNSIGNED )  {
 		// TODO: Error here.

@@ -8,9 +8,7 @@
 
 #include <stdint.h>
 
-#include <Ice/Ice.h>
-#include "ice/frame.h"
-
+#include "private/ice.h"
 #include "private/glib.h"
 
 #include "ruminate/common.h"
@@ -123,8 +121,8 @@ RType *r_frame_function_type( RFrame *rf, GError **err ) RUMINATE_NOEXCEPT {
 	return rf->functionType;
 }
 
-uint32_t r_frame_line( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
-	return rf->frame.line;
+uintmax_t r_frame_line( RFrame *rf, GError ** ) RUMINATE_NOEXCEPT {
+	return (uintmax_t) rf->frame.line;
 }
 
 G_END_DECLS

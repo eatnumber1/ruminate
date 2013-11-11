@@ -13,13 +13,7 @@
 #include <spawn.h>
 #include <sys/wait.h>
 
-#include <IceUtil/UUID.h>
-#include <Ice/Ice.h>
-#include "ice/debugger_factory.h"
-#include "ice/debugger.h"
-#include "ice/frame.h"
-#include "ice/type.h"
-
+#include "private/ice.h"
 #include "private/glib.h"
 
 #include "ruminate/common.h"
@@ -56,10 +50,7 @@ static gint fork_child( GError **err ) RUMINATE_NOEXCEPT {
 	} else {
 		len = strlen(controller_path) + 1;
 	}
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wvla-extension"
 	char controller_path_ary[len];
-#pragma clang diagnostic pop
 	if( controller_path == NULL ) {
 		memcpy(controller_path_ary, RUMINATE_DEBUGGER_CONTROLLER_PATH, len);
 	} else {
@@ -105,7 +96,8 @@ static int read_child_port( gint child_stdout, GError **error ) RUMINATE_NOEXCEP
 			r_perror(error, "read");
 			return -1;
 		}
-		nb_read += count;
+		g_assert(count >= 0);
+		nb_read += (size_t) count;
 		port_ptr += count;
 		if( nb_read == 0 ) {
 			g_set_error_literal(
@@ -232,7 +224,7 @@ bool ruminate_destroy( GError **error ) RUMINATE_NOEXCEPT {
 
 RFrameList *ruminate_backtrace( GError **error ) RUMINATE_NOEXCEPT {
 	Ice::AsyncResultPtr arp;
-	if( !gxx_call(arp = ruminate->debugger->begin_getBacktrace(gettid()), error) )
+	if( !gxx_call(arp = ruminate->debugger->begin_getBacktrace((::Ice::Long) gettid()), error) )
 		return NULL;
 	ruminate_hit_breakpoint();
 	RuminateBackend::FrameList fl = ruminate->debugger->end_getBacktrace(arp);
@@ -241,7 +233,7 @@ RFrameList *ruminate_backtrace( GError **error ) RUMINATE_NOEXCEPT {
 
 RType *ruminate_get_type_by_variable_name( const char *varname, GError **error ) RUMINATE_NOEXCEPT {
 	g_assert(ruminate->arp == 0);
-	if( !gxx_call(ruminate->arp = ruminate->debugger->begin_getTypeByVariableName(varname, gettid()), error) )
+	if( !gxx_call(ruminate->arp = ruminate->debugger->begin_getTypeByVariableName(varname, (::Ice::Long) gettid()), error) )
 		return NULL;
 
 	ruminate_hit_breakpoint();
@@ -269,7 +261,8 @@ GPtrArray *ruminate_get_types_by_name( const char *name, GError **error ) RUMINA
 	if( !gxx_call(types = ruminate->debugger->getTypesByName(name), error) )
 		return NULL;
 
-	GPtrArray *ret = g_ptr_array_new_full(types.size(), (GDestroyNotify) r_type_unref);
+	// TODO: size here could overflow
+	GPtrArray *ret = g_ptr_array_new_full((guint) types.size(), (GDestroyNotify) r_type_unref);
 	for( RuminateBackend::TypeList::iterator t = types.begin(); t != types.end(); t++ ) {
 		RType *type = r_type_new(*t, error);
 		if( type == NULL ) goto error_type_new;

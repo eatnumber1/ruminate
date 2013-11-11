@@ -14,6 +14,7 @@ set(HEADERS
 	type.h
 	type_member.h
 	typedef_type.h
+	memory.h
 )
 
 install(FILES ${HEADERS} DESTINATION include/ruminate)

@@ -23,7 +23,7 @@ G_BEGIN_DECLS
 RString *r_string_new_len( const char *init, size_t len ) RUMINATE_NOEXCEPT {
 	RString *ret = g_slice_new(RString);
 	new (ret) RString();
-	ret->gstr = g_string_new_len(init, len);
+	ret->gstr = g_string_new_len(init, (gssize) len);
 	ret->refcnt = 1;
 	ret->quark.initialized = false;
 	return ret;

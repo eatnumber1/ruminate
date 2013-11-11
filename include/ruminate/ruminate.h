@@ -37,15 +37,22 @@ bool RUMINATE_EXPORT ruminate_init(
  * @return A pointer to an RFrameList representing the frames found in the
  *         caller's call stack. This RFrameList must be freed using
  *         r_frame_list_unref().
+ * @todo This method should return a GPtrArray rather than a custom list
+ *       implementation.
  */
 RFrameList * RUMINATE_EXPORT ruminate_backtrace(
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
-/// @todo document
+/** Retrieve RTypes by name
+*
+* This function retrieves all the types which are named \a type_name.
+* 
+* @return A GPtrArray of the types which are named \a type_name
+*/
 GPtrArray * RUMINATE_EXPORT ruminate_get_types_by_name(
-	const char *type_name,
-	GError **error
+	const char *type_name /** [in] the name of the types to find */,
+	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
 /// @todo document

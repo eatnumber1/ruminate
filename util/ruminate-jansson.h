@@ -15,7 +15,7 @@ typedef struct JsonSerializer {
 	void *data;
 } JsonSerializer;
 
-JsonState *json_state_new();
+JsonState *json_state_new(void);
 JsonState *json_state_ref( JsonState * );
 void json_state_unref( JsonState * );
 

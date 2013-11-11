@@ -5,14 +5,6 @@ configure_file(
 )
 add_custom_target(build_ruminate_pkg_config ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/ruminate.pc)
 
-#include_directories(
-#	${RUMINATE_SOURCE_DIR}/include
-#	${RUMINATE_BINARY_DIR}/include
-#	${RUMINATE_BINARY_DIR}/ice
-#	${RUMINATE_BINARY_DIR}
-#	${GLIB2_INCLUDE_DIRS}
-#	${ICE_INCLUDE_DIR}
-#)
 link_directories(${ICE_LIBRARY_DIR})
 
 set(c_sources
@@ -35,7 +27,11 @@ set(cxx_sources
 	type_member.cpp
 	frame.cpp
 	ruminate.cpp
+	memory.cpp
 )
+
+#message(WARNING "${SLICE2CPP_OUTPUT_FILES}")
+#set_source_files_properties(${SLICE2CPP_OUTPUT_FILES} PROPERTIES COMPILE_FLAGS -w)
 
 add_library(ruminate
 	${c_sources}

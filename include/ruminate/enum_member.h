@@ -12,7 +12,7 @@ G_BEGIN_DECLS
  * @memberof REnumMember
  * @return the signed value of this enum member
  */
-uintmax_t RUMINATE_EXPORT r_enum_member_value_signed(
+intmax_t RUMINATE_EXPORT r_enum_member_value_signed(
 	REnumMember *member /** [in] the enum member to get the value of */,
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
@@ -22,7 +22,7 @@ uintmax_t RUMINATE_EXPORT r_enum_member_value_signed(
  * @memberof REnumMember
  * @return the unsigned value of this enum member
  */
-intmax_t RUMINATE_EXPORT r_enum_member_value_unsigned(
+uintmax_t RUMINATE_EXPORT r_enum_member_value_unsigned(
 	REnumMember *member /** [in] the enum member to get the value of */,
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;

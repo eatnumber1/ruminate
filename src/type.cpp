@@ -6,10 +6,7 @@
 #include <cstddef>
 #include <new>
 
-#include <Ice/Ice.h>
-#include "ice/type.h"
-#include "ice/type_member.h"
-
+#include "private/ice.h"
 #include "private/glib.h"
 
 #include "ruminate/common.h"
@@ -259,7 +256,7 @@ RType *r_type_pointer( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 size_t r_type_size( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	if( rt->size.initialized ) return rt->size.value;
 
-	if( !gxx_call(rt->size.value = rt->type->getSize(), error) )
+	if( !gxx_call(rt->size.value = (size_t) rt->type->getSize(), error) )
 		return 0;
 	rt->size.initialized = true;
 	return rt->size.value;

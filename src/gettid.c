@@ -15,7 +15,7 @@
 
 uint64_t gettid() {
 #if defined(__linux__)
-	return syscall(SYS_gettid);
+	return (uint64_t) syscall(SYS_gettid);
 #elif defined(__APPLE__) && defined(__MACH__)
 	return syscall(SYS_thread_selfid);
 #else

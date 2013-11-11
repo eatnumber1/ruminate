@@ -32,10 +32,10 @@ typedef enum {
 G_BEGIN_DECLS
 
 /// @private
-GQuark ruminate_error_quark();
+GQuark ruminate_error_quark(void);
 
 /// @private
-GQuark ruminate_errno_quark();
+GQuark ruminate_errno_quark(void);
 
 G_END_DECLS
 

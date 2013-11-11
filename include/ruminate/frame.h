@@ -121,7 +121,7 @@ RType * RUMINATE_EXPORT r_frame_function_type(
  * @memberof RFrame
  * @return the line number that this frame is at
  */
-uint32_t RUMINATE_EXPORT r_frame_line(
+uintmax_t RUMINATE_EXPORT r_frame_line(
 	RFrame *frame /** [in] the frame to get the line number of */,
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
