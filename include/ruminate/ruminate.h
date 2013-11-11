@@ -21,12 +21,16 @@ bool RUMINATE_EXPORT ruminate_destroy(
  *
  * This must be called before any other ruminate functions.
  *
+ * The argument \a program_name must either be the name of this program or `NULL`.
+ * If null, `g_get_prgname()` will be called to get the name of this program. If
+ * the program name has not been previously set via a call to `g_set_prgname()`,
+ * an error will occur.
+ *
  * @return Whether or not an error occurred.
- * @todo Ruminate takes no arguments. Remove \a args and \a arglen
+ * @see [g_set_prgname](https://developer.gnome.org/glib/2.28/glib-Miscellaneous-Utility-Functions.html#g-set-prgname)
  */
 bool RUMINATE_EXPORT ruminate_init(
-	int *arglen /** [in,out] a pointer to the number of arguments */,
-	char *args[] /** [in,out] an array of string arguments */,
+	const char *program_name /** [in] the name of this program, e.g. `argv[0]` or `NULL` */,
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 

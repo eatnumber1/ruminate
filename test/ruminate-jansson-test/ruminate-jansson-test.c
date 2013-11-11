@@ -43,7 +43,8 @@ static JsonSerializer string_serializer = {
 };
 
 int main( int argc, char *argv[] ) {
-	ruminate_init(&argc, argv, NULL);
+	(void) argc;
+	ruminate_init(argv[0], NULL);
 	int ipt = 2;
 	struct MyStruct foo = {
 		.i = 1,

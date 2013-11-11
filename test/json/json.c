@@ -454,11 +454,12 @@ static bool _print_json_for_type( RType *type, void *data, GError **error ) {
 }
 
 int main( int argc, char *argv[] ) {
+	(void) argc;
 	setlocale(LC_ALL, "");
 	setbuf(stdout, NULL);
 
 	GError *err = NULL;
-	ruminate_init(&argc, argv, &err);
+	ruminate_init(argv[0], &err);
 	die_if_error(err);
 
 	MyTypedef f = {

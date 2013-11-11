@@ -15,9 +15,10 @@ void die_if_error( GError *err ) {
 }
 
 int main( int argc, char *argv[] ) {
+	(void) argc;
 	GError *err = NULL;
 
-	ruminate_init(&argc, argv, &err);
+	ruminate_init(argv[0], &err);
 	die_if_error(err);
 
 	const char *src_str = "Hello World!";

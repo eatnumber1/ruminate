@@ -1,6 +1,0 @@
-*.o
-*.pyc
-*.d
-config.mk
-*.exe
-.slice2py-lock

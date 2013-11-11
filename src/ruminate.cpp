@@ -115,25 +115,79 @@ static int read_child_port( gint child_stdout, GError **error ) RUMINATE_NOEXCEP
 	return port;
 }
 
+static void setup_ice( const char *prgname ) {
+	int argc = 1;
+
+	size_t prgname_len = strlen(prgname) + 1;
+	char prgname_vla[prgname_len];
+	memcpy(prgname_vla, prgname, prgname_len);
+	char *argv[] = { prgname_vla, NULL };
+
+	Ice::PropertiesPtr props = Ice::createProperties(argc, argv);
+	props->setProperty("Ice.ACM.Client", "0");
+	Ice::InitializationData id;
+	id.properties = props;
+	ruminate->communicator = Ice::initialize(id);
+}
+
+static void create_factory( int port ) {
+	struct AutoHeapString {
+		~AutoHeapString() throw() {
+			g_free(value);
+		}
+
+		AutoHeapString( int port ) {
+			value = g_strdup_printf("DebuggerFactory:default -h 127.0.0.1 -p %d", port);
+		}
+
+		char *value;
+	} proxy_str(port);
+
+	Ice::ObjectPrx factory_proxy = ruminate->communicator->stringToProxy(proxy_str.value);
+	ruminate->factory = RuminateBackend::DebuggerFactoryPrx::checkedCast(factory_proxy);
+}
+
+static bool create_debugger( const char *prgname, GError **error ) RUMINATE_NOEXCEPT {
+	RuminateBackend::DebuggerFactoryOptions opts;
+	opts.exename = prgname;
+	opts.pid = getpid();
+	opts.breakpointAddress = (::Ice::Long) &ruminate_hit_breakpoint;
+
+#if 0
+	if( !gxx_call(ruminate->debugger = ruminate->factory->create(opts, cbid), error) )
+		return false;
+#else
+	if( !gxx_call(ruminate->debugger = ruminate->factory->create(opts, Ice::Identity()), error) )
+		return false;
+#endif
+	return true;
+}
+
 R_STATIC_ASSERT(sizeof(::Ice::Long) >= sizeof(pid_t) && "A pid cannot fit in a long!");
 R_STATIC_ASSERT(sizeof(::Ice::Long) >= sizeof(size_t) && "A pointer cannot fit in a long!");
 
-bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT {
+bool ruminate_init( const char *prgname, GError **error ) RUMINATE_NOEXCEPT {
 	GError *err = NULL;
-	RuminateBackend::DebuggerFactoryOptions opts;
-	char *proxy_str;
-	Ice::ObjectPrx factory_proxy;
 	gint child_stdout;
 	int port;
 #if 0
 	Ice::Identity cbid;
 #endif
-	Ice::PropertiesPtr props;
-	Ice::InitializationData id;
 
 	// TODO Thread safety
 	if( ruminate != NULL ) return true;
 	ruminate = g_new(Ruminate, 1);
+
+	if( prgname == NULL ) prgname = g_get_prgname();
+	if( prgname == NULL ) {
+		g_set_error_literal(
+			error,
+			RUMINATE_ERROR,
+			RUMINATE_ERROR_NO_PRGNAME,
+			"Unable to determine executable name"
+		);
+		return false;
+	}
 
 	child_stdout = fork_child(&err);
 	if( err != NULL ) {
@@ -147,25 +201,11 @@ bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT 
 		goto error_read_child_port;
 	}
 
-	// TODO: Move all this checked C++ code into it's own method which can throw
-	// TODO: Remove ice arguments from argc.
-	if( !gxx_call(props = Ice::createProperties(*argc, argv), error) )
-		goto error_ice_create_properties;
-	if( !gxx_call(props->setProperty("Ice.ACM.Client", "0"), error) )
-		goto error_ice_set_property;
-	if( !gxx_call(id.properties = props, error) )
-		goto error_ice_assign_properties;
+	if( !gxx_call(setup_ice(prgname), error) )
+		goto error_setup_ice;
 
-	if( !gxx_call(ruminate->communicator = Ice::initialize(id), error) )
-		goto error_ice_initialize;
-
-	proxy_str = g_strdup_printf("DebuggerFactory:default -h 127.0.0.1 -p %d", port);
-
-	if( !gxx_call(factory_proxy = ruminate->communicator->stringToProxy(proxy_str), error) )
-		goto error_communicator_stringToProxy;
-
-	if( !gxx_call(ruminate->factory = RuminateBackend::DebuggerFactoryPrx::checkedCast(factory_proxy), error) )
-		goto error_checkedCast;
+	if( !gxx_call(create_factory(port), error) )
+		goto error_create_factory;
 
 #if 0
 	// TODO: Handle exceptions
@@ -173,35 +213,18 @@ bool ruminate_init( int *argc, char *argv[], GError **error ) RUMINATE_NOEXCEPT 
 		goto error_init_callbacks;
 #endif
 
-	opts.exename = argv[0];
-	opts.pid = getpid();
-	opts.breakpointAddress = (::Ice::Long) &ruminate_hit_breakpoint;
-
-#if 0
-	if( !gxx_call(ruminate->debugger = ruminate->factory->create(opts, cbid), error) )
-		goto error_factory_create;
-#else
-	if( !gxx_call(ruminate->debugger = ruminate->factory->create(opts, Ice::Identity()), error) )
-		goto error_factory_create;
-#endif
+	if( !create_debugger(prgname, error) ) goto error_create_debugger;
 
 	atexit(ruminate_destroy_atexit);
 
-	g_free(proxy_str);
-
 	return true;
 
-error_factory_create:
+error_create_debugger:
 #if 0
 error_init_callbacks:
 #endif
-error_checkedCast:
-error_communicator_stringToProxy:
-	g_free(proxy_str);
-error_ice_initialize:
-error_ice_assign_properties:
-error_ice_set_property:
-error_ice_create_properties:
+error_create_factory:
+error_setup_ice:
 error_read_child_port:
 error_fork_child:
 	// TODO: Resource cleanup
