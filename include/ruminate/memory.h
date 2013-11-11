@@ -10,12 +10,11 @@ void * RUMINATE_EXPORT r_mem_malloc_fn( RType *, GError ** ) RUMINATE_NOEXCEPT;
 	_Pragma("clang diagnostic push") \
 	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
 	({ \
-		RType *rt = ruminate_get_type((type *) NULL, error); \
-		void *ret = NULL; \
-		if( rt != NULL ) { \
-			ret = _r_mem_malloc(rt, error); \
-		} \
-		ret; \
+		GError **_err = (error); \
+		void *_ret = NULL; \
+		RType *_rt = ruminate_get_type((type *) NULL, _err); \
+		if( _rt != NULL ) _ret = _r_mem_malloc(_rt, _err); \
+		_ret; \
 	}) \
 	_Pragma("clang diagnostic pop")
 
@@ -27,12 +26,11 @@ void * RUMINATE_EXPORT r_mem_malloc_sized_fn( RType *, size_t, GError ** ) RUMIN
 	_Pragma("clang diagnostic push") \
 	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
 	({ \
-		RType *rt = ruminate_get_type((type *) NULL, error); \
-		void *ret = NULL; \
-		if( rt != NULL ) { \
-			ret = _r_mem_malloc_sized(rt, size, error); \
-		} \
-		ret; \
+		GError **_err = (error); \
+		void *_ret = NULL; \
+		RType *_rt = ruminate_get_type((type *) NULL, _err); \
+		if( _rt != NULL ) _ret = _r_mem_malloc_sized(_rt, size, _err); \
+		_ret; \
 	}) \
 	_Pragma("clang diagnostic pop")
 
@@ -44,12 +42,12 @@ void * RUMINATE_EXPORT r_mem_calloc_fn( RType *, size_t, GError ** ) RUMINATE_NO
 	_Pragma("clang diagnostic push") \
 	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
 	({ \
-		RType *rt = ruminate_get_type((type *) NULL, error); \
-		void *ret = NULL; \
-		if( rt != NULL ) { \
-			ret = _r_mem_calloc(rt, error); \
+		RType *_rt = ruminate_get_type((type *) NULL, error); \
+		void *_ret = NULL; \
+		if( _rt != NULL ) { \
+			_ret = _r_mem_calloc(_rt, error); \
 		} \
-		ret; \
+		_ret; \
 	}) \
 	_Pragma("clang diagnostic pop")
 
@@ -61,12 +59,11 @@ void * RUMINATE_EXPORT r_mem_calloc_sized_fn( RType *, size_t, size_t, GError **
 	_Pragma("clang diagnostic push") \
 	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
 	({ \
-		RType *rt = ruminate_get_type((type *) NULL, error); \
-		void *ret = NULL; \
-		if( rt != NULL ) { \
-			ret = _r_mem_calloc_sized(rt, size, error); \
-		} \
-		ret; \
+		GError **_err = (error); \
+		void *_ret = NULL; \
+		RType *_rt = ruminate_get_type((type *) NULL, _err); \
+		if( _rt != NULL ) _ret = _r_mem_calloc_sized(_rt, size, _err); \
+		_ret; \
 	}) \
 	_Pragma("clang diagnostic pop")
 
