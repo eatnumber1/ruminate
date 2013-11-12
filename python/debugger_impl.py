@@ -94,7 +94,8 @@ class DebuggerImpl(Debugger):
 
 			for sbframe in thread.frames:
 				frame = Frame()
-				frame.functionName = sbframe.name
+				# In order for this to work with inlined functions, sbframe.function.name won't work.
+				frame.functionName = sbframe.name.split("(")[0]
 				frame.moduleName = sbframe.module.file.basename
 				frame.compileUnitName = sbframe.compile_unit.file.basename
 				frame.functionType = self.type_factory.proxy(
