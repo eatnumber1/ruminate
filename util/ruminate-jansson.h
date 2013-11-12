@@ -10,8 +10,10 @@ typedef struct JsonState {
 	gint refcnt;
 } JsonState;
 
+typedef json_t *(*JsonSerializerFunc)( JsonState *, RType *, void *, void *, GError ** );
+
 typedef struct JsonSerializer {
-	json_t *(*func)( JsonState *, RType *, void *, void *, GError ** );
+	JsonSerializerFunc func;
 	void *data;
 } JsonSerializer;
 

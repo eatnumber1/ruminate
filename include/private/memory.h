@@ -1,9 +1,9 @@
-struct RMemory {
+typedef struct RMemory {
 	RType *type;
 	gint refcnt;
 	size_t size;
 	char data[];
-};
+} RMemory;
 
 RMemory *r_memory_new( RType *, size_t ) RUMINATE_NOEXCEPT;
 RMemory * RUMINATE_NONNULL(1) r_memory_realloc( RMemory *, size_t ) RUMINATE_NOEXCEPT;

@@ -1,4 +1,7 @@
-typedef struct RMemory RMemory;
+/** Typed memory allocator
+ *
+ * @file include/ruminate/memory.h
+ */
 
 G_BEGIN_DECLS
 
