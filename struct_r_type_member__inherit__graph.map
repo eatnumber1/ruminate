@@ -1,4 +1,4 @@
 <map id="RTypeMember" name="RTypeMember">
-<area shape="rect" id="node2" href="$struct_r_aggregate_member.html" title="An opaque struct representing a aggregate member. " alt="" coords="5,83,147,111"/>
-<area shape="rect" id="node3" href="$struct_r_enum_member.html" title="An opaque struct representing an enum member. " alt="" coords="19,161,133,189"/>
+<area shape="rect" id="node3" href="$struct_r_aggregate_member.html" title="An opaque struct representing a aggregate member. " alt="" coords="5,83,144,112"/>
+<area shape="rect" id="node5" href="$struct_r_enum_member.html" title="An opaque struct representing an enum member. " alt="" coords="19,160,131,189"/>
 </map>
