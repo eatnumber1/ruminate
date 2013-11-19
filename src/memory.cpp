@@ -59,25 +59,6 @@ void *r_memory_to_opaque( RMemory *mem ) RUMINATE_NOEXCEPT {
 
 G_BEGIN_DECLS
 
-void *_r_mem_malloc( RType *ptrtype, GError **error ) RUMINATE_NOEXCEPT {
-	RType *type = NULL;
-	void *ret = NULL;
-
-	type = r_pointer_type_pointee((RPointerType *) ptrtype, error);
-	if( type == NULL ) goto error_pt_pointee;
-
-	ret = r_mem_malloc_fn(type, error);
-	if( error == NULL ) goto error_malloc_fn;
-
-	r_type_unref(ptrtype);
-	return ret;
-error_malloc_fn:
-	r_type_unref(type);
-error_pt_pointee:
-	r_type_unref(ptrtype);
-	return NULL;
-}
-
 void *r_mem_malloc_fn( RType *rt, GError **error ) RUMINATE_NOEXCEPT {
 	GError *err = NULL;
 
@@ -116,30 +97,11 @@ void *r_mem_malloc_sized_fn( RType *rt, size_t size, GError **error ) RUMINATE_N
 	if( err != NULL ) goto error_typ_size;
 
 	// TODO: Make this set GError rather than assert
-	g_assert(type_size < size);
+	g_assert(type_size <= size);
 
 	return r_memory_to_opaque(r_memory_new(rt, size));
 error_typ_size:
 	g_propagate_error(error, err);
-	return NULL;
-}
-
-void *_r_mem_calloc( RType *ptrtype, size_t nmemb, GError **error ) RUMINATE_NOEXCEPT {
-	RType *type = NULL;
-	void *ret = NULL;
-
-	type = r_pointer_type_pointee((RPointerType *) ptrtype, error);
-	if( type == NULL ) goto error_pt_pointee;
-
-	ret = r_mem_calloc_fn(type, nmemb, error);
-	if( error == NULL ) goto error_calloc_sized_fn;
-
-	r_type_unref(ptrtype);
-	return ret;
-error_calloc_sized_fn:
-	r_type_unref(type);
-error_pt_pointee:
-	r_type_unref(ptrtype);
 	return NULL;
 }
 

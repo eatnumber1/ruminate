@@ -12,7 +12,9 @@
 
 #define print_json_for_type(expr, err) \
 	_Pragma("clang diagnostic push") \
+	_Pragma("clang diagnostic ignored \"-Wunknown-pragmas\"") \
 	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
+	_Pragma("clang diagnostic ignored \"-Wgnu\"") \
 	({ \
 		__typeof__(expr) __expr = (expr); \
 		RType *_type = ruminate_get_type(__expr, err); \

@@ -6,42 +6,9 @@
 #include <ruminate.h>
 
 #include "ruminate-jansson.h"
+#include "common.h"
 
-#if JANSSON_MAJOR_VERSION <= 2 && JANSSON_MINOR_VERSION < 4
-#define json_boolean(val) ((val) ? json_true() : json_false())
-#endif
-
-__attribute__((visibility("default")))
-JsonState *json_state_new() {
-	JsonState *ret = g_slice_new(JsonState);
-	ret->refcnt = 1;
-	g_datalist_init(&ret->handlers);
-	return ret;
-}
-
-__attribute__((visibility("default")))
-JsonState *json_state_ref( JsonState *js ) {
-	g_atomic_int_inc(&js->refcnt);
-	return js;
-}
-
-__attribute__((visibility("default")))
-void json_state_unref( JsonState *js ) {
-	if( g_atomic_int_dec_and_test(&js->refcnt) ) {
-		g_datalist_clear(&js->handlers);
-		g_slice_free(JsonState, js);
-	}
-}
-
-__attribute__((visibility("default")))
-void json_state_add_serializer( JsonState *js, GQuark id, JsonSerializer *ser ) {
-	g_datalist_id_set_data(&js->handlers, id, ser);
-}
-
-__attribute__((visibility("default")))
-void json_state_remove_serializer( JsonState *js, GQuark id ) {
-	g_datalist_id_remove_data(&js->handlers, id);
-}
+static json_t *_json_serialize( JsonState *js, RType *rt, void *value, GError **error );
 
 static json_t *json_serialize_builtin( JsonState *js, RBuiltinType *rbt, void *value, GError **error ) {
 	(void) js;
@@ -77,7 +44,7 @@ static bool json_serialize_struct_member( JsonState *js, RAggregateMember *ram, 
 	RType *rt = r_type_member_type((RTypeMember *) ram, &err);
 	if( rt == NULL ) goto error_tm_type;;
 
-	json_t *obj_memb = json_serialize_bijective(js, rt, value, &err);
+	json_t *obj_memb = _json_serialize(js, rt, value, &err);
 	if( err != NULL ) goto error_js_ser;
 	if( obj_memb == NULL ) {
 		r_type_unref(rt);
@@ -280,7 +247,7 @@ static json_t *json_serialize_array( JsonState *js, RArrayType *rat, void *value
 		ptrdiff_t offset = r_type_member_offset(tm, &err);
 		if( err != NULL ) goto error_tm_offset;
 
-		json_t *memb_json = json_serialize_bijective(js, rt, ((char *) value) + offset, &err);
+		json_t *memb_json = _json_serialize(js, rt, ((char *) value) + offset, &err);
 		if( err != NULL ) goto error_json_serialize;
 		if( memb_json == NULL )
 			memb_json = json_null();
@@ -312,48 +279,79 @@ error_array_size:
 	return NULL;
 }
 
-__attribute__((visibility("default")))
-json_t *json_serialize_bijective( JsonState *js, RType *rt, void *value, GError **error ) {
+static json_t *_json_serialize( JsonState *js, RType *rt, void *value, GError **error ) {
 	RTypeId id = r_type_id(rt, error);
 	if( id == R_TYPE_UNKNOWN ) return NULL;
 
-	if( value == NULL ) return json_null();
+	if( value == NULL ) {
+		// TODO: Set error
+		return NULL;
+	}
 
 	RString *name = r_type_name(rt, error);
 	GQuark typeid = r_string_quark(name);
 	r_string_unref(name);
 
+	json_t *ret = NULL;
+
 	if( js != NULL ) {
-		JsonSerializer *serializer = g_datalist_id_get_data(&js->handlers, typeid);
-		if( serializer != NULL )
-			return serializer->func(js, rt, value, serializer->data, error);
+		JsonHook *hook = g_datalist_id_get_data(&js->handlers, typeid);
+		if( hook != NULL && hook->serializer != NULL )
+			ret = hook->serializer(js, rt, value, hook->serializer_data, error);
 	}
 
-	switch( id ) {
-		case R_TYPE_BUILTIN:
-			return json_serialize_builtin(js, (RBuiltinType *) rt, value, error);
-		case R_TYPE_AGGREGATE:
-			return json_serialize_aggregate(js, (RAggregateType *) rt, value, error);
-		case R_TYPE_POINTER: {
-			RPointerType *rpt = (RPointerType *) rt;
-			RType *pointee = r_pointer_type_pointee(rpt, error);
-			// This is not portable
-			json_t *ret = json_serialize_bijective(js, (RType *) pointee, *((void **) value), error);
-			r_type_unref(pointee);
-			return ret;
+	if( ret == NULL ) {
+		switch( id ) {
+			case R_TYPE_BUILTIN:
+				ret = json_serialize_builtin(js, (RBuiltinType *) rt, value, error);
+				break;
+			case R_TYPE_AGGREGATE:
+				ret = json_serialize_aggregate(js, (RAggregateType *) rt, value, error);
+				break;
+			case R_TYPE_POINTER: {
+				RPointerType *rpt = (RPointerType *) rt;
+				RType *pointee = r_pointer_type_pointee(rpt, error);
+				// TODO: This is not portable
+				ret = _json_serialize(js, (RType *) pointee, *((void **) value), error);
+				r_type_unref(pointee);
+				break;
+			}
+			case R_TYPE_ARRAY:
+				ret = json_serialize_array(js, (RArrayType *) rt, value, error);
+				break;
+			case R_TYPE_TYPEDEF: {
+				RType *canonical = r_typedef_type_canonical((RTypedefType *) rt, error);
+				ret = _json_serialize(js, canonical, value, error);
+				r_type_unref(canonical);
+				break;
+			}
+			default:
+				// TODO: Remove this
+				g_assert_not_reached();
 		}
-		case R_TYPE_ARRAY:
-		    return json_serialize_array(js, (RArrayType *) rt, value, error);
-		case R_TYPE_TYPEDEF: {
-			RType *canonical = r_typedef_type_canonical((RTypedefType *) rt, error);
-			json_t *ret = json_serialize_bijective(js, canonical, value, error);
-			r_type_unref(canonical);
-			return ret;
-		}
-		default:
-			// TODO: Remove this
-			g_assert_not_reached();
 	}
 
-	g_assert_not_reached();
+	return ret;
+}
+
+json_t *json_serialize( JsonState *js, RType *rt, void *value, GError **error ) {
+	json_t *serialized = _json_serialize(js, rt, value, error);
+	if( serialized == NULL ) return NULL;
+
+	if( js->flags | JSON_FLAG_BIJECTIVE ) {
+		RString *name = r_type_name(rt, error);
+		if( name == NULL ) {
+			json_decref(serialized);
+			return NULL;
+		}
+		// TODO: Error check
+		json_t *obj = json_object();
+		json_object_set(obj, "type", json_string(r_string_bytes(name)));
+		json_object_set(obj, "value", serialized);
+		r_string_unref(name);
+
+		return obj;
+	} else {
+		return serialized;
+	}
 }

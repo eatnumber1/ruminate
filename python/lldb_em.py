@@ -40,6 +40,8 @@ class LLDBEventMachine(threading.Thread):
 		self.start()
 
 	def shutdown(self):
+		if self.begun:
+			self.process.Detach()
 		self.shutdownRequested = True
 		if threading.currentThread() != self:
 			self.join()
@@ -68,6 +70,8 @@ class LLDBEventMachine(threading.Thread):
 		elif state == lldb.eStateStopped:
 			# TODO: This is a hack
 			self.process.Continue()
+		elif state == lldb.eStateExited:
+			self.shutdown()
 
 	def addCallback(self, state, cb):
 		self.callbacks[state].append(cb)

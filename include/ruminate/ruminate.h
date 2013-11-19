@@ -91,7 +91,9 @@ G_END_DECLS
  */
 #define ruminate_get_type(expr, error) \
 	_Pragma("clang diagnostic push") \
+	_Pragma("clang diagnostic ignored \"-Wunknown-pragmas\"") \
 	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
+	_Pragma("clang diagnostic ignored \"-Wgnu\"") \
 	({ \
 		__typeof__(expr) _expr = (expr); \
 		(void) _expr; \

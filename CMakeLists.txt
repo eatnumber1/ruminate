@@ -9,7 +9,8 @@ set(CMAKE_MODULE_PATH
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} -Wno-vla -Wno-vla-extension -Wno-variadic-macros")
 
-set(COMMON_FLAGS "-Wall -Wextra -Wnonnull -Werror -pedantic")
+#set(COMMON_FLAGS "-Wall -Wextra -Wnonnull -Werror -pedantic")
+set(COMMON_FLAGS "-Wall -Wextra -Wnonnull -pedantic")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} -Wno-vla -Wno-vla-extension -Wno-variadic-macros")
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")

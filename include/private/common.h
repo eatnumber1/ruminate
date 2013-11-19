@@ -1,6 +1,8 @@
 #define gxx_call(body, error) \
 	_Pragma("clang diagnostic push") \
+	_Pragma("clang diagnostic ignored \"-Wunknown-pragmas\"") \
 	_Pragma("clang diagnostic ignored \"-Wgnu-statement-expression\"") \
+	_Pragma("clang diagnostic ignored \"-Wgnu\"") \
 	({ \
 		bool _ret = true; \
 		try { \

@@ -111,7 +111,7 @@ class DebuggerImpl(Debugger):
 		for type in self.target.FindTypes(name):
 			ret.append(
 				self.type_factory.proxy(
-					sbtype = sbframe.function.type,
+					sbtype = type,
 					current = current
 				)
 			)

@@ -23,7 +23,7 @@ int main( int argc, char *argv[] ) {
 
 	const char *src_str = "Hello World!";
 	size_t src_str_len = strlen(src_str) + 1;
-	char *str = r_mem_malloc_sized(char *, src_str_len, &err);
+	void *str = r_mem_malloc_sized(char *, src_str_len, &err);
 	die_if_error(err);
 	memcpy(str, src_str, src_str_len);
 
