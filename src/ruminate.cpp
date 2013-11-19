@@ -177,6 +177,7 @@ bool ruminate_init( const char *prgname, GError **error ) RUMINATE_NOEXCEPT {
 	// TODO Thread safety
 	if( ruminate != NULL ) return true;
 	ruminate = g_new(Ruminate, 1);
+	new (ruminate) Ruminate();
 
 	if( prgname == NULL ) prgname = g_get_prgname();
 	if( prgname == NULL ) {
@@ -239,6 +240,7 @@ bool ruminate_destroy( GError **error ) RUMINATE_NOEXCEPT {
 	// TODO: Check child return code
 	waitpid(ruminate->child_pid, NULL, 0);
 	g_spawn_close_pid(ruminate->child_pid);
+	ruminate->~Ruminate();
 	g_free(ruminate);
 	ruminate = NULL;
 
