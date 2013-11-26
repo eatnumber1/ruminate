@@ -11,10 +11,14 @@ typedef char *string;
 
 struct MyStruct {
 	int i;
+	union {
+		char b;
+		void *v;
+	} *u1;
 	union MyUnion {
 		char b;
 		void *v;
-	} u;
+	} u2;
 	string s;
 	enum MyEnum {
 		MY_ENUM_VALUE_1,
@@ -24,19 +28,19 @@ struct MyStruct {
 	char a[3];
 };
 
-static void *deserialize_my_union( JsonState *js, RType *rt, json_t *value, void *data, GError **error ) {
-	(void) js, (void) data, (void) error;
-	char *ret = r_mem_malloc_fn(rt, error);
+static void *deserialize_my_union( JsonDeserializerArgs args, void *data, GError **error ) {
+	(void) data, (void) error;
+	char *ret = r_mem_malloc_fn(args.type, error);
 	if( ret == NULL ) return NULL;
 
-	const char *c = json_string_value(value);
+	const char *c = json_string_value(args.value);
 	*ret = *c;
 	return ret;
 }
 
-static json_t *serialize_my_union( JsonState *js, RType *rt, void *value, void *data, GError **error ) {
-	(void) js, (void) rt, (void) data, (void) error;
-	char v[] = { *((char *) value), '\0' };
+static json_t *serialize_my_union( JsonSerializerArgs args, void *data, GError **error ) {
+	(void) data, (void) error;
+	char v[] = { *((char *) args.value), '\0' };
 	return json_string(v);
 }
 
@@ -45,12 +49,12 @@ static JsonHook my_union_hook = {
 	.deserializer = deserialize_my_union
 };
 
-static void *deserialize_string( JsonState *js, RType *rt, json_t *value, void *data, GError **error ) {
-	(void) js, (void) data, (void) error;
-	const char *str = json_string_value(value);
+static void *deserialize_string( JsonDeserializerArgs args, void *data, GError **error ) {
+	(void) data, (void) error;
+	const char *str = json_string_value(args.value);
 	size_t str_len = strlen(str) + 1;
 
-	char **ret = r_mem_malloc_fn(rt, error);
+	char **ret = r_mem_malloc_fn(args.type, error);
 	if( ret == NULL ) return NULL;
 	*ret = r_mem_malloc_sized(char *, str_len, error);
 	if( *ret == NULL ) {
@@ -62,9 +66,9 @@ static void *deserialize_string( JsonState *js, RType *rt, json_t *value, void *
 	return ret;
 }
 
-static json_t *serialize_string( JsonState *js, RType *rt, void *value, void *data, GError **error ) {
-	(void) js, (void) rt, (void) data, (void) error;
-	return json_string(*((char **) value));
+static json_t *serialize_string( JsonSerializerArgs args, void *data, GError **error ) {
+	(void) data, (void) error;
+	return json_string(*((char **) args.value));
 }
 
 static JsonHook string_hook = {
@@ -78,7 +82,8 @@ int main( int argc, char *argv[] ) {
 	int ipt = 2;
 	struct MyStruct foo = {
 		.i = 1,
-		.u = {
+		.u1 = NULL,
+		.u2 = {
 			.b = 'c'
 		},
 		.s = "hello world!",
@@ -89,25 +94,20 @@ int main( int argc, char *argv[] ) {
 	JsonState *st = json_state_new();
 	json_state_add_hook(st, g_quark_from_static_string("string"), &string_hook);
 	json_state_add_hook(st, g_quark_from_static_string("MyUnion"), &my_union_hook);
-	json_state_set_flags(st, JSON_FLAG_BIJECTIVE);
-	//json_dumpf(json_serialize(st, ruminate_get_type(foo, NULL), &foo, NULL), stdout, 0);
+	json_state_set_flags(st, JSON_FLAG_INVERTABLE);
 	json_t *serialized = json_serialize(st, ruminate_get_type(foo, NULL), &foo, NULL);
 	json_dumpf(serialized, stdout, 0);
 	printf("\n");
-	GError *err = NULL;
-	struct MyStruct *_foo = json_deserialize(st, serialized, &err);
-	if( _foo == NULL ) {
-		fprintf(stderr, "%s\n", err->message);
-		exit(EXIT_FAILURE);
-	}
-	printf("struct MyStruct {\n");
-	printf("\t.i = %d,\n", _foo->i);
-	printf("\t.u = { .b = '%c' },\n", _foo->u.b);
-	printf("\t.s = \"%s\",\n", _foo->s);
-	printf("\t.e = %d,\n", _foo->e);
-	printf("\t.p = %p (%d),\n", _foo->p, *_foo->p);
-	printf("\t.a = [%d, %d, %d]\n", _foo->a[0], _foo->a[1], _foo->a[2]);
-	printf("};\n");
+	struct MyStruct *_foo = json_deserialize(st, serialized, NULL);
+	printf("struct MyStruct {");
+	printf(" .i = %d,", _foo->i);
+	printf(" .u1 = %p,", _foo->u1);
+	printf(" .u2 = { .b = '%c' },", _foo->u2.b);
+	printf(" .s = \"%s\",", _foo->s);
+	printf(" .e = %d,", _foo->e);
+	printf(" .p = %p (%d),", _foo->p, *_foo->p);
+	printf(" .a = [%d, %d, %d]", _foo->a[0], _foo->a[1], _foo->a[2]);
+	printf(" };\n");
 	r_mem_unref(_foo->s);
 	r_mem_unref(_foo->p);
 	r_mem_unref(_foo);

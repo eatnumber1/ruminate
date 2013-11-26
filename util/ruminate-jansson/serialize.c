@@ -8,7 +8,7 @@
 #include "ruminate-jansson.h"
 #include "common.h"
 
-static json_t *_json_serialize( JsonState *js, RType *rt, void *value, GError **error );
+static json_t *_json_serialize( JsonState *js, RType *rt, void *value, bool, GError **error );
 
 static json_t *json_serialize_builtin( JsonState *js, RBuiltinType *rbt, void *value, GError **error ) {
 	(void) js;
@@ -29,6 +29,7 @@ static json_t *json_serialize_builtin( JsonState *js, RBuiltinType *rbt, void *v
 		case R_BUILTIN_TYPE_BOOL:
 			return json_boolean(*((bool *) value));
 		case R_BUILTIN_TYPE_VOID:
+			if( js->flags & JSON_FLAG_SKIP_UNKNOWN ) return NULL;
 			// TODO: Error here
 			g_assert_not_reached();
 		case R_BUILTIN_TYPE_UNKNOWN:
@@ -44,7 +45,7 @@ static bool json_serialize_struct_member( JsonState *js, RAggregateMember *ram, 
 	RType *rt = r_type_member_type((RTypeMember *) ram, &err);
 	if( rt == NULL ) goto error_tm_type;;
 
-	json_t *obj_memb = _json_serialize(js, rt, value, &err);
+	json_t *obj_memb = _json_serialize(js, rt, value, true, &err);
 	if( err != NULL ) goto error_js_ser;
 	if( obj_memb == NULL ) {
 		r_type_unref(rt);
@@ -159,8 +160,9 @@ static json_t *json_serialize_enum( JsonState *js, RAggregateType *rat, void *va
 				val = *((bool *) value);
 				break;
 			case R_BUILTIN_TYPE_VOID:
-			case R_BUILTIN_TYPE_UNKNOWN:
+				if( js->flags & JSON_FLAG_SKIP_UNKNOWN ) return NULL;
 				g_assert_not_reached();
+			case R_BUILTIN_TYPE_UNKNOWN:
 				g_assert_not_reached();
 		}
 
@@ -216,6 +218,7 @@ static json_t *json_serialize_aggregate( JsonState *js, RAggregateType *rat, voi
 	switch( id ) {
 		case R_AGGREGATE_TYPE_UNION:
 		case R_AGGREGATE_TYPE_FUNCTION:
+			if( js->flags & JSON_FLAG_SKIP_UNKNOWN ) return NULL;
 			// TODO: Error out
 			g_assert_not_reached();
 		case R_AGGREGATE_TYPE_STRUCT:
@@ -247,7 +250,7 @@ static json_t *json_serialize_array( JsonState *js, RArrayType *rat, void *value
 		ptrdiff_t offset = r_type_member_offset(tm, &err);
 		if( err != NULL ) goto error_tm_offset;
 
-		json_t *memb_json = _json_serialize(js, rt, ((char *) value) + offset, &err);
+		json_t *memb_json = _json_serialize(js, rt, ((char *) value) + offset, true, &err);
 		if( err != NULL ) goto error_json_serialize;
 		if( memb_json == NULL )
 			memb_json = json_null();
@@ -279,7 +282,9 @@ error_array_size:
 	return NULL;
 }
 
-static json_t *_json_serialize( JsonState *js, RType *rt, void *value, GError **error ) {
+static json_t *_json_serialize_cont( JsonState *js, RType *rt, void *value, GError **error );
+
+static json_t *_json_serialize( JsonState *js, RType *rt, void *value, bool do_hook, GError **error ) {
 	RTypeId id = r_type_id(rt, error);
 	if( id == R_TYPE_UNKNOWN ) return NULL;
 
@@ -294,10 +299,11 @@ static json_t *_json_serialize( JsonState *js, RType *rt, void *value, GError **
 
 	json_t *ret = NULL;
 
-	if( js != NULL ) {
+	if( do_hook && js != NULL ) {
 		JsonHook *hook = g_datalist_id_get_data(&js->handlers, typeid);
-		if( hook != NULL && hook->serializer != NULL )
-			ret = hook->serializer(js, rt, value, hook->serializer_data, error);
+		if( hook != NULL && hook->serializer != NULL ) {
+			ret = hook->serializer((JsonSerializerArgs){ js, rt, value, _json_serialize_cont }, hook->serializer_data, error);
+		}
 	}
 
 	if( ret == NULL ) {
@@ -309,11 +315,16 @@ static json_t *_json_serialize( JsonState *js, RType *rt, void *value, GError **
 				ret = json_serialize_aggregate(js, (RAggregateType *) rt, value, error);
 				break;
 			case R_TYPE_POINTER: {
-				RPointerType *rpt = (RPointerType *) rt;
-				RType *pointee = r_pointer_type_pointee(rpt, error);
 				// TODO: This is not portable
-				ret = _json_serialize(js, (RType *) pointee, *((void **) value), error);
-				r_type_unref(pointee);
+				void *pointee_value = *((void **) value);
+				if( pointee_value == NULL ) {
+					ret = json_null();
+				} else {
+					RPointerType *rpt = (RPointerType *) rt;
+					RType *pointee = r_pointer_type_pointee(rpt, error);
+					ret = _json_serialize(js, (RType *) pointee, pointee_value, true, error);
+					r_type_unref(pointee);
+				}
 				break;
 			}
 			case R_TYPE_ARRAY:
@@ -321,12 +332,11 @@ static json_t *_json_serialize( JsonState *js, RType *rt, void *value, GError **
 				break;
 			case R_TYPE_TYPEDEF: {
 				RType *canonical = r_typedef_type_canonical((RTypedefType *) rt, error);
-				ret = _json_serialize(js, canonical, value, error);
+				ret = _json_serialize(js, canonical, value, true, error);
 				r_type_unref(canonical);
 				break;
 			}
-			default:
-				// TODO: Remove this
+			case R_TYPE_UNKNOWN:
 				g_assert_not_reached();
 		}
 	}
@@ -334,11 +344,15 @@ static json_t *_json_serialize( JsonState *js, RType *rt, void *value, GError **
 	return ret;
 }
 
+static json_t *_json_serialize_cont( JsonState *js, RType *rt, void *value, GError **error ) {
+	return _json_serialize(js, rt, value, false, error);
+}
+
 json_t *json_serialize( JsonState *js, RType *rt, void *value, GError **error ) {
-	json_t *serialized = _json_serialize(js, rt, value, error);
+	json_t *serialized = _json_serialize(js, rt, value, true, error);
 	if( serialized == NULL ) return NULL;
 
-	if( js->flags | JSON_FLAG_BIJECTIVE ) {
+	if( js->flags & JSON_FLAG_INVERTABLE ) {
 		RString *name = r_type_name(rt, error);
 		if( name == NULL ) {
 			json_decref(serialized);

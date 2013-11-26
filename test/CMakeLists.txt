@@ -1,4 +1,6 @@
 add_subdirectory(backtrace)
 add_subdirectory(json)
 add_subdirectory(ruminate-jansson-test)
+add_subdirectory(stdout)
 add_subdirectory(memory)
+add_subdirectory(main)

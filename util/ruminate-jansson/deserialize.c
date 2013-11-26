@@ -10,7 +10,7 @@
 #include "ruminate-jansson.h"
 #include "common.h"
 
-static void *_json_deserialize( JsonState *js, RType *rt, json_t *json, GError **error );
+static void *_json_deserialize( JsonState *js, RType *rt, json_t *json, bool, GError **error );
 
 static void *json_deserialize_builtin( JsonState *js, RBuiltinType *rbt, json_t *json, GError **error ) {
 	(void) js;
@@ -70,7 +70,7 @@ static bool json_deserialize_struct_member( JsonState *js, RAggregateMember *ram
 	RType *rt = r_type_member_type((RTypeMember *) ram, &err);
 	if( rt == NULL ) goto error_tm_type;
 
-	void *memb = _json_deserialize(js, rt, value, &err);
+	void *memb = _json_deserialize(js, rt, value, true, &err);
 	if( err != NULL ) goto error_js_ser;
 
 	size_t size = r_type_size(rt, &err);
@@ -196,7 +196,7 @@ static void *json_deserialize_array( JsonState *js, RArrayType *rat, json_t *val
 		json_t *memb_json = json_array_get(value, i);
 		g_assert(memb_json != NULL);
 
-		void *memb = _json_deserialize(js, rt, memb_json, &err);
+		void *memb = _json_deserialize(js, rt, memb_json, true, &err);
 		if( err != NULL ) goto error_json_deserialize;
 
 		memcpy(((char *) array) + offset, memb, rt_size);
@@ -225,7 +225,9 @@ error_array_size:
 	return NULL;
 }
 
-static void *_json_deserialize( JsonState *js, RType *rt, json_t *json, GError **error ) {
+static void *_json_deserialize_cont( JsonState *js, RType *rt, json_t *json, GError **error );
+
+static void *_json_deserialize( JsonState *js, RType *rt, json_t *json, bool do_hook, GError **error ) {
 	RTypeId id = r_type_id(rt, error);
 	if( id == R_TYPE_UNKNOWN ) return NULL;
 
@@ -233,10 +235,10 @@ static void *_json_deserialize( JsonState *js, RType *rt, json_t *json, GError *
 	GQuark typeid = r_string_quark(name);
 	r_string_unref(name);
 
-	if( js != NULL ) {
+	if( do_hook && js != NULL ) {
 		JsonHook *hook = g_datalist_id_get_data(&js->handlers, typeid);
 		if( hook != NULL && hook->deserializer != NULL ) {
-			return hook->deserializer(js, rt, json, hook->deserializer_data, error);
+			return hook->deserializer((JsonDeserializerArgs){ js, rt, json, _json_deserialize_cont }, hook->deserializer_data, error);
 		}
 	}
 
@@ -246,11 +248,18 @@ static void *_json_deserialize( JsonState *js, RType *rt, json_t *json, GError *
 		case R_TYPE_AGGREGATE:
 			return json_deserialize_aggregate(js, (RAggregateType *) rt, json, error);
 		case R_TYPE_POINTER: {
+			if( json_is_null(json) ) {
+				void **ppt = r_mem_malloc_fn(rt, error);
+				if( ppt == NULL ) return NULL;
+				*ppt = NULL;
+				return ppt;
+			}
+
 			// TODO: Error check this
 			RPointerType *rpt = (RPointerType *) rt;
 			RType *pointee = r_pointer_type_pointee(rpt, error);
 			// TODO: This is not portable
-			void *pt = _json_deserialize(js, (RType *) pointee, json, error);
+			void *pt = _json_deserialize(js, (RType *) pointee, json, true, error);
 			r_type_unref(pointee);
 			void **ppt = r_mem_malloc_fn(rt, error);
 			*ppt = pt;
@@ -264,13 +273,17 @@ static void *_json_deserialize( JsonState *js, RType *rt, json_t *json, GError *
 	}
 }
 
+static void *_json_deserialize_cont( JsonState *js, RType *rt, json_t *json, GError **error ) {
+	return _json_deserialize(js, rt, json, false, error);
+}
+
 void *json_deserialize( JsonState *js, json_t *json, GError **error ) {
 	GPtrArray *types = ruminate_get_types_by_name(json_string_value(json_object_get(json, "type")), error);
 	if( types == NULL ) return false;
 	// TODO: Handle multiple types of this name.
 	//g_assert_cmpuint(types->len, ==, 1);
 	RType *type = g_ptr_array_index(types, 0);
-	void *ret = _json_deserialize(js, type, json_object_get(json, "value"), error);
+	void *ret = _json_deserialize(js, type, json_object_get(json, "value"), true, error);
 	g_ptr_array_unref(types);
 	return ret;
 }

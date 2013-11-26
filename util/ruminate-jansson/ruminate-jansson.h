@@ -6,13 +6,31 @@
 #include <ruminate.h>
 
 typedef enum JsonFlags {
-	JSON_FLAG_BIJECTIVE = 1 << 0
+	JSON_FLAG_INVERTABLE = 1 << 1,
+	JSON_FLAG_SKIP_UNKNOWN = 1 << 2
 } JsonFlags;
 
 typedef struct JsonState JsonState;
 
-typedef json_t *(*JsonSerializer)( JsonState *, RType *, void *, void *, GError ** );
-typedef void *(*JsonDeserializer)( JsonState *, RType *, json_t *, void *, GError ** );
+typedef json_t *(*JsonSerializeCont)( JsonState *, RType *, void *, GError ** );
+typedef void *(*JsonDeserializeCont)( JsonState *, RType *, json_t *, GError ** );
+
+typedef struct JsonSerializerArgs {
+	JsonState *state;
+	RType *type;
+	void *value;
+	JsonSerializeCont cont;
+} JsonSerializerArgs;
+
+typedef struct JsonDeserializerArgs {
+	JsonState *state;
+	RType *type;
+	json_t *value;
+	JsonDeserializeCont cont;
+} JsonDeserializerArgs;
+
+typedef json_t *(*JsonSerializer)( JsonSerializerArgs, void *, GError ** );
+typedef void *(*JsonDeserializer)( JsonDeserializerArgs, void *, GError ** );
 
 typedef struct JsonHook {
 	JsonSerializer serializer;

@@ -1,9 +1,9 @@
 if(JANSSON_FOUND)
-	add_executable(ruminate-jansson-test
-		ruminate-jansson-test.c
+	add_executable(stdout
+		stdout.c
 	)
-	set_target_properties(ruminate-jansson-test PROPERTIES COMPILE_FLAGS "-std=c11 -g")
-	target_link_libraries(ruminate-jansson-test
+	set_target_properties(stdout PROPERTIES COMPILE_FLAGS "-std=c99 -g")
+	target_link_libraries(stdout
 		ruminate
 		ruminate-jansson
 		jansson
