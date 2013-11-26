@@ -27,16 +27,6 @@ RMemory *r_memory_new( RType *rt, size_t size ) RUMINATE_NOEXCEPT {
 	return rm;
 }
 
-RMemory * RUMINATE_NONNULL(1) r_memory_realloc( RMemory * rm, size_t size ) RUMINATE_NOEXCEPT {
-	if( size == 0 ) {
-		if( rm != NULL ) r_memory_unref(rm);
-		return NULL;
-	}
-
-	// TODO: Check for overflow.
-	return (RMemory *) g_realloc(rm, size + sizeof(RMemory));
-}
-
 void r_memory_unref( RMemory *rm ) RUMINATE_NOEXCEPT {
 	if( g_atomic_int_dec_and_test(&rm->refcnt) ) {
 		r_type_unref(rm->type);
@@ -144,11 +134,6 @@ void *r_mem_calloc_sized_fn( RType *rt, size_t size, size_t nmemb, GError **erro
 	if( ret == NULL ) return NULL;
 	memset(ret, 0, real_size);
 	return ret;
-}
-
-void *r_mem_realloc( void *mem, size_t size ) RUMINATE_NOEXCEPT {
-	if( mem == NULL ) return NULL;
-	return r_memory_realloc(r_memory_from_opaque(mem), size);
 }
 
 size_t r_mem_size( void *mem ) RUMINATE_NOEXCEPT {
