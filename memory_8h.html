@@ -95,75 +95,522 @@ $(document).ready(function(){initNavTree('memory_8h.html','');});
 </div><!--header-->
 <div class="contents">
 
-<p>Typed memory allocator.  
+<p>Typed reference counted memory allocator.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ae4d72da6eaa1f49c731f5b467511687e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae4d72da6eaa1f49c731f5b467511687e"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_malloc</b>(type, error)</td></tr>
+<tr class="memitem:ae4d72da6eaa1f49c731f5b467511687e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#ae4d72da6eaa1f49c731f5b467511687e">r_mem_malloc</a>(type, error)</td></tr>
+<tr class="memdesc:ae4d72da6eaa1f49c731f5b467511687e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate typed memory.  <a href="#ae4d72da6eaa1f49c731f5b467511687e">More...</a><br/></td></tr>
 <tr class="separator:ae4d72da6eaa1f49c731f5b467511687e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ce06009f659776d34afd8d13bf656ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ce06009f659776d34afd8d13bf656ce"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_malloc_sized</b>(type, size, error)</td></tr>
+<tr class="memitem:a1ce06009f659776d34afd8d13bf656ce"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a1ce06009f659776d34afd8d13bf656ce">r_mem_malloc_sized</a>(type, size, error)</td></tr>
+<tr class="memdesc:a1ce06009f659776d34afd8d13bf656ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate typed memory with size.  <a href="#a1ce06009f659776d34afd8d13bf656ce">More...</a><br/></td></tr>
 <tr class="separator:a1ce06009f659776d34afd8d13bf656ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae07e2095ad3b035b66c0349617a221b0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae07e2095ad3b035b66c0349617a221b0"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_calloc</b>(type, error)</td></tr>
-<tr class="separator:ae07e2095ad3b035b66c0349617a221b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b06fc22c0eaac35cc7e08b9cdacc6e4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0b06fc22c0eaac35cc7e08b9cdacc6e4"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_calloc_sized</b>(type, size, error)</td></tr>
-<tr class="separator:a0b06fc22c0eaac35cc7e08b9cdacc6e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a021210641e7ca32164d2418531110d73"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a021210641e7ca32164d2418531110d73">r_mem_calloc</a>(type, nmemb, error)</td></tr>
+<tr class="memdesc:a021210641e7ca32164d2418531110d73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate zero'ed typed memory.  <a href="#a021210641e7ca32164d2418531110d73">More...</a><br/></td></tr>
+<tr class="separator:a021210641e7ca32164d2418531110d73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaeb47cae325a8d6d8818e7d09061ba26"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#aaeb47cae325a8d6d8818e7d09061ba26">r_mem_calloc_sized</a>(type, size, nmemb, error)</td></tr>
+<tr class="memdesc:aaeb47cae325a8d6d8818e7d09061ba26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate zero'ed typed memory, with size.  <a href="#aaeb47cae325a8d6d8818e7d09061ba26">More...</a><br/></td></tr>
+<tr class="separator:aaeb47cae325a8d6d8818e7d09061ba26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae6f71a3e87eeb0810b582b46cb59c5d7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6f71a3e87eeb0810b582b46cb59c5d7"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>_r_mem_malloc</b> (<a class="el" href="struct_r_type.html">RType</a> *, GError **)</td></tr>
-<tr class="separator:ae6f71a3e87eeb0810b582b46cb59c5d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4db9f529229758e1b9ca5471133c1516"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4db9f529229758e1b9ca5471133c1516"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_malloc_fn</b> (<a class="el" href="struct_r_type.html">RType</a> *, GError **)</td></tr>
-<tr class="separator:a4db9f529229758e1b9ca5471133c1516"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a241f2e5c8fbd94e25de34754fde975da"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a241f2e5c8fbd94e25de34754fde975da"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>_r_mem_malloc_sized</b> (<a class="el" href="struct_r_type.html">RType</a> *, size_t, GError **)</td></tr>
-<tr class="separator:a241f2e5c8fbd94e25de34754fde975da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f47bf0cdbc57d232a2634b7fdc6c88b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f47bf0cdbc57d232a2634b7fdc6c88b"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_malloc_sized_fn</b> (<a class="el" href="struct_r_type.html">RType</a> *, size_t, GError **)</td></tr>
-<tr class="separator:a5f47bf0cdbc57d232a2634b7fdc6c88b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4ff74c70d613c069af9806b5c8ee242"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af4ff74c70d613c069af9806b5c8ee242"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>_r_mem_calloc</b> (<a class="el" href="struct_r_type.html">RType</a> *, size_t, GError **)</td></tr>
-<tr class="separator:af4ff74c70d613c069af9806b5c8ee242"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52779e875be39dc21eee08fa1076db14"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a52779e875be39dc21eee08fa1076db14"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_calloc_fn</b> (<a class="el" href="struct_r_type.html">RType</a> *, size_t, GError **)</td></tr>
-<tr class="separator:a52779e875be39dc21eee08fa1076db14"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a80a8556432168e86965230b1a3d093"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7a80a8556432168e86965230b1a3d093"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>_r_mem_calloc_sized</b> (<a class="el" href="struct_r_type.html">RType</a> *, size_t, size_t, GError **)</td></tr>
-<tr class="separator:a7a80a8556432168e86965230b1a3d093"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a141746fe4d9295bd218f9c3ff1d1c66f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a141746fe4d9295bd218f9c3ff1d1c66f"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_calloc_sized_fn</b> (<a class="el" href="struct_r_type.html">RType</a> *, size_t, size_t, GError **)</td></tr>
-<tr class="separator:a141746fe4d9295bd218f9c3ff1d1c66f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22688d22051b2481355d001523afeb57"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a22688d22051b2481355d001523afeb57"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_realloc</b> (void *, size_t)</td></tr>
-<tr class="separator:a22688d22051b2481355d001523afeb57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7fca90ff714af1f160ad64b072853770"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7fca90ff714af1f160ad64b072853770"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_size</b> (void *)</td></tr>
-<tr class="separator:a7fca90ff714af1f160ad64b072853770"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05a5ee3e6c929b35875d01f04fec0cba"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05a5ee3e6c929b35875d01f04fec0cba"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_ref</b> (void *)</td></tr>
-<tr class="separator:a05a5ee3e6c929b35875d01f04fec0cba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9bd798b53315b1787be30442a6c89097"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9bd798b53315b1787be30442a6c89097"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_unref</b> (void *)</td></tr>
-<tr class="separator:a9bd798b53315b1787be30442a6c89097"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5bfa521ebf70f8334dcd7ef03679c64"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af5bfa521ebf70f8334dcd7ef03679c64"></a>
-<a class="el" href="struct_r_type.html">RType</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>r_mem_type</b> (void *)</td></tr>
-<tr class="separator:af5bfa521ebf70f8334dcd7ef03679c64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75a334c89bf27d2632f88071daedb571"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a75a334c89bf27d2632f88071daedb571">r_mem_malloc_fn</a> (<a class="el" href="struct_r_type.html">RType</a> *type, GError **error)</td></tr>
+<tr class="memdesc:a75a334c89bf27d2632f88071daedb571"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate typed memory.  <a href="#a75a334c89bf27d2632f88071daedb571">More...</a><br/></td></tr>
+<tr class="separator:a75a334c89bf27d2632f88071daedb571"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42cf0c15546270790d68c1bdbeace960"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a42cf0c15546270790d68c1bdbeace960">r_mem_malloc_sized_fn</a> (<a class="el" href="struct_r_type.html">RType</a> *type, size_t size, GError **error)</td></tr>
+<tr class="memdesc:a42cf0c15546270790d68c1bdbeace960"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate typed memory with size.  <a href="#a42cf0c15546270790d68c1bdbeace960">More...</a><br/></td></tr>
+<tr class="separator:a42cf0c15546270790d68c1bdbeace960"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b85a89dbd5164e57163ab0efb24f536"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a2b85a89dbd5164e57163ab0efb24f536">r_mem_calloc_fn</a> (<a class="el" href="struct_r_type.html">RType</a> *type, size_t nmemb, GError **error)</td></tr>
+<tr class="memdesc:a2b85a89dbd5164e57163ab0efb24f536"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate zero'ed typed memory.  <a href="#a2b85a89dbd5164e57163ab0efb24f536">More...</a><br/></td></tr>
+<tr class="separator:a2b85a89dbd5164e57163ab0efb24f536"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae015932866677442597ed10d3fc8ef2d"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#ae015932866677442597ed10d3fc8ef2d">r_mem_calloc_sized_fn</a> (<a class="el" href="struct_r_type.html">RType</a> *type, size_t size, size_t nmemb, GError **error)</td></tr>
+<tr class="memdesc:ae015932866677442597ed10d3fc8ef2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate zero'ed typed memory, with size.  <a href="#ae015932866677442597ed10d3fc8ef2d">More...</a><br/></td></tr>
+<tr class="separator:ae015932866677442597ed10d3fc8ef2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e3d73f1c02dc3aa939507f6e849631b"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a7e3d73f1c02dc3aa939507f6e849631b">r_mem_size</a> (void *mem)</td></tr>
+<tr class="memdesc:a7e3d73f1c02dc3aa939507f6e849631b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the allocated size of typed memory.  <a href="#a7e3d73f1c02dc3aa939507f6e849631b">More...</a><br/></td></tr>
+<tr class="separator:a7e3d73f1c02dc3aa939507f6e849631b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5a2b3eedc081c7f097d49678ca23ae4"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#ad5a2b3eedc081c7f097d49678ca23ae4">r_mem_ref</a> (void *mem)</td></tr>
+<tr class="memdesc:ad5a2b3eedc081c7f097d49678ca23ae4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increment the reference count of typed memory.  <a href="#ad5a2b3eedc081c7f097d49678ca23ae4">More...</a><br/></td></tr>
+<tr class="separator:ad5a2b3eedc081c7f097d49678ca23ae4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7646f31027040b96f9c37c9d011719ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a7646f31027040b96f9c37c9d011719ef">r_mem_unref</a> (void *mem)</td></tr>
+<tr class="memdesc:a7646f31027040b96f9c37c9d011719ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease the reference count of typed memory.  <a href="#a7646f31027040b96f9c37c9d011719ef">More...</a><br/></td></tr>
+<tr class="separator:a7646f31027040b96f9c37c9d011719ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7aba2307bdd9b8f95b24919fee0f3551"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_r_type.html">RType</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a7aba2307bdd9b8f95b24919fee0f3551">r_mem_type</a> (void *mem)</td></tr>
+<tr class="memdesc:a7aba2307bdd9b8f95b24919fee0f3551"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the type of typed memory.  <a href="#a7aba2307bdd9b8f95b24919fee0f3551">More...</a><br/></td></tr>
+<tr class="separator:a7aba2307bdd9b8f95b24919fee0f3551"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Typed memory allocator. </p>
-</div></div><!-- contents -->
+<div class="textblock"><p>Typed reference counted memory allocator. </p>
+<p>These functions provide facilities for allocating dynamic memory which you can retrieve the type of via a call to <a class="el" href="memory_8h.html#a7aba2307bdd9b8f95b24919fee0f3551" title="Retrieve the type of typed memory. ">r_mem_type()</a>. This allows you to retrieve the real type of e.x. a <code>void *</code>.</p>
+<p>This memory is also reference counted via calls to <a class="el" href="memory_8h.html#ad5a2b3eedc081c7f097d49678ca23ae4" title="Increment the reference count of typed memory. ">r_mem_ref()</a> and <a class="el" href="memory_8h.html#a7646f31027040b96f9c37c9d011719ef" title="Decrease the reference count of typed memory. ">r_mem_unref()</a>. </p>
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="a021210641e7ca32164d2418531110d73"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define r_mem_calloc</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">nmemb, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">error&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate zero'ed typed memory. </p>
+<p>This macro allocates enough memory for <em>nmemb</em> instances of <em>type</em> sized elements and sets the allocated memory to zero.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>the type of the memory to allocate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nmemb</td><td>the number of <em>type</em> sized members to allocate. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to dynamically allocated memory </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aaeb47cae325a8d6d8818e7d09061ba26"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define r_mem_calloc_sized</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">size, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">nmemb, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">error&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate zero'ed typed memory, with size. </p>
+<p>This macro allocates enough memory for <em>nmemb</em> instances of <em>size</em> sized elements and sets the allocated memory to zero.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>the type of the memory to allocate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>the size of the memory to allocate. This must be at least as large as the type represented by <em>type</em> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nmemb</td><td>the number of <em>type</em> sized members to allocate. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to dynamically allocated memory </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ae4d72da6eaa1f49c731f5b467511687e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define r_mem_malloc</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">error&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate typed memory. </p>
+<p>This macro allocates memory of size <code>sizeof(type)</code> and with type <em>type</em>.</p>
+<p>This memory must be freed via a call to <a class="el" href="memory_8h.html#a7646f31027040b96f9c37c9d011719ef" title="Decrease the reference count of typed memory. ">r_mem_unref()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>the type of the memory to allocate </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to dynamically allocated memory </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1ce06009f659776d34afd8d13bf656ce"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define r_mem_malloc_sized</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">size, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">error&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate typed memory with size. </p>
+<p>This macro allocates memory of size <em>size</em> and with type <em>type</em>.</p>
+<p>This memory must be freed via a call to <a class="el" href="memory_8h.html#a7646f31027040b96f9c37c9d011719ef" title="Decrease the reference count of typed memory. ">r_mem_unref()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>the type of the memory to allocate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>the size of the memory to allocate This must be at least as large as the type represented by <em>type</em> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to dynamically allocated memory </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a2b85a89dbd5164e57163ab0efb24f536"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* r_mem_calloc_fn </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_type.html">RType</a> *&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nmemb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate zero'ed typed memory. </p>
+<p>This is the function version of <a class="el" href="memory_8h.html#a021210641e7ca32164d2418531110d73" title="Allocate zero&#39;ed typed memory. ">r_mem_calloc()</a></p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="memory_8h.html#a021210641e7ca32164d2418531110d73" title="Allocate zero&#39;ed typed memory. ">r_mem_calloc</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to dynamically allocated memory </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>an <a class="el" href="struct_r_type.html" title="An opaque struct representing a type. ">RType</a> representing the type of the allocated memory </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nmemb</td><td>the number of <em>type</em> sized elements to allocate memory for </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ae015932866677442597ed10d3fc8ef2d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* r_mem_calloc_sized_fn </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_type.html">RType</a> *&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nmemb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate zero'ed typed memory, with size. </p>
+<p>This is the function version of <a class="el" href="memory_8h.html#aaeb47cae325a8d6d8818e7d09061ba26" title="Allocate zero&#39;ed typed memory, with size. ">r_mem_calloc_sized()</a></p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="memory_8h.html#aaeb47cae325a8d6d8818e7d09061ba26" title="Allocate zero&#39;ed typed memory, with size. ">r_mem_calloc_sized</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to dynamically allocated memory </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>an <a class="el" href="struct_r_type.html" title="An opaque struct representing a type. ">RType</a> representing the type of the allocated memory </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>size the size of the memory to allocate. This must be at least as large as the type represented by <em>type</em> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nmemb</td><td>the number of <em>type</em> sized elements to allocate memory for </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a75a334c89bf27d2632f88071daedb571"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* r_mem_malloc_fn </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_type.html">RType</a> *&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate typed memory. </p>
+<p>This is the function version of <a class="el" href="memory_8h.html#ae4d72da6eaa1f49c731f5b467511687e" title="Allocate typed memory. ">r_mem_malloc()</a></p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="memory_8h.html#ae4d72da6eaa1f49c731f5b467511687e" title="Allocate typed memory. ">r_mem_malloc</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to dynamically allocated memory </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>an <a class="el" href="struct_r_type.html" title="An opaque struct representing a type. ">RType</a> representing the type of the allocated memory </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a42cf0c15546270790d68c1bdbeace960"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* r_mem_malloc_sized_fn </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_type.html">RType</a> *&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate typed memory with size. </p>
+<p>This is the function version of <a class="el" href="memory_8h.html#a1ce06009f659776d34afd8d13bf656ce" title="Allocate typed memory with size. ">r_mem_malloc_sized()</a>.</p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="memory_8h.html#a1ce06009f659776d34afd8d13bf656ce" title="Allocate typed memory with size. ">r_mem_malloc_sized</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to dynamically allocated memory </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>an <a class="el" href="struct_r_type.html" title="An opaque struct representing a type. ">RType</a> representing the type of the allocated memory </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>size the size of the memory to allocate. This must be at least as large as the type represented by <em>type</em> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ad5a2b3eedc081c7f097d49678ca23ae4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* r_mem_ref </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>mem</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Increment the reference count of typed memory. </p>
+<dl class="section return"><dt>Returns</dt><dd><em>mem</em> </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mem</td><td>the memory to increase the reference count of </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a7e3d73f1c02dc3aa939507f6e849631b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t r_mem_size </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>mem</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieve the allocated size of typed memory. </p>
+<dl class="section return"><dt>Returns</dt><dd>the allocated size of <em>mem</em> </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mem</td><td>the typed memory to retrieve the allocated size of </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a7aba2307bdd9b8f95b24919fee0f3551"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_r_type.html">RType</a>* r_mem_type </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>mem</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieve the type of typed memory. </p>
+<dl class="section return"><dt>Returns</dt><dd>an <a class="el" href="struct_r_type.html" title="An opaque struct representing a type. ">RType</a> representing the type of <em>mem</em>. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mem</td><td>the memory to retrieve the type of </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a7646f31027040b96f9c37c9d011719ef"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void r_mem_unref </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>mem</em>)</td><td></td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Decrease the reference count of typed memory. </p>
+<p>This function frees <em>mem</em> if the reference count reaches zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mem</td><td>the memory to decrease the reference count of </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_1229bae49d98528e082d5169ebe9d673.html">ruminate</a></li><li class="navelem"><a class="el" href="memory_8h.html">memory.h</a></li>
-    <li class="footer">Generated on Tue Nov 12 2013 21:38:20 for Ruminate by
+    <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

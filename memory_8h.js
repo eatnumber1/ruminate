@@ -1,20 +1,17 @@
 var memory_8h =
 [
-    [ "r_mem_calloc", "memory_8h.html#ae07e2095ad3b035b66c0349617a221b0", null ],
-    [ "r_mem_calloc_sized", "memory_8h.html#a0b06fc22c0eaac35cc7e08b9cdacc6e4", null ],
+    [ "r_mem_calloc", "memory_8h.html#a021210641e7ca32164d2418531110d73", null ],
+    [ "r_mem_calloc_sized", "memory_8h.html#aaeb47cae325a8d6d8818e7d09061ba26", null ],
     [ "r_mem_malloc", "memory_8h.html#ae4d72da6eaa1f49c731f5b467511687e", null ],
     [ "r_mem_malloc_sized", "memory_8h.html#a1ce06009f659776d34afd8d13bf656ce", null ],
-    [ "_r_mem_calloc", "memory_8h.html#af4ff74c70d613c069af9806b5c8ee242", null ],
     [ "_r_mem_calloc_sized", "memory_8h.html#a7a80a8556432168e86965230b1a3d093", null ],
-    [ "_r_mem_malloc", "memory_8h.html#ae6f71a3e87eeb0810b582b46cb59c5d7", null ],
     [ "_r_mem_malloc_sized", "memory_8h.html#a241f2e5c8fbd94e25de34754fde975da", null ],
-    [ "r_mem_calloc_fn", "memory_8h.html#a52779e875be39dc21eee08fa1076db14", null ],
-    [ "r_mem_calloc_sized_fn", "memory_8h.html#a141746fe4d9295bd218f9c3ff1d1c66f", null ],
-    [ "r_mem_malloc_fn", "memory_8h.html#a4db9f529229758e1b9ca5471133c1516", null ],
-    [ "r_mem_malloc_sized_fn", "memory_8h.html#a5f47bf0cdbc57d232a2634b7fdc6c88b", null ],
-    [ "r_mem_realloc", "memory_8h.html#a22688d22051b2481355d001523afeb57", null ],
-    [ "r_mem_ref", "memory_8h.html#a05a5ee3e6c929b35875d01f04fec0cba", null ],
-    [ "r_mem_size", "memory_8h.html#a7fca90ff714af1f160ad64b072853770", null ],
-    [ "r_mem_type", "memory_8h.html#af5bfa521ebf70f8334dcd7ef03679c64", null ],
-    [ "r_mem_unref", "memory_8h.html#a9bd798b53315b1787be30442a6c89097", null ]
+    [ "r_mem_calloc_fn", "memory_8h.html#a2b85a89dbd5164e57163ab0efb24f536", null ],
+    [ "r_mem_calloc_sized_fn", "memory_8h.html#ae015932866677442597ed10d3fc8ef2d", null ],
+    [ "r_mem_malloc_fn", "memory_8h.html#a75a334c89bf27d2632f88071daedb571", null ],
+    [ "r_mem_malloc_sized_fn", "memory_8h.html#a42cf0c15546270790d68c1bdbeace960", null ],
+    [ "r_mem_ref", "memory_8h.html#ad5a2b3eedc081c7f097d49678ca23ae4", null ],
+    [ "r_mem_size", "memory_8h.html#a7e3d73f1c02dc3aa939507f6e849631b", null ],
+    [ "r_mem_type", "memory_8h.html#a7aba2307bdd9b8f95b24919fee0f3551", null ],
+    [ "r_mem_unref", "memory_8h.html#a7646f31027040b96f9c37c9d011719ef", null ]
 ];
