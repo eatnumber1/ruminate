@@ -88,7 +88,7 @@ void * RUMINATE_EXPORT r_mem_malloc_sized_fn(
 		GError **_err = (error); \
 		void *_ret = NULL; \
 		RType *_rt = ruminate_get_type((type *) NULL, _err); \
-		if( _rt != NULL ) _ret = _r_mem_malloc_sized(_rt, size, _err); \
+		if( _rt != NULL ) _ret = _r_mem_malloc_sized(_rt, (size), _err); \
 		_ret; \
 	}) \
 	_Pragma("clang diagnostic pop")
@@ -126,7 +126,7 @@ void * RUMINATE_EXPORT r_mem_calloc_fn(
 		RType *_rt = ruminate_get_type((type *) NULL, error); \
 		void *_ret = NULL; \
 		if( _rt != NULL ) { \
-			_ret = _r_mem_calloc_sized(_rt, sizeof(type), nmemb, error); \
+			_ret = _r_mem_calloc_sized(_rt, sizeof(type), (nmemb), error); \
 		} \
 		_ret; \
 	}) \
@@ -172,7 +172,7 @@ void * RUMINATE_EXPORT r_mem_calloc_sized_fn(
 		GError **_err = (error); \
 		void *_ret = NULL; \
 		RType *_rt = ruminate_get_type((type *) NULL, _err); \
-		if( _rt != NULL ) _ret = _r_mem_calloc_sized(_rt, size, nmemb, _err); \
+		if( _rt != NULL ) _ret = _r_mem_calloc_sized(_rt, (size), (nmemb), _err); \
 		_ret; \
 	}) \
 	_Pragma("clang diagnostic pop")

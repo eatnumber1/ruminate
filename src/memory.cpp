@@ -69,7 +69,7 @@ void *_r_mem_malloc_sized( RType *ptrtype, size_t size, GError **error ) RUMINAT
 	if( type == NULL ) goto error_pt_pointee;
 
 	ret = r_mem_malloc_sized_fn(type, size, error);
-	if( error == NULL ) goto error_malloc_sized_fn;
+	if( ret == NULL ) goto error_malloc_sized_fn;
 
 	r_type_unref(ptrtype);
 	return ret;
@@ -116,7 +116,7 @@ void *_r_mem_calloc_sized( RType *ptrtype, size_t size, size_t nmemb, GError **e
 	if( type == NULL ) goto error_pt_pointee;
 
 	ret = r_mem_calloc_sized_fn(type, size, nmemb, error);
-	if( error == NULL ) goto error_calloc_sized_fn;
+	if( ret == NULL ) goto error_calloc_sized_fn;
 
 	r_type_unref(ptrtype);
 	return ret;
