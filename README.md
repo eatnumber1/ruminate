@@ -2,10 +2,9 @@
 
 Ruminate is an [introspective][introspection] library for C.
 
-It is a relatively new project and very much a work in progress.
+# Usage
 
-More documentation to come later.
-
-See ruminate_get_type()
+To start using it, see ruminate_get_type() in [ruminate.h][ruminate.h]
 
 [introspection]: http://en.wikipedia.org/wiki/Introspection_(computer_science)
+[ruminate.h]: http://rus.har.mn/ruminate/ruminate_2ruminate_8h.html
