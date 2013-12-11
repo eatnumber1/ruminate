@@ -55,7 +55,7 @@ size_t RUMINATE_EXPORT r_aggregate_type_nmembers(
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 
-/** Get a aggregate's member at a specified index.
+/** Get an aggregate's member at a specified index.
  *
  * @return a RAggregateMember representing the member of this aggregate at index \a
  *         index.
@@ -64,6 +64,18 @@ size_t RUMINATE_EXPORT r_aggregate_type_nmembers(
 RAggregateMember * RUMINATE_EXPORT r_aggregate_type_member_at(
 	RAggregateType *type /** [in] the aggregate type to retrieve a member of */,
 	size_t index /** [in] the index of the member */,
+	GError **error /** [out] see errors.h */
+) RUMINATE_NOEXCEPT;
+
+/** Get an aggregate's member by name.
+ *
+ * @return a RAggregateMember representing the member of this aggregate with
+ *         name \a name.
+ * @memberof RAggregateType
+ */
+RAggregateMember * RUMINATE_EXPORT r_aggregate_type_member_by_name(
+	RAggregateType *type /** [in] the aggregate type to retrieve a member of */,
+	const char *name /** [in] the name of the aggregate member */,
 	GError **error /** [out] see errors.h */
 ) RUMINATE_NOEXCEPT;
 

@@ -68,10 +68,15 @@ class LLDBEventMachine(threading.Thread):
 			for cb in callbacks:
 				cb(event)
 		elif state == lldb.eStateStopped:
+			#print("Child stopped unexpectedly")
 			# TODO: This is a hack
 			self.process.Continue()
 		elif state == lldb.eStateExited:
+			#print("Child exited")
 			self.shutdown()
+		else:
+			#print("No callback registered")
+			pass
 
 	def addCallback(self, state, cb):
 		self.callbacks[state].append(cb)

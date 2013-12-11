@@ -135,4 +135,40 @@ RAggregateMember *r_aggregate_type_member_at( RAggregateType *rat, size_t i, GEr
 	return (RAggregateMember *) r_type_member_new(tmp, rt, error);
 }
 
+RAggregateMember *r_aggregate_type_member_by_name( RAggregateType *rat, const char *name, GError **error ) RUMINATE_NOEXCEPT {
+	GError *err = NULL;
+	GQuark member_name_quark, name_quark;
+	size_t nmembers, i;
+	RAggregateMember *member;
+	RString *member_name;
+
+	name_quark = g_quark_from_string(name);
+	nmembers = r_aggregate_type_nmembers(rat, &err);
+	if( err != NULL ) goto error_nmembers;
+	for( i = 0; i < nmembers; i++ ) {
+		member = r_aggregate_type_member_at(rat, i, error);
+		if( member == NULL ) goto error_member_at;
+
+		member_name = r_aggregate_member_name(member, error);
+		if( member_name == NULL ) goto error_member_name;
+		member_name_quark = r_string_quark(member_name);
+		r_string_unref(member_name);
+
+		if( member_name_quark == name_quark ) return member;
+
+		r_type_member_unref((RTypeMember *) member);
+
+		continue;
+error_member_name:
+		r_type_member_unref((RTypeMember *) member);
+error_member_at:
+		goto error_in_loop;
+	}
+
+error_in_loop:
+error_nmembers:
+	g_propagate_error(error, err);
+	return NULL;
+}
+
 G_END_DECLS
