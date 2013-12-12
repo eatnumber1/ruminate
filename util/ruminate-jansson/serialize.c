@@ -299,7 +299,7 @@ static json_t *_json_serialize( JsonState *js, RType *rt, void *value, bool do_h
 
 	json_t *ret = NULL;
 
-	if( do_hook && js != NULL ) {
+	if( do_hook ) {
 		JsonHook *hook = g_datalist_id_get_data(&js->handlers, typeid);
 		if( hook != NULL && hook->serializer != NULL ) {
 			ret = hook->serializer((JsonSerializerArgs){ js, rt, value, _json_serialize_cont }, hook->serializer_data, error);
@@ -349,23 +349,33 @@ static json_t *_json_serialize_cont( JsonState *js, RType *rt, void *value, GErr
 }
 
 json_t *json_serialize( JsonState *js, RType *rt, void *value, GError **error ) {
-	json_t *serialized = _json_serialize(js, rt, value, true, error);
-	if( serialized == NULL ) return NULL;
+	bool free_json_state = false;
+	if( js == NULL ) {
+		free_json_state = true;
+		js = json_state_new();
+	}
 
+	json_t *serialized = _json_serialize(js, rt, value, true, error);
+	if( serialized == NULL ) goto error__json_serialize;
+
+	json_t *ret = serialized;
 	if( js->flags & JSON_FLAG_INVERTABLE ) {
 		RString *name = r_type_name(rt, error);
-		if( name == NULL ) {
-			json_decref(serialized);
-			return NULL;
-		}
+		if( name == NULL ) goto error_type_name;
 		// TODO: Error check
 		json_t *obj = json_object();
 		json_object_set(obj, "type", json_string(r_string_bytes(name)));
 		json_object_set(obj, "value", serialized);
 		r_string_unref(name);
-
-		return obj;
-	} else {
-		return serialized;
+		ret = obj;
 	}
+
+	if( free_json_state ) json_state_unref(js);
+	return ret;
+
+error_type_name:
+	json_decref(serialized);
+error__json_serialize:
+	if( free_json_state ) json_state_unref(js);
+	return NULL;
 }

@@ -235,7 +235,7 @@ static void *_json_deserialize( JsonState *js, RType *rt, json_t *json, bool do_
 	GQuark typeid = r_string_quark(name);
 	r_string_unref(name);
 
-	if( do_hook && js != NULL ) {
+	if( do_hook ) {
 		JsonHook *hook = g_datalist_id_get_data(&js->handlers, typeid);
 		if( hook != NULL && hook->deserializer != NULL ) {
 			return hook->deserializer((JsonDeserializerArgs){ js, rt, json, _json_deserialize_cont }, hook->deserializer_data, error);
@@ -278,12 +278,22 @@ static void *_json_deserialize_cont( JsonState *js, RType *rt, json_t *json, GEr
 }
 
 void *json_deserialize( JsonState *js, json_t *json, GError **error ) {
+	bool free_json_state = false;
+	if( js == NULL ) {
+		free_json_state = true;
+		js = json_state_new();
+	}
 	GPtrArray *types = ruminate_get_types_by_name(json_string_value(json_object_get(json, "type")), error);
-	if( types == NULL ) return false;
+	if( types == NULL ) goto error_types_by_name;
 	// TODO: Handle multiple types of this name.
 	//g_assert_cmpuint(types->len, ==, 1);
 	RType *type = g_ptr_array_index(types, 0);
 	void *ret = _json_deserialize(js, type, json_object_get(json, "value"), true, error);
 	g_ptr_array_unref(types);
+	if( free_json_state ) json_state_unref(js);
 	return ret;
+
+error_types_by_name:
+	if( free_json_state ) json_state_unref(js);
+	return false;
 }
