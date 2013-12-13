@@ -4,6 +4,7 @@ var searchData=
   ['r_5faggregate_5fmember_5fname',['r_aggregate_member_name',['../struct_r_aggregate_member.html#a48fc0de0e9dc5bfba78304194536c919',1,'RAggregateMember']]],
   ['r_5faggregate_5ftype_5fid',['r_aggregate_type_id',['../struct_r_aggregate_type.html#a3ad647b94dd87268b91e92f630b84726',1,'RAggregateType']]],
   ['r_5faggregate_5ftype_5fmember_5fat',['r_aggregate_type_member_at',['../struct_r_aggregate_type.html#aea94153a211184cee889e445a7dd003a',1,'RAggregateType']]],
+  ['r_5faggregate_5ftype_5fmember_5fby_5fname',['r_aggregate_type_member_by_name',['../struct_r_aggregate_type.html#aaedae83d9a40bc853240408346444d6c',1,'RAggregateType']]],
   ['r_5faggregate_5ftype_5fnmembers',['r_aggregate_type_nmembers',['../struct_r_aggregate_type.html#a193960ea5996d7c1c7935b1525cf64c9',1,'RAggregateType']]],
   ['r_5farray_5ftype_5fmember_5fat',['r_array_type_member_at',['../struct_r_array_type.html#a7efce78c90306eca927204d10b72f4e4',1,'RArrayType']]],
   ['r_5farray_5ftype_5fsize',['r_array_type_size',['../struct_r_array_type.html#a91fdc9370c7373eae37b12372042a9d6',1,'RArrayType']]],

@@ -114,8 +114,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a193960ea5996d7c1c7935b1525cf64c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of members in this aggregate type.  <a href="#a193960ea5996d7c1c7935b1525cf64c9">More...</a><br/></td></tr>
 <tr class="separator:a193960ea5996d7c1c7935b1525cf64c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea94153a211184cee889e445a7dd003a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_r_aggregate_member.html">RAggregateMember</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_aggregate_type.html#aea94153a211184cee889e445a7dd003a">r_aggregate_type_member_at</a> (<a class="el" href="struct_r_aggregate_type.html">RAggregateType</a> *type, size_t index, GError **error)</td></tr>
-<tr class="memdesc:aea94153a211184cee889e445a7dd003a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a aggregate's member at a specified index.  <a href="#aea94153a211184cee889e445a7dd003a">More...</a><br/></td></tr>
+<tr class="memdesc:aea94153a211184cee889e445a7dd003a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an aggregate's member at a specified index.  <a href="#aea94153a211184cee889e445a7dd003a">More...</a><br/></td></tr>
 <tr class="separator:aea94153a211184cee889e445a7dd003a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaedae83d9a40bc853240408346444d6c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_r_aggregate_member.html">RAggregateMember</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_aggregate_type.html#aaedae83d9a40bc853240408346444d6c">r_aggregate_type_member_by_name</a> (<a class="el" href="struct_r_aggregate_type.html">RAggregateType</a> *type, const char *name, GError **error)</td></tr>
+<tr class="memdesc:aaedae83d9a40bc853240408346444d6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an aggregate's member by name.  <a href="#aaedae83d9a40bc853240408346444d6c">More...</a><br/></td></tr>
+<tr class="separator:aaedae83d9a40bc853240408346444d6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_struct_r_type"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_struct_r_type')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="struct_r_type.html">RType</a></td></tr>
 <tr class="memitem:a40ec26771acf938d1d4fd4968272bf43 inherit pub_methods_struct_r_type"><td class="memItemLeft" align="right" valign="top"><a class="el" href="type_8h.html#a200873d33e0b46e4ae64e4bfd4f7ac9d">RTypeId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_r_type.html#a40ec26771acf938d1d4fd4968272bf43">r_type_id</a> (<a class="el" href="struct_r_type.html">RType</a> *type, GError **error)</td></tr>
 <tr class="memdesc:a40ec26771acf938d1d4fd4968272bf43 inherit pub_methods_struct_r_type"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the type identifier of this type.  <a href="#a40ec26771acf938d1d4fd4968272bf43">More...</a><br/></td></tr>
@@ -204,12 +207,55 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Get a aggregate's member at a specified index. </p>
+<p>Get an aggregate's member at a specified index. </p>
 <dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="struct_r_aggregate_member.html" title="An opaque struct representing a aggregate member. ">RAggregateMember</a> representing the member of this aggregate at index <em>index</em>. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>the aggregate type to retrieve a member of </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">index</td><td>the index of the member </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aaedae83d9a40bc853240408346444d6c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_r_aggregate_member.html">RAggregateMember</a> * r_aggregate_type_member_by_name </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_r_aggregate_type.html">RAggregateType</a> *&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GError **&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get an aggregate's member by name. </p>
+<dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="struct_r_aggregate_member.html" title="An opaque struct representing a aggregate member. ">RAggregateMember</a> representing the member of this aggregate with name <em>name</em>. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>the aggregate type to retrieve a member of </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>the name of the aggregate member </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">error</td><td>see <a class="el" href="errors_8h.html" title="Error handling facilities. ">errors.h</a> </td></tr>
   </table>
   </dd>
